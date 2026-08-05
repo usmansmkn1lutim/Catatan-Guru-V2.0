@@ -28,6 +28,7 @@ import {
 } from './lib/storage';
 import { getStoredGasUrl, saveAppDataToGasUrl, loadAppDataFromGasUrl } from './lib/gasApi';
 import { getAccessToken, exportToGoogleSheets, importFromGoogleSheets } from './lib/googleSheets';
+import { sanitizePresensiList, formatDateString } from './lib/dateUtils';
 import { CODE_GS_TEMPLATE, INDEX_HTML_TEMPLATE } from './lib/gasCode';
 
 import { Header } from './components/Header';
@@ -83,13 +84,13 @@ export function App() {
     loadFromStorage('siswaList', initialSiswaList)
   );
   const [presensiList, setPresensiList] = useState<PresensiRecord[]>(() =>
-    loadFromStorage('presensiList', initialPresensiList)
+    sanitizePresensiList(loadFromStorage('presensiList', initialPresensiList))
   );
   const [nilaiList, setNilaiList] = useState<NilaiRecord[]>(() =>
-    loadFromStorage('nilaiList', initialNilaiList)
+    loadFromStorage('nilaiList', initialNilaiList).map((n: NilaiRecord) => ({ ...n, tanggal: formatDateString(n.tanggal) }))
   );
   const [jurnalList, setJurnalList] = useState<JurnalRecord[]>(() =>
-    loadFromStorage('jurnalList', initialJurnalList)
+    loadFromStorage('jurnalList', initialJurnalList).map((j: JurnalRecord) => ({ ...j, tanggal: formatDateString(j.tanggal) }))
   );
 
   // Auto-Sync to Google Sheets State
@@ -224,9 +225,15 @@ export function App() {
         if (remoteData.mapelList && Array.isArray(remoteData.mapelList)) setMapelList(remoteData.mapelList);
         if (remoteData.kelasList && Array.isArray(remoteData.kelasList)) setKelasList(remoteData.kelasList);
         if (remoteData.siswaList && Array.isArray(remoteData.siswaList)) setSiswaList(remoteData.siswaList);
-        if (remoteData.presensiList && Array.isArray(remoteData.presensiList)) setPresensiList(remoteData.presensiList);
-        if (remoteData.nilaiList && Array.isArray(remoteData.nilaiList)) setNilaiList(remoteData.nilaiList);
-        if (remoteData.jurnalList && Array.isArray(remoteData.jurnalList)) setJurnalList(remoteData.jurnalList);
+        if (remoteData.presensiList && Array.isArray(remoteData.presensiList)) {
+          setPresensiList(sanitizePresensiList(remoteData.presensiList));
+        }
+        if (remoteData.nilaiList && Array.isArray(remoteData.nilaiList)) {
+          setNilaiList(remoteData.nilaiList.map((n: NilaiRecord) => ({ ...n, tanggal: formatDateString(n.tanggal) })));
+        }
+        if (remoteData.jurnalList && Array.isArray(remoteData.jurnalList)) {
+          setJurnalList(remoteData.jurnalList.map((j: JurnalRecord) => ({ ...j, tanggal: formatDateString(j.tanggal) })));
+        }
         if (remoteData.appConfig) {
           setAppConfig((prev) => ({
             ...remoteData.appConfig,

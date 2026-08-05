@@ -218,6 +218,42 @@ function saveAppDataFull(data) {
   }
 }
 
+function cleanGasDate(val) {
+  if (!val) return "";
+  if (val instanceof Date) {
+    try {
+      return Utilities.formatDate(val, Session.getScriptTimeZone() || "GMT+8", "yyyy-MM-dd");
+    } catch (e) {}
+  }
+  var str = String(val).trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
+  if (str.indexOf("GMT") !== -1 || str.indexOf("1899") !== -1) {
+    var d = new Date(str);
+    if (!isNaN(d.getTime()) && d.getFullYear() > 1900) {
+      return Utilities.formatDate(d, Session.getScriptTimeZone() || "GMT+8", "yyyy-MM-dd");
+    }
+  }
+  return str;
+}
+
+function cleanGasTime(val) {
+  if (!val) return "";
+  if (val instanceof Date) {
+    try {
+      return Utilities.formatDate(val, Session.getScriptTimeZone() || "GMT+8", "HH:mm");
+    } catch (e) {}
+  }
+  var str = String(val).trim();
+  if (/^\d{2}:\d{2}$/.test(str)) return str;
+  var m = str.match(/(\d{1,2}):(\d{2})/);
+  if (m) {
+    var h = ("0" + m[1]).slice(-2);
+    var min = m[2];
+    return h + ":" + min;
+  }
+  return str;
+}
+
 function loadAppDataFull() {
   try {
     var ss = getSpreadsheet();
@@ -255,7 +291,7 @@ function loadAppDataFull() {
       var g = sheetGuru.getRange(2, 1, 1, 10).getValues()[0];
       payload.profilGuru = {
         namaGuru: String(g[0]||''), nip: String(g[1]||''), nuptk: String(g[2]||''), jenisKelamin: String(g[3]||''),
-        tempatLahir: String(g[4]||''), tanggalLahir: String(g[5]||''), nomorHp: String(g[6]||''), email: String(g[7]||''),
+        tempatLahir: String(g[4]||''), tanggalLahir: cleanGasDate(g[5]), nomorHp: String(g[6]||''), email: String(g[7]||''),
         alamat: String(g[8]||''), fotoProfilUrl: String(g[9]||'')
       };
     }
@@ -285,7 +321,7 @@ function loadAppDataFull() {
     if (sheetSiswa && sheetSiswa.getLastRow() >= 2) {
       var sData = sheetSiswa.getRange(2, 1, sheetSiswa.getLastRow()-1, 11).getValues();
       payload.siswaList = sData.map(function(r) {
-        return { id: String(r[0]), nisn: String(r[1]), nis: String(r[2]), namaLengkap: String(r[3]), jenisKelamin: String(r[4]), namaKelas: String(r[5]), tempatLahir: String(r[6]), tanggalLahir: String(r[7]), alamat: String(r[8]), namaOrangTua: String(r[9]), kontakOrangTua: String(r[10]) };
+        return { id: String(r[0]), nisn: String(r[1]), nis: String(r[2]), namaLengkap: String(r[3]), jenisKelamin: String(r[4]), namaKelas: String(r[5]), tempatLahir: String(r[6]), tanggalLahir: cleanGasDate(r[7]), alamat: String(r[8]), namaOrangTua: String(r[9]), kontakOrangTua: String(r[10]) };
       });
     }
 
@@ -297,7 +333,7 @@ function loadAppDataFull() {
         var items = [], summary = {};
         try { items = JSON.parse(r[9]||"[]"); } catch (e) {}
         try { summary = JSON.parse(r[10]||"{}"); } catch (e) {}
-        return { id: String(r[0]), tanggal: String(r[1]), kelas: String(r[2]), kodeMapel: String(r[3]), namaMapel: String(r[4]), pertemuanKe: Number(r[5]||1), waktuMulai: String(r[6]), waktuSelesai: String(r[7]), catatanGlobal: String(r[8]), items: items, summary: summary };
+        return { id: String(r[0]), tanggal: cleanGasDate(r[1]), kelas: String(r[2]), kodeMapel: String(r[3]), namaMapel: String(r[4]), pertemuanKe: Number(r[5]||1), waktuMulai: cleanGasTime(r[6]), waktuSelesai: cleanGasTime(r[7]), catatanGlobal: String(r[8]), items: items, summary: summary };
       });
     }
 
@@ -308,7 +344,7 @@ function loadAppDataFull() {
       payload.nilaiList = nData.map(function(r) {
         var items = [];
         try { items = JSON.parse(r[6]||"[]"); } catch (e) {}
-        return { id: String(r[0]), tanggal: String(r[1]), kelas: String(r[2]), kodeMapel: String(r[3]), namaMapel: String(r[4]), kkm: Number(r[5]||70), items: items };
+        return { id: String(r[0]), tanggal: cleanGasDate(r[1]), kelas: String(r[2]), kodeMapel: String(r[3]), namaMapel: String(r[4]), kkm: Number(r[5]||70), items: items };
       });
     }
 
@@ -317,7 +353,7 @@ function loadAppDataFull() {
     if (sheetJurnal && sheetJurnal.getLastRow() >= 2) {
       var jData = sheetJurnal.getRange(2, 1, sheetJurnal.getLastRow()-1, 13).getValues();
       payload.jurnalList = jData.map(function(r) {
-        return { id: String(r[0]), tanggal: String(r[1]), kodeMapel: String(r[2]), namaMapel: String(r[3]), kelas: String(r[4]), jamKe: String(r[5]), pertemuanKe: Number(r[6]||1), materiPembelajaran: String(r[7]), tujuanPembelajaran: String(r[8]), prosesPembelajaran: String(r[9]), catatanKendala: String(r[10]), jumlahHadir: Number(r[11]||0), jumlahTidakHadir: Number(r[12]||0) };
+        return { id: String(r[0]), tanggal: cleanGasDate(r[1]), kodeMapel: String(r[2]), namaMapel: String(r[3]), kelas: String(r[4]), jamKe: String(r[5]), pertemuanKe: Number(r[6]||1), materiPembelajaran: String(r[7]), tujuanPembelajaran: String(r[8]), prosesPembelajaran: String(r[9]), catatanKendala: String(r[10]), jumlahHadir: Number(r[11]||0), jumlahTidakHadir: Number(r[12]||0) };
       });
     }
 

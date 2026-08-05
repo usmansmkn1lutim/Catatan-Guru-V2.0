@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { JurnalRecord, Mapel, Kelas } from '../types';
 import { exportToPdf } from '../lib/storage';
+import { formatDateString } from '../lib/dateUtils';
 import {
   BookMarked,
   Plus,
@@ -105,7 +106,7 @@ export const JurnalGuruView: React.FC<JurnalGuruProps> = ({
 
     const newJurnal: JurnalRecord = {
       id: `jurnal-${Date.now()}`,
-      tanggal: inputTanggal,
+      tanggal: formatDateString(inputTanggal),
       kodeMapel: activeMapelObj?.kodeMapel || inputMapelCode,
       namaMapel: activeMapelObj?.namaMapel || 'Mata Pelajaran',
       kelas: inputKelas,
@@ -459,7 +460,7 @@ export const JurnalGuruView: React.FC<JurnalGuruProps> = ({
                   <p><strong>TP:</strong> {j.tujuanPembelajaran}</p>
                   <p className="line-clamp-2"><strong>Proses:</strong> {j.prosesPembelajaran || '-'}</p>
                   <div className="flex items-center justify-between text-[11px] pt-1">
-                    <span>{j.tanggal} | Jam: {j.jamKe}</span>
+                    <span>{formatDateString(j.tanggal)} | Jam: {j.jamKe}</span>
                     <div className="flex items-center space-x-2 font-bold">
                       <span className="text-emerald-600">Hadir: {j.jumlahHadir}</span>
                       <span className="text-rose-600">Tidak Hadir: {j.jumlahTidakHadir ?? 0}</span>
@@ -494,7 +495,7 @@ export const JurnalGuruView: React.FC<JurnalGuruProps> = ({
 
             <div className="space-y-3 text-xs text-slate-700 dark:text-slate-300">
               <p><strong>Mata Pelajaran:</strong> {selectedViewJurnal.namaMapel}</p>
-              <p><strong>Tanggal & Waktu:</strong> {selectedViewJurnal.tanggal} ({selectedViewJurnal.jamKe})</p>
+              <p><strong>Tanggal & Waktu:</strong> {formatDateString(selectedViewJurnal.tanggal)} ({selectedViewJurnal.jamKe})</p>
               <p><strong>Pertemuan Ke-:</strong> #{selectedViewJurnal.pertemuanKe}</p>
               <p><strong>Materi:</strong> {selectedViewJurnal.materiPembelajaran}</p>
               <p><strong>Tujuan Pembelajaran:</strong> {selectedViewJurnal.tujuanPembelajaran}</p>
