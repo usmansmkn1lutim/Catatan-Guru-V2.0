@@ -1,0 +1,8 @@
+{
+  "name": "Catatan Seorang Guru V2.0",
+  "description": "Aplikasi Web Administrasi Guru Modern, Responsif, dan Terintegrasi dengan Google Spreadsheet \u0026 Drive",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
