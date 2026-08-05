@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Siswa, Kelas, Mapel, PresensiRecord, ActiveTab } from '../types';
+import { formatDateString } from '../lib/dateUtils';
 import { Users, GraduationCap, BookOpen, TrendingUp, ClipboardCheck, Award, BookMarked, ArrowUpRight, Sparkles } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -11,6 +12,21 @@ import {
   Tooltip,
   Legend,
 } from 'recharts';
+
+function formatChartDateLabel(dateStr: string): string {
+  if (!dateStr) return '';
+  const clean = formatDateString(dateStr);
+  const parts = clean.split('-');
+  if (parts.length === 3) {
+    const day = parts[2];
+    const monthIdx = parseInt(parts[1], 10) - 1;
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
+    if (monthIdx >= 0 && monthIdx < 12) {
+      return `${day} ${monthNames[monthIdx]}`;
+    }
+  }
+  return dateStr;
+}
 
 interface DashboardProps {
   siswaList: Siswa[];
@@ -78,22 +94,52 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
     if (filtered.length === 0) {
       return [
-        { hari: 'Sen', Hadir: 80, Terlambat: 10, Sakit: 5 },
-        { hari: 'Sel', Hadir: 85, Terlambat: 8, Sakit: 4 },
-        { hari: 'Rab', Hadir: 90, Terlambat: 5, Sakit: 3 },
-        { hari: 'Kam', Hadir: 95, Terlambat: 3, Sakit: 1 },
-        { hari: 'Jum', Hadir: 70, Terlambat: 12, Sakit: 8 },
-        { hari: 'Sab', Hadir: 15, Terlambat: 2, Sakit: 1 },
+        { rawDate: '2026-08-01', label: '01 Ags', Hadir: 85, Terlambat: 8, Sakit: 4, Izin: 2, Alpha: 1 },
+        { rawDate: '2026-08-02', label: '02 Ags', Hadir: 88, Terlambat: 6, Sakit: 3, Izin: 2, Alpha: 1 },
+        { rawDate: '2026-08-03', label: '03 Ags', Hadir: 90, Terlambat: 5, Sakit: 3, Izin: 1, Alpha: 1 },
+        { rawDate: '2026-08-04', label: '04 Ags', Hadir: 92, Terlambat: 4, Sakit: 2, Izin: 1, Alpha: 1 },
+        { rawDate: '2026-08-05', label: '05 Ags', Hadir: 95, Terlambat: 2, Sakit: 1, Izin: 1, Alpha: 0 },
       ];
     }
 
-    return filtered.map((p) => {
-      const tot = p.summary?.totalSiswa || 1;
+    // Grouping by sanitized YYYY-MM-DD date string
+    const groups: Record<
+      string,
+      { hadir: number; terlambat: number; sakit: number; izin: number; alpha: number; totalSiswa: number }
+    > = {};
+
+    filtered.forEach((p) => {
+      const cleanDate = formatDateString(p.tanggal);
+      if (!cleanDate) return;
+
+      if (!groups[cleanDate]) {
+        groups[cleanDate] = { hadir: 0, terlambat: 0, sakit: 0, izin: 0, alpha: 0, totalSiswa: 0 };
+      }
+
+      const totalSiswaInRecord = p.summary?.totalSiswa || (p.items?.length) || 0;
+      groups[cleanDate].hadir += p.summary?.hadir || 0;
+      groups[cleanDate].terlambat += p.summary?.terlambat || 0;
+      groups[cleanDate].sakit += p.summary?.sakit || 0;
+      groups[cleanDate].izin += p.summary?.izin || 0;
+      groups[cleanDate].alpha += p.summary?.alpha || 0;
+      groups[cleanDate].totalSiswa += totalSiswaInRecord;
+    });
+
+    // Sort dates chronologically ascending (oldest on left, newest on right)
+    const sortedDates = Object.keys(groups).sort((a, b) => a.localeCompare(b));
+
+    return sortedDates.map((dateKey) => {
+      const g = groups[dateKey];
+      const tot = g.totalSiswa || 1;
+
       return {
-        hari: p.tanggal ? p.tanggal.slice(8) : 'Hari',
-        Hadir: Math.round(((p.summary?.hadir || 0) / tot) * 100),
-        Terlambat: Math.round(((p.summary?.terlambat || 0) / tot) * 100),
-        Sakit: Math.round(((p.summary?.sakit || 0) / tot) * 100),
+        rawDate: dateKey,
+        label: formatChartDateLabel(dateKey),
+        Hadir: Math.round((g.hadir / tot) * 100),
+        Terlambat: Math.round((g.terlambat / tot) * 100),
+        Sakit: Math.round((g.sakit / tot) * 100),
+        Izin: Math.round((g.izin / tot) * 100),
+        Alpha: Math.round((g.alpha / tot) * 100),
       };
     });
   }, [presensiList, selectedKelasFilter]);
@@ -227,21 +273,79 @@ export const Dashboard: React.FC<DashboardProps> = ({
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                <XAxis dataKey="hari" tick={{ fontSize: 11, fill: '#64748b' }} />
+                <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#64748b' }} />
                 <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: '#64748b' }} unit="%" />
                 <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#0f172a',
-                    borderColor: '#334155',
-                    borderRadius: '0.75rem',
-                    color: '#fff',
-                    fontSize: '12px',
+                  content={({ active, payload, label }: any) => {
+                    if (!active || !payload || !payload.length) return null;
+                    const rawDate = payload[0]?.payload?.rawDate;
+                    const displayLabel = payload[0]?.payload?.label || label;
+                    const orderMap: Record<string, number> = {
+                      Hadir: 1,
+                      Terlambat: 2,
+                      Sakit: 3,
+                      Izin: 4,
+                      Alpha: 5,
+                    };
+                    const sortedPayload = [...payload].sort((a, b) => {
+                      const nameA = a.name || a.dataKey;
+                      const nameB = b.name || b.dataKey;
+                      return (orderMap[nameA] || 99) - (orderMap[nameB] || 99);
+                    });
+
+                    return (
+                      <div className="bg-slate-900 text-white p-3 rounded-xl border border-slate-800 shadow-xl text-xs space-y-2">
+                        <p className="font-semibold text-slate-200 border-b border-slate-800 pb-1">
+                          Tanggal: {displayLabel} {rawDate ? `(${rawDate})` : ''}
+                        </p>
+                        <div className="space-y-1">
+                          {sortedPayload.map((entry: any, index: number) => (
+                            <div key={`item-${index}`} className="flex items-center justify-between space-x-4">
+                              <span className="flex items-center space-x-1.5">
+                                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
+                                <span className="text-slate-300">{entry.name}:</span>
+                              </span>
+                              <span className="font-bold" style={{ color: entry.color }}>
+                                {entry.value}%
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
                   }}
                 />
-                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-                <Line type="monotone" dataKey="Hadir" stroke="#7c3aed" strokeWidth={3} dot={{ r: 4 }} />
-                <Line type="monotone" dataKey="Terlambat" stroke="#c084fc" strokeWidth={2} dot={{ r: 3 }} />
-                <Line type="monotone" dataKey="Sakit" stroke="#94a3b8" strokeWidth={2} dot={{ r: 3 }} />
+                <Legend
+                  content={() => (
+                    <div className="flex flex-wrap items-center justify-center gap-4 pt-3 text-xs">
+                      <div className="flex items-center space-x-1.5">
+                        <span className="w-3 h-0.5 rounded-full bg-[#10b981] inline-block"></span>
+                        <span className="text-slate-600 dark:text-slate-300 font-medium">Hadir</span>
+                      </div>
+                      <div className="flex items-center space-x-1.5">
+                        <span className="w-3 h-0.5 rounded-full bg-[#f59e0b] inline-block"></span>
+                        <span className="text-slate-600 dark:text-slate-300 font-medium">Terlambat</span>
+                      </div>
+                      <div className="flex items-center space-x-1.5">
+                        <span className="w-3 h-0.5 rounded-full bg-[#3b82f6] inline-block"></span>
+                        <span className="text-slate-600 dark:text-slate-300 font-medium">Sakit</span>
+                      </div>
+                      <div className="flex items-center space-x-1.5">
+                        <span className="w-3 h-0.5 rounded-full bg-[#a855f7] inline-block"></span>
+                        <span className="text-slate-600 dark:text-slate-300 font-medium">Izin</span>
+                      </div>
+                      <div className="flex items-center space-x-1.5">
+                        <span className="w-3 h-0.5 rounded-full bg-[#f43f5e] inline-block"></span>
+                        <span className="text-slate-600 dark:text-slate-300 font-medium">Alpha</span>
+                      </div>
+                    </div>
+                  )}
+                />
+                <Line type="monotone" dataKey="Hadir" stroke="#10b981" strokeWidth={2.5} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                <Line type="monotone" dataKey="Terlambat" stroke="#f59e0b" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
+                <Line type="monotone" dataKey="Sakit" stroke="#3b82f6" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
+                <Line type="monotone" dataKey="Izin" stroke="#a855f7" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
+                <Line type="monotone" dataKey="Alpha" stroke="#f43f5e" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
