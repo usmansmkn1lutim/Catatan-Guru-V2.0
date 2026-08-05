@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ProfilGuru } from '../types';
 import { UserCheck, Save, Upload, User } from 'lucide-react';
+import { compressImage } from '../lib/imageUtils';
 
 interface ProfilGuruProps {
   guru?: ProfilGuru;
@@ -33,21 +34,38 @@ export const ProfilGuruView: React.FC<ProfilGuruProps> = ({
   const [formData, setFormData] = useState<ProfilGuru>(currentGuru);
   const [fotoPreview, setFotoPreview] = useState<string>(currentGuru.fotoProfilUrl || '');
 
+  // Keep state synchronized with incoming props when updated from parent
+  useEffect(() => {
+    const activeGuru = guru || profilGuru;
+    if (activeGuru) {
+      setFormData(activeGuru);
+      if (activeGuru.fotoProfilUrl) {
+        setFotoPreview(activeGuru.fotoProfilUrl);
+      }
+    }
+  }, [guru, profilGuru]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleFotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result as string;
-        setFotoPreview(result);
-        setFormData((prev) => ({ ...prev, fotoProfilUrl: result }));
-      };
-      reader.readAsDataURL(file);
+      try {
+        const compressedDataUrl = await compressImage(file, 400, 400, 0.85);
+        setFotoPreview(compressedDataUrl);
+        const updated = { ...formData, fotoProfilUrl: compressedDataUrl };
+        setFormData(updated);
+        // Save immediately to parent state & storage
+        if (onSave) onSave(updated);
+        if (onSaveProfilGuru) onSaveProfilGuru(updated);
+        showToast('Foto profil guru berhasil diunggah dan disimpan!', 'success');
+      } catch (err) {
+        console.error('Compress foto error:', err);
+        showToast('Gagal memproses foto profil. Coba gunakan foto lain.', 'error');
+      }
     }
   };
 

@@ -195,6 +195,7 @@ export async function exportToGoogleSheets(
       ['Website', data.dataSekolah.website],
       ['Akreditasi', data.dataSekolah.akreditasi],
       ['Nama Kepala Sekolah', data.dataSekolah.namaKepalaSekolah],
+      ['Logo Sekolah URL', data.dataSekolah.logoSekolahUrl || ''],
     ];
 
     const profilGuruRows = [
@@ -208,6 +209,7 @@ export async function exportToGoogleSheets(
       ['Nomor HP', data.profilGuru.nomorHp],
       ['Email', data.profilGuru.email],
       ['Alamat', data.profilGuru.alamat],
+      ['Foto Profil URL', data.profilGuru.fotoProfilUrl || ''],
     ];
 
     const mapelRows = [
@@ -418,19 +420,19 @@ export async function importFromGoogleSheets(spreadsheetId: string, accessToken:
         website: dsObj['Website'] || '',
         akreditasi: dsObj['Akreditasi'] || 'A',
         namaKepalaSekolah: dsObj['Nama Kepala Sekolah'] || '',
-        logoSekolahUrl: '',
+        logoSekolahUrl: dsObj['Logo Sekolah URL'] || dsObj['Logo Sekolah'] || dsObj['Logo URL'] || '',
       } : null,
       profilGuru: Object.keys(pgObj).length > 0 ? {
         namaGuru: pgObj['Nama Guru'] || '',
         nip: pgObj['NIP'] || '',
         nuptk: pgObj['NUPTK'] || '',
-        jenisKelamin: pgObj['Jenis Kelamin'] || 'Laki-laki',
+        jenisKelamin: (pgObj['Jenis Kelamin'] as 'L' | 'P') || 'L',
         tempatLahir: pgObj['Tempat Lahir'] || '',
         tanggalLahir: pgObj['Tanggal Lahir'] || '',
         nomorHp: pgObj['Nomor HP'] || '',
         email: pgObj['Email'] || '',
         alamat: pgObj['Alamat'] || '',
-        fotoProfilUrl: '',
+        fotoProfilUrl: pgObj['Foto Profil URL'] || pgObj['Foto Profil'] || pgObj['Foto URL'] || '',
       } : null,
       mapelList: mapelList.filter((m) => m.namaMapel),
       kelasList: kelasList.filter((k) => k.namaKelas),

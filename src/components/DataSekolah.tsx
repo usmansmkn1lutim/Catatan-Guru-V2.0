@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DataSekolah } from '../types';
 import { Building2, Save, Upload, CheckCircle2 } from 'lucide-react';
+import { compressImage } from '../lib/imageUtils';
 
 interface DataSekolahProps {
   sekolah?: DataSekolah;
@@ -36,21 +37,38 @@ export const DataSekolahView: React.FC<DataSekolahProps> = ({
   const [formData, setFormData] = useState<DataSekolah>(currentSekolah);
   const [logoPreview, setLogoPreview] = useState<string>(currentSekolah.logoSekolahUrl || '');
 
+  // Keep state synchronized with incoming props when updated from parent
+  useEffect(() => {
+    const activeData = sekolah || dataSekolah;
+    if (activeData) {
+      setFormData(activeData);
+      if (activeData.logoSekolahUrl) {
+        setLogoPreview(activeData.logoSekolahUrl);
+      }
+    }
+  }, [sekolah, dataSekolah]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result as string;
-        setLogoPreview(result);
-        setFormData((prev) => ({ ...prev, logoSekolahUrl: result }));
-      };
-      reader.readAsDataURL(file);
+      try {
+        const compressedDataUrl = await compressImage(file, 400, 400, 0.85);
+        setLogoPreview(compressedDataUrl);
+        const updated = { ...formData, logoSekolahUrl: compressedDataUrl };
+        setFormData(updated);
+        // Save immediately to parent state & storage
+        if (onSave) onSave(updated);
+        if (onSaveDataSekolah) onSaveDataSekolah(updated);
+        showToast('Logo sekolah berhasil diunggah dan disimpan!', 'success');
+      } catch (err) {
+        console.error('Compress logo error:', err);
+        showToast('Gagal memproses gambar logo. Coba gunakan gambar lain.', 'error');
+      }
     }
   };
 

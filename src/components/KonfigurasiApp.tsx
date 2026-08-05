@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppConfig } from '../types';
 import { Sliders, Save, Upload, RotateCcw, Image as ImageIcon, Sparkles } from 'lucide-react';
+import { compressImage } from '../lib/imageUtils';
 
 interface KonfigurasiAppProps {
   appConfig: AppConfig;
@@ -16,6 +17,16 @@ export const KonfigurasiAppView: React.FC<KonfigurasiAppProps> = ({
   const [formData, setFormData] = useState<AppConfig>(appConfig);
   const [logoPreview, setLogoPreview] = useState<string>(appConfig.logoAplikasiUrl || '');
 
+  // Keep state synchronized with incoming appConfig prop
+  useEffect(() => {
+    if (appConfig) {
+      setFormData(appConfig);
+      if (appConfig.logoAplikasiUrl) {
+        setLogoPreview(appConfig.logoAplikasiUrl);
+      }
+    }
+  }, [appConfig]);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -23,7 +34,7 @@ export const KonfigurasiAppView: React.FC<KonfigurasiAppProps> = ({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       // Validate file type (jpg, png, svg, etc.)
@@ -33,13 +44,17 @@ export const KonfigurasiAppView: React.FC<KonfigurasiAppProps> = ({
         return;
       }
 
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result as string;
-        setLogoPreview(result);
-        setFormData((prev) => ({ ...prev, logoAplikasiUrl: result }));
-      };
-      reader.readAsDataURL(file);
+      try {
+        const compressedDataUrl = await compressImage(file, 400, 400, 0.85);
+        setLogoPreview(compressedDataUrl);
+        const updated = { ...formData, logoAplikasiUrl: compressedDataUrl };
+        setFormData(updated);
+        onSaveAppConfig(updated);
+        showToast('Logo aplikasi berhasil diunggah dan disimpan!', 'success');
+      } catch (err) {
+        console.error('Compress logo error:', err);
+        showToast('Gagal memproses gambar logo.', 'error');
+      }
     }
   };
 

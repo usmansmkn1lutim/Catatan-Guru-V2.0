@@ -209,15 +209,30 @@ export function App() {
       }
 
       if (remoteData) {
-        if (remoteData.dataSekolah) setDataSekolah(remoteData.dataSekolah);
-        if (remoteData.profilGuru) setProfilGuru(remoteData.profilGuru);
+        if (remoteData.dataSekolah) {
+          setDataSekolah((prev) => ({
+            ...remoteData.dataSekolah,
+            logoSekolahUrl: remoteData.dataSekolah.logoSekolahUrl || prev.logoSekolahUrl || '',
+          }));
+        }
+        if (remoteData.profilGuru) {
+          setProfilGuru((prev) => ({
+            ...remoteData.profilGuru,
+            fotoProfilUrl: remoteData.profilGuru.fotoProfilUrl || prev.fotoProfilUrl || '',
+          }));
+        }
         if (remoteData.mapelList && Array.isArray(remoteData.mapelList)) setMapelList(remoteData.mapelList);
         if (remoteData.kelasList && Array.isArray(remoteData.kelasList)) setKelasList(remoteData.kelasList);
         if (remoteData.siswaList && Array.isArray(remoteData.siswaList)) setSiswaList(remoteData.siswaList);
         if (remoteData.presensiList && Array.isArray(remoteData.presensiList)) setPresensiList(remoteData.presensiList);
         if (remoteData.nilaiList && Array.isArray(remoteData.nilaiList)) setNilaiList(remoteData.nilaiList);
         if (remoteData.jurnalList && Array.isArray(remoteData.jurnalList)) setJurnalList(remoteData.jurnalList);
-        if (remoteData.appConfig) setAppConfig(remoteData.appConfig);
+        if (remoteData.appConfig) {
+          setAppConfig((prev) => ({
+            ...remoteData.appConfig,
+            logoAplikasiUrl: remoteData.appConfig.logoAplikasiUrl || prev.logoAplikasiUrl || '',
+          }));
+        }
 
         const timeStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
         setLastSyncedTime(timeStr);
