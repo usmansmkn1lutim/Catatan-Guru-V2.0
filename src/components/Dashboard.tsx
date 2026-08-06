@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Siswa, Kelas, Mapel, PresensiRecord, ActiveTab } from '../types';
 import { formatDateString } from '../lib/dateUtils';
-import { Users, GraduationCap, BookOpen, TrendingUp, ClipboardCheck, Award, BookMarked, ArrowUpRight, Sparkles } from 'lucide-react';
+import { Users, GraduationCap, BookOpen, TrendingUp, ClipboardCheck, Award, BookMarked, ArrowUpRight, Sparkles, DoorClosed, School } from 'lucide-react';
 import {
   ResponsiveContainer,
   LineChart,
@@ -178,7 +178,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
               Jumlah Kelas
             </span>
             <div className="p-2.5 bg-indigo-100 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 rounded-xl">
-              <GraduationCap className="w-5 h-5" />
+              <DoorClosed className="w-5 h-5" />
             </div>
           </div>
           <div className="flex items-end justify-between">
@@ -207,9 +207,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
           <div className="flex items-end justify-between">
             <div>
               <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white">
-                {totalMapel < 10 ? `0${totalMapel}` : totalMapel}
+                {totalMapel}
               </h3>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Mata pelajaran diajar</p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Mata pelajaran diampu</p>
             </div>
             <span className="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold rounded-lg border border-emerald-200/50 dark:border-emerald-800/50">
               Terdaftar

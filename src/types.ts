@@ -68,6 +68,7 @@ export interface Mapel {
   id: string;
   kodeMapel: string;
   namaMapel: string;
+  jenjang?: string;
   tingkatKelas: string;
   fase: string;
   bebanJam: number;
@@ -136,10 +137,10 @@ export interface NilaiItem {
   siswaId: string;
   nisn: string;
   namaSiswa: string;
-  tpScores: Record<string, number>;
-  uhScores: Record<string, number>;
-  utsScore?: number;
-  uasScore?: number;
+  tpScores: Record<string, number | string>;
+  uhScores: Record<string, number | string>;
+  utsScore?: number | string;
+  uasScore?: number | string;
   rataRata: number;
   isTuntas: boolean;
 }

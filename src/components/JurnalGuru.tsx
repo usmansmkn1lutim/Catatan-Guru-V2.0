@@ -273,7 +273,10 @@ export const JurnalGuruView: React.FC<JurnalGuruProps> = ({
                 type="number"
                 min={1}
                 value={inputPertemuanKe}
-                onChange={(e) => setInputPertemuanKe(Number(e.target.value))}
+                onChange={(e) => {
+                  const raw = e.target.value;
+                  setInputPertemuanKe(raw === '' ? ('' as any) : Number(raw));
+                }}
                 className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
               />
             </div>
@@ -284,7 +287,10 @@ export const JurnalGuruView: React.FC<JurnalGuruProps> = ({
                 type="number"
                 min={0}
                 value={inputJumlahHadir}
-                onChange={(e) => setInputJumlahHadir(Number(e.target.value))}
+                onChange={(e) => {
+                  const raw = e.target.value;
+                  setInputJumlahHadir(raw === '' ? ('' as any) : Number(raw));
+                }}
                 className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold text-emerald-600"
               />
             </div>
@@ -295,7 +301,10 @@ export const JurnalGuruView: React.FC<JurnalGuruProps> = ({
                 type="number"
                 min={0}
                 value={inputJumlahTidakHadir}
-                onChange={(e) => setInputJumlahTidakHadir(Number(e.target.value))}
+                onChange={(e) => {
+                  const raw = e.target.value;
+                  setInputJumlahTidakHadir(raw === '' ? ('' as any) : Number(raw));
+                }}
                 className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold text-rose-600"
               />
             </div>

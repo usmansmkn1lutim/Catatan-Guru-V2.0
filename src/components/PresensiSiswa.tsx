@@ -398,7 +398,10 @@ export const PresensiSiswaView: React.FC<PresensiSiswaProps> = ({
                   min={1}
                   max={25}
                   value={inputPertemuanKe}
-                  onChange={(e) => setInputPertemuanKe(Number(e.target.value))}
+                  onChange={(e) => {
+                    const raw = e.target.value;
+                    setInputPertemuanKe(raw === '' ? ('' as any) : Number(raw));
+                  }}
                   className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                 />
               </div>
@@ -555,13 +558,13 @@ export const PresensiSiswaView: React.FC<PresensiSiswaProps> = ({
               >
                 <div className="flex items-start justify-between">
                   <div>
-                    <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-violet-100 dark:bg-violet-950/60 text-violet-600 dark:text-violet-300">
-                      Kelas {rec.kelas} • Pertemuan #{rec.pertemuanKe}
-                    </span>
-                    <h3 className="text-base font-extrabold text-slate-900 dark:text-white mt-1">
+                    <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
                       {rec.namaMapel}
                     </h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center space-x-3 mt-1">
+                    <p className="text-base font-semibold text-slate-700 dark:text-slate-300 mt-0.5">
+                      Kelas {rec.kelas} • Pertemuan ke-{rec.pertemuanKe}
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center space-x-3 mt-1.5">
                       <span className="flex items-center space-x-1">
                         <Calendar className="w-3.5 h-3.5 text-violet-500" />
                         <span>{formatDateString(rec.tanggal)}</span>
@@ -777,7 +780,7 @@ export const PresensiSiswaView: React.FC<PresensiSiswaProps> = ({
             </div>
 
             <p className="text-xs text-slate-500 font-medium">
-              Kelas: <strong className="text-slate-800 dark:text-slate-200">{selectedViewRecord.kelas}</strong> | Tanggal: <strong className="text-slate-800 dark:text-slate-200">{formatDateString(selectedViewRecord.tanggal)}</strong> | Pertemuan <strong className="text-slate-800 dark:text-slate-200">#{selectedViewRecord.pertemuanKe}</strong>
+              Kelas: <strong className="text-slate-800 dark:text-slate-200">{selectedViewRecord.kelas}</strong> | Tanggal: <strong className="text-slate-800 dark:text-slate-200">{formatDateString(selectedViewRecord.tanggal)}</strong> | <strong className="text-slate-800 dark:text-slate-200">Pertemuan ke-{selectedViewRecord.pertemuanKe}</strong>
             </p>
 
             <div className="max-h-80 overflow-y-auto custom-scrollbar border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
@@ -844,7 +847,7 @@ export const PresensiSiswaView: React.FC<PresensiSiswaProps> = ({
                   Edit Presensi — {editingRecord.namaMapel}
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                  Kelas: {editingRecord.kelas} | Tanggal: {formatDateString(editingRecord.tanggal)} | Pertemuan #{editingRecord.pertemuanKe}
+                  Kelas: {editingRecord.kelas} | Tanggal: {formatDateString(editingRecord.tanggal)} | Pertemuan ke-{editingRecord.pertemuanKe}
                 </p>
               </div>
               <button onClick={() => setEditingRecord(null)} className="text-slate-400 hover:text-slate-600">
@@ -965,7 +968,7 @@ export const PresensiSiswaView: React.FC<PresensiSiswaProps> = ({
             </div>
 
             <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-              Apakah Anda yakin ingin menghapus data presensi tanggal <strong className="text-slate-900 dark:text-white">{formatDateString(deletingRecord.tanggal)}</strong> (Pertemuan #{deletingRecord.pertemuanKe})? Data yang telah dihapus tidak dapat dikembalikan.
+              Apakah Anda yakin ingin menghapus data presensi tanggal <strong className="text-slate-900 dark:text-white">{formatDateString(deletingRecord.tanggal)}</strong> (Pertemuan ke-{deletingRecord.pertemuanKe})? Data yang telah dihapus tidak dapat dikembalikan.
             </p>
 
             <div className="flex items-center justify-end space-x-2 pt-2 border-t border-slate-100 dark:border-slate-800">

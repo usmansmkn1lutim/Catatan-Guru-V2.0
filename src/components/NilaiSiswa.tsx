@@ -65,7 +65,7 @@ export const NilaiSiswaView: React.FC<NilaiSiswaProps> = ({
     return mapelList.find((m) => m.kodeMapel === inputMapelCode) || mapelList[0];
   }, [mapelList, inputMapelCode]);
 
-  const [inputKkm, setInputKkm] = useState<number>(selectedMapelObj?.kkm || 75);
+  const [inputKkm, setInputKkm] = useState<number | string>(selectedMapelObj?.kkm || 75);
 
   React.useEffect(() => {
     if (selectedMapelObj) setInputKkm(selectedMapelObj.kkm || 75);
@@ -79,12 +79,33 @@ export const NilaiSiswaView: React.FC<NilaiSiswaProps> = ({
   // Score state for current input matrix
   const [nilaiItems, setNilaiItems] = useState<NilaiItemSiswa[]>([]);
 
+  // Helper to sync changes to parent state/nilaiList for instant Rekap Nilai reflection
+  const autoSyncToNilaiList = (
+    updatedItems: NilaiItemSiswa[],
+    kkmVal: number | string = inputKkm,
+    tglVal: string = inputTanggal
+  ) => {
+    if (updatedItems.length === 0) return;
+    const newRecord: NilaiRecord = {
+      id: `nilai-${inputKelas}-${inputMapelCode}`,
+      tanggal: tglVal,
+      kelas: inputKelas,
+      kodeMapel: selectedMapelObj?.kodeMapel || inputMapelCode,
+      namaMapel: selectedMapelObj?.namaMapel || 'Mata Pelajaran',
+      kkm: Number(kkmVal) || 75,
+      items: updatedItems,
+    };
+
+    const filtered = nilaiList.filter((n) => !(n.kelas === inputKelas && n.kodeMapel === inputMapelCode));
+    onSaveNilaiList([newRecord, ...filtered]);
+  };
+
   // Calculate average and completion based on active score columns
-  const calculateItemSummary = (item: NilaiItemSiswa, cols: ScoreColumn[]) => {
+  const calculateItemSummary = (item: NilaiItemSiswa, cols: ScoreColumn[], kkmVal: number | string = inputKkm) => {
     const validScores: number[] = [];
 
     cols.forEach((col) => {
-      let val: number | undefined;
+      let val: number | string | undefined;
       if (col.category === 'uts') {
         val = item.utsScore;
       } else if (col.category === 'uas') {
@@ -96,13 +117,14 @@ export const NilaiSiswaView: React.FC<NilaiSiswaProps> = ({
         val = item.tpScores?.[col.label] ?? item.tpScores?.[col.id];
       }
 
-      if (val !== undefined && val !== null && !isNaN(val)) {
+      if (val !== undefined && val !== null && val !== '' && !isNaN(Number(val))) {
         validScores.push(Number(val));
       }
     });
 
     const avg = validScores.length > 0 ? Number((validScores.reduce((a, b) => a + b, 0) / validScores.length).toFixed(1)) : 0;
-    const isTuntas = avg >= inputKkm;
+    const targetKkm = Number(kkmVal) || 75;
+    const isTuntas = avg >= targetKkm;
     return { avg, isTuntas };
   };
 
@@ -126,10 +148,10 @@ export const NilaiSiswaView: React.FC<NilaiSiswaProps> = ({
             newCols.push({ id: `col_${k}`, label: k, category: 'uh' });
           });
         }
-        if (sample.utsScore !== undefined) {
+        if (sample.utsScore !== undefined && sample.utsScore !== '') {
           newCols.push({ id: 'uts', label: 'UTS', category: 'uts' });
         }
-        if (sample.uasScore !== undefined) {
+        if (sample.uasScore !== undefined && sample.uasScore !== '') {
           newCols.push({ id: 'uas', label: 'UAS', category: 'uas' });
         }
 
@@ -145,43 +167,52 @@ export const NilaiSiswaView: React.FC<NilaiSiswaProps> = ({
         siswaId: s.id,
         nisn: s.nisn,
         namaSiswa: s.namaLengkap,
-        tpScores: { 'TP 1': 80, 'TP 2': 82 },
-        uhScores: { 'UH 1': 78 },
-        utsScore: 80,
-        uasScore: 85,
-        rataRata: 81.2,
-        isTuntas: 81.2 >= inputKkm,
+        tpScores: { 'TP 1': '', 'TP 2': '' },
+        uhScores: { 'UH 1': '' },
+        utsScore: '',
+        uasScore: '',
+        rataRata: 0,
+        isTuntas: false,
       }));
       setNilaiItems(initial);
     }
   }, [classStudents, inputKelas, inputMapelCode, inputKkm, nilaiList]);
 
   // Handle score change for any column
-  const handleScoreChangeForCol = (siswaId: string, col: ScoreColumn, val: number) => {
-    setNilaiItems((prev) =>
-      prev.map((item) => {
-        if (item.siswaId === siswaId) {
-          const newItem: NilaiItemSiswa = { ...item };
+  const handleScoreChangeForCol = (siswaId: string, col: ScoreColumn, rawVal: string) => {
+    let parsedVal: number | string = '';
+    if (rawVal !== '' && rawVal !== null && rawVal !== undefined) {
+      const num = Number(rawVal);
+      if (!isNaN(num)) {
+        parsedVal = Math.max(0, Math.min(100, num));
+      }
+    }
 
-          if (col.category === 'uts') {
-            newItem.utsScore = val;
-          } else if (col.category === 'uas') {
-            newItem.uasScore = val;
-          } else if (col.category === 'uh') {
-            newItem.uhScores = { ...(newItem.uhScores || {}), [col.label]: val };
-          } else {
-            // tp or custom
-            newItem.tpScores = { ...(newItem.tpScores || {}), [col.label]: val };
-          }
+    const updatedItems = nilaiItems.map((item) => {
+      if (item.siswaId === siswaId) {
+        const newItem: NilaiItemSiswa = { ...item };
 
-          const { avg, isTuntas } = calculateItemSummary(newItem, scoreColumns);
-          newItem.rataRata = avg;
-          newItem.isTuntas = isTuntas;
-          return newItem;
+        if (col.category === 'uts') {
+          newItem.utsScore = parsedVal;
+        } else if (col.category === 'uas') {
+          newItem.uasScore = parsedVal;
+        } else if (col.category === 'uh') {
+          newItem.uhScores = { ...(newItem.uhScores || {}), [col.label]: parsedVal };
+        } else {
+          // tp or custom
+          newItem.tpScores = { ...(newItem.tpScores || {}), [col.label]: parsedVal };
         }
-        return item;
-      })
-    );
+
+        const { avg, isTuntas } = calculateItemSummary(newItem, scoreColumns);
+        newItem.rataRata = avg;
+        newItem.isTuntas = isTuntas;
+        return newItem;
+      }
+      return item;
+    });
+
+    setNilaiItems(updatedItems);
+    autoSyncToNilaiList(updatedItems);
   };
 
   // Add a new score column
@@ -196,20 +227,19 @@ export const NilaiSiswaView: React.FC<NilaiSiswaProps> = ({
     const updatedCols = [...scoreColumns, newCol];
     setScoreColumns(updatedCols);
 
-    // Initialize initial default score 80 for new column
-    setNilaiItems((prev) =>
-      prev.map((item) => {
-        const newItem = {
-          ...item,
-          tpScores: { ...(item.tpScores || {}), [newCol.label]: 80 },
-        };
-        const { avg, isTuntas } = calculateItemSummary(newItem, updatedCols);
-        newItem.rataRata = avg;
-        newItem.isTuntas = isTuntas;
-        return newItem;
-      })
-    );
+    const updatedItems = nilaiItems.map((item) => {
+      const newItem = {
+        ...item,
+        tpScores: { ...(item.tpScores || {}), [newCol.label]: '' },
+      };
+      const { avg, isTuntas } = calculateItemSummary(newItem, updatedCols);
+      newItem.rataRata = avg;
+      newItem.isTuntas = isTuntas;
+      return newItem;
+    });
 
+    setNilaiItems(updatedItems);
+    autoSyncToNilaiList(updatedItems);
     showToast(`Kolom "${newCol.label}" berhasil ditambahkan!`, 'success');
   };
 
@@ -219,26 +249,26 @@ export const NilaiSiswaView: React.FC<NilaiSiswaProps> = ({
     if (!oldCol) return;
     const oldLabel = oldCol.label;
 
-    setScoreColumns((prev) =>
-      prev.map((col) => (col.id === colId ? { ...col, label: newLabel } : col))
-    );
+    const updatedCols = scoreColumns.map((col) => (col.id === colId ? { ...col, label: newLabel } : col));
+    setScoreColumns(updatedCols);
 
     // Sync item key name
-    setNilaiItems((prev) =>
-      prev.map((item) => {
-        const newItem = { ...item };
-        if (oldCol.category === 'uh' && newItem.uhScores && oldLabel in newItem.uhScores) {
-          const val = newItem.uhScores[oldLabel];
-          delete newItem.uhScores[oldLabel];
-          newItem.uhScores[newLabel] = val;
-        } else if (newItem.tpScores && oldLabel in newItem.tpScores) {
-          const val = newItem.tpScores[oldLabel];
-          delete newItem.tpScores[oldLabel];
-          newItem.tpScores[newLabel] = val;
-        }
-        return newItem;
-      })
-    );
+    const updatedItems = nilaiItems.map((item) => {
+      const newItem = { ...item };
+      if (oldCol.category === 'uh' && newItem.uhScores && oldLabel in newItem.uhScores) {
+        const val = newItem.uhScores[oldLabel];
+        delete newItem.uhScores[oldLabel];
+        newItem.uhScores[newLabel] = val;
+      } else if (newItem.tpScores && oldLabel in newItem.tpScores) {
+        const val = newItem.tpScores[oldLabel];
+        delete newItem.tpScores[oldLabel];
+        newItem.tpScores[newLabel] = val;
+      }
+      return newItem;
+    });
+
+    setNilaiItems(updatedItems);
+    autoSyncToNilaiList(updatedItems);
   };
 
   // Delete column
@@ -253,20 +283,21 @@ export const NilaiSiswaView: React.FC<NilaiSiswaProps> = ({
     setScoreColumns(updatedCols);
 
     if (colToDelete) {
-      setNilaiItems((prev) =>
-        prev.map((item) => {
-          const newItem = { ...item };
-          if (colToDelete.category === 'uts') delete newItem.utsScore;
-          else if (colToDelete.category === 'uas') delete newItem.uasScore;
-          else if (colToDelete.category === 'uh' && newItem.uhScores) delete newItem.uhScores[colToDelete.label];
-          else if (newItem.tpScores) delete newItem.tpScores[colToDelete.label];
+      const updatedItems = nilaiItems.map((item) => {
+        const newItem = { ...item };
+        if (colToDelete.category === 'uts') delete newItem.utsScore;
+        else if (colToDelete.category === 'uas') delete newItem.uasScore;
+        else if (colToDelete.category === 'uh' && newItem.uhScores) delete newItem.uhScores[colToDelete.label];
+        else if (newItem.tpScores) delete newItem.tpScores[colToDelete.label];
 
-          const { avg, isTuntas } = calculateItemSummary(newItem, updatedCols);
-          newItem.rataRata = avg;
-          newItem.isTuntas = isTuntas;
-          return newItem;
-        })
-      );
+        const { avg, isTuntas } = calculateItemSummary(newItem, updatedCols);
+        newItem.rataRata = avg;
+        newItem.isTuntas = isTuntas;
+        return newItem;
+      });
+
+      setNilaiItems(updatedItems);
+      autoSyncToNilaiList(updatedItems);
     }
 
     showToast('Kolom nilai berhasil dihapus', 'success');
@@ -311,12 +342,12 @@ export const NilaiSiswaView: React.FC<NilaiSiswaProps> = ({
     }
 
     const newRecord: NilaiRecord = {
-      id: `nilai-${Date.now()}`,
+      id: `nilai-${inputKelas}-${inputMapelCode}`,
       tanggal: inputTanggal,
       kelas: inputKelas,
       kodeMapel: selectedMapelObj?.kodeMapel || inputMapelCode,
       namaMapel: selectedMapelObj?.namaMapel || 'Mata Pelajaran',
-      kkm: inputKkm,
+      kkm: Number(inputKkm) || 75,
       items: nilaiItems,
     };
 
@@ -330,16 +361,31 @@ export const NilaiSiswaView: React.FC<NilaiSiswaProps> = ({
   const [rekapMapelFilter, setRekapMapelFilter] = useState('Semua');
   const [rekapSearchTerm, setRekapSearchTerm] = useState('');
 
+  // Collect all dynamic column labels present across matched NilaiRecords
+  const rekapColumns = useMemo(() => {
+    const colsSet = new Set<string>();
+    nilaiList.forEach((nr) => {
+      if (rekapMapelFilter !== 'Semua' && nr.kodeMapel !== rekapMapelFilter) return;
+      if (rekapKelasFilter !== 'Semua' && nr.kelas !== rekapKelasFilter) return;
+
+      nr.items.forEach((it) => {
+        if (it.tpScores) Object.keys(it.tpScores).forEach((k) => colsSet.add(k));
+        if (it.uhScores) Object.keys(it.uhScores).forEach((k) => colsSet.add(k));
+        if (it.utsScore !== undefined && it.utsScore !== '') colsSet.add('UTS');
+        if (it.uasScore !== undefined && it.uasScore !== '') colsSet.add('UAS');
+      });
+    });
+
+    const cols = Array.from(colsSet);
+    return cols.length > 0 ? cols : ['TP 1', 'TP 2', 'UH 1', 'UTS', 'UAS'];
+  }, [nilaiList, rekapKelasFilter, rekapMapelFilter]);
+
   const rekapFlatData = useMemo(() => {
     const list: {
       siswa: Siswa;
       mapel: string;
       kkm: number;
-      tp1: number;
-      tp2: number;
-      uh1: number;
-      uts: number;
-      uas: number;
+      scoresMap: Record<string, number | string>;
       rata: number;
       isTuntas: boolean;
     }[] = [];
@@ -354,15 +400,26 @@ export const NilaiSiswaView: React.FC<NilaiSiswaProps> = ({
 
         const found = nr.items.find((it) => it.siswaId === s.id || it.nisn === s.nisn);
         if (found) {
+          const scoresMap: Record<string, number | string> = {};
+          rekapColumns.forEach((colName) => {
+            if (colName === 'UTS') {
+              scoresMap[colName] = found.utsScore ?? '-';
+            } else if (colName === 'UAS') {
+              scoresMap[colName] = found.uasScore ?? '-';
+            } else if (found.uhScores && colName in found.uhScores) {
+              scoresMap[colName] = found.uhScores[colName] ?? '-';
+            } else if (found.tpScores && colName in found.tpScores) {
+              scoresMap[colName] = found.tpScores[colName] ?? '-';
+            } else {
+              scoresMap[colName] = '-';
+            }
+          });
+
           list.push({
             siswa: s,
             mapel: nr.namaMapel,
             kkm: nr.kkm,
-            tp1: found.tpScores?.['TP 1'] || 0,
-            tp2: found.tpScores?.['TP 2'] || 0,
-            uh1: found.uhScores?.['UH 1'] || 0,
-            uts: found.utsScore || 0,
-            uas: found.uasScore || 0,
+            scoresMap,
             rata: found.rataRata || 0,
             isTuntas: !!found.isTuntas,
           });
@@ -371,7 +428,7 @@ export const NilaiSiswaView: React.FC<NilaiSiswaProps> = ({
     });
 
     return list;
-  }, [siswaList, nilaiList, rekapKelasFilter, rekapMapelFilter, rekapSearchTerm]);
+  }, [siswaList, nilaiList, rekapKelasFilter, rekapMapelFilter, rekapSearchTerm, rekapColumns]);
 
   return (
     <div className="space-y-6 pb-12">
@@ -455,7 +512,10 @@ export const NilaiSiswaView: React.FC<NilaiSiswaProps> = ({
                 <input
                   type="date"
                   value={inputTanggal}
-                  onChange={(e) => setInputTanggal(e.target.value)}
+                  onChange={(e) => {
+                    setInputTanggal(e.target.value);
+                    autoSyncToNilaiList(nilaiItems, inputKkm, e.target.value);
+                  }}
                   className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                 />
               </div>
@@ -467,13 +527,18 @@ export const NilaiSiswaView: React.FC<NilaiSiswaProps> = ({
                   min={50}
                   max={100}
                   value={inputKkm}
-                  onChange={(e) => setInputKkm(Number(e.target.value))}
+                  onChange={(e) => {
+                    const raw = e.target.value;
+                    const val = raw === '' ? '' : Number(raw);
+                    setInputKkm(val);
+                    autoSyncToNilaiList(nilaiItems, val, inputTanggal);
+                  }}
                   className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-violet-600 font-bold"
                 />
               </div>
             </div>
 
-            {/* Quick Stats Bar & Add Column action */}
+            {/* Quick Stats Bar & Add Column action & Simpan Nilai button beside it */}
             <div className="flex flex-col sm:flex-row items-center justify-between p-4 bg-violet-50 dark:bg-violet-950/40 rounded-xl border border-violet-200 dark:border-violet-800 text-xs text-slate-800 dark:text-slate-200 gap-3">
               <div className="flex items-center space-x-4">
                 <span>Rata-Rata Kelas: <strong className="text-violet-600 text-sm">{classAvgScore}</strong></span>
@@ -490,13 +555,15 @@ export const NilaiSiswaView: React.FC<NilaiSiswaProps> = ({
                   <Plus className="w-3.5 h-3.5" />
                   <span>Tambah Kolom Nilai</span>
                 </button>
+
                 <button
                   type="button"
-                  onClick={handleFillSampleScores}
-                  className="flex items-center space-x-1.5 px-3.5 py-1.5 bg-violet-600 text-white font-semibold rounded-full hover:bg-violet-700 shadow-sm"
+                  onClick={handleSimpanNilai}
+                  className="flex items-center space-x-1.5 px-3.5 py-1.5 bg-violet-600 text-white font-semibold rounded-full hover:bg-violet-700 shadow-sm transition-all"
+                  title="Simpan Nilai Siswa"
                 >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Isi Nilai Contoh</span>
+                  <Save className="w-3.5 h-3.5" />
+                  <span>Simpan Nilai</span>
                 </button>
               </div>
             </div>
@@ -582,7 +649,7 @@ export const NilaiSiswaView: React.FC<NilaiSiswaProps> = ({
                               min={0}
                               max={100}
                               value={scoreVal}
-                              onChange={(e) => handleScoreChangeForCol(item.siswaId, col, Number(e.target.value))}
+                              onChange={(e) => handleScoreChangeForCol(item.siswaId, col, e.target.value)}
                               className="w-16 text-center px-1 py-1 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-violet-500"
                             />
                           </td>
@@ -613,16 +680,6 @@ export const NilaiSiswaView: React.FC<NilaiSiswaProps> = ({
                   Tidak ada siswa di kelas ini untuk diinput nilainya.
                 </div>
               )}
-            </div>
-
-            <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end">
-              <button
-                onClick={handleSimpanNilai}
-                className="flex items-center space-x-2 px-6 py-2.5 bg-violet-600 text-white text-xs font-semibold rounded-full hover:bg-violet-700 shadow-md shadow-violet-500/20"
-              >
-                <Save className="w-4 h-4" />
-                <span>Simpan Nilai Siswa</span>
-              </button>
             </div>
           </div>
         </div>
@@ -688,11 +745,11 @@ export const NilaiSiswaView: React.FC<NilaiSiswaProps> = ({
                     <th className="p-3 sticky left-[158px] z-20 bg-slate-100 dark:bg-slate-800 min-w-[180px] border-b border-r-2 border-slate-300 dark:border-slate-600 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.08)]">Nama Siswa</th>
                     <th className="p-3">Kelas</th>
                     <th className="p-3">Mata Pelajaran</th>
-                    <th className="p-3 text-center">TP 1</th>
-                    <th className="p-3 text-center">TP 2</th>
-                    <th className="p-3 text-center">UH 1</th>
-                    <th className="p-3 text-center">UTS</th>
-                    <th className="p-3 text-center">UAS</th>
+                    {rekapColumns.map((colName) => (
+                      <th key={colName} className="p-3 text-center min-w-[80px]">
+                        {colName}
+                      </th>
+                    ))}
                     <th className="p-3 text-center">Rata-Rata</th>
                     <th className="p-3 text-center">Status</th>
                   </tr>
@@ -705,11 +762,11 @@ export const NilaiSiswaView: React.FC<NilaiSiswaProps> = ({
                       <td className="p-3 sticky left-[158px] z-10 bg-white dark:bg-slate-900 font-bold text-slate-900 dark:text-white border-r-2 border-slate-200 dark:border-slate-700 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.05)]">{row.siswa.namaLengkap}</td>
                       <td className="p-3">{row.siswa.namaKelas}</td>
                       <td className="p-3 text-slate-600 dark:text-slate-300">{row.mapel}</td>
-                      <td className="p-3 text-center">{row.tp1 || '-'}</td>
-                      <td className="p-3 text-center">{row.tp2 || '-'}</td>
-                      <td className="p-3 text-center font-semibold text-indigo-600">{row.uh1 || '-'}</td>
-                      <td className="p-3 text-center font-semibold text-purple-600">{row.uts || '-'}</td>
-                      <td className="p-3 text-center font-semibold text-violet-600">{row.uas || '-'}</td>
+                      {rekapColumns.map((colName) => (
+                        <td key={colName} className="p-3 text-center font-semibold text-slate-800 dark:text-slate-200">
+                          {row.scoresMap[colName] !== undefined && row.scoresMap[colName] !== '' ? row.scoresMap[colName] : '-'}
+                        </td>
+                      ))}
                       <td className="p-3 text-center font-bold text-slate-900 dark:text-white">{row.rata}</td>
                       <td className="p-3 text-center">
                         <span

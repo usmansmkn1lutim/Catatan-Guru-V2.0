@@ -1,6 +1,6 @@
 import React from 'react';
 import { DataSekolah, ProfilGuru, ActiveTab } from '../types';
-import { Moon, Sun, User, RefreshCw, School, CloudCheck, CloudOff, AlertCircle, Zap, Download, Menu } from 'lucide-react';
+import { Moon, Sun, User, RefreshCw, School, CloudCheck, CloudOff, AlertCircle, Zap, Menu } from 'lucide-react';
 
 interface HeaderProps {
   sekolah?: DataSekolah;
@@ -157,30 +157,6 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           )}
         </div>
-
-        {/* Fetch Remote / Sync Manual */}
-        {onFetchRemoteData && (
-          <button
-            onClick={onFetchRemoteData}
-            disabled={isFetchingRemote}
-            title="Tarik & Perbarui Data Terkini dari Google Sheets"
-            className="px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-lg flex items-center space-x-1 transition-colors disabled:opacity-50"
-          >
-            <Download className={`w-3.5 h-3.5 ${isFetchingRemote ? 'animate-bounce text-violet-600' : ''}`} />
-            <span className="hidden sm:inline">{isFetchingRemote ? 'Memuat...' : 'Tarik Data'}</span>
-          </button>
-        )}
-
-        {onSyncData && (
-          <button
-            onClick={onSyncData}
-            disabled={isSyncing}
-            title="Sinkronkan Seluruh Data Sekarang ke Google Sheets"
-            className="p-2 text-slate-400 hover:text-violet-600 transition-colors rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50"
-          >
-            <RefreshCw className={`w-5 h-5 ${isSyncing ? 'animate-spin text-violet-600' : ''}`} />
-          </button>
-        )}
 
         <button
           onClick={handleToggleDark}

@@ -21,6 +21,63 @@ interface DataMapelProps {
   showToast: (msg: string, type?: 'success' | 'error') => void;
 }
 
+const JENJANG_OPTIONS = [
+  'SD / MI',
+  'SMP / MTs',
+  'SMA / SMK / MA / SLB',
+];
+
+const KELAS_BY_JENJANG: Record<string, string[]> = {
+  'SD / MI': ['Kelas 1', 'Kelas 2', 'Kelas 3', 'Kelas 4', 'Kelas 5', 'Kelas 6'],
+  'SMP / MTs': ['Kelas 7', 'Kelas 8', 'Kelas 9'],
+  'SMA / SMK / MA / SLB': ['Kelas 10', 'Kelas 11', 'Kelas 12'],
+};
+
+const getInferredJenjang = (mapel?: Mapel | null): string => {
+  if (mapel?.jenjang) return mapel.jenjang;
+  const tk = mapel?.tingkatKelas || '';
+  if (['Kelas 1', 'Kelas 2', 'Kelas 3', 'Kelas 4', 'Kelas 5', 'Kelas 6'].includes(tk)) {
+    return 'SD / MI';
+  }
+  if (['Kelas 7', 'Kelas 8', 'Kelas 9'].includes(tk)) {
+    return 'SMP / MTs';
+  }
+  return 'SMA / SMK / MA / SLB';
+};
+
+const getAutoFase = (jenjang: string, kelas: string): string => {
+  if (jenjang === 'SD / MI') {
+    if (kelas === 'Kelas 1' || kelas === 'Kelas 2') return 'Fase A';
+    if (kelas === 'Kelas 3' || kelas === 'Kelas 4') return 'Fase B';
+    if (kelas === 'Kelas 5' || kelas === 'Kelas 6') return 'Fase C';
+    return 'Fase A';
+  }
+  if (jenjang === 'SMP / MTs') {
+    return 'Fase D';
+  }
+  if (kelas === 'Kelas 10') return 'Fase E';
+  return 'Fase F';
+};
+
+const getFaseOptionsByJenjang = (jenjang: string): { value: string; label: string }[] => {
+  if (jenjang === 'SD / MI') {
+    return [
+      { value: 'Fase A', label: 'Fase A (Kelas 1 - 2)' },
+      { value: 'Fase B', label: 'Fase B (Kelas 3 - 4)' },
+      { value: 'Fase C', label: 'Fase C (Kelas 5 - 6)' },
+    ];
+  }
+  if (jenjang === 'SMP / MTs') {
+    return [
+      { value: 'Fase D', label: 'Fase D (Kelas 7 - 9)' },
+    ];
+  }
+  return [
+    { value: 'Fase E', label: 'Fase E (Kelas 10)' },
+    { value: 'Fase F', label: 'Fase F (Kelas 11 - 12)' },
+  ];
+};
+
 export const DataMapelView: React.FC<DataMapelProps> = ({
   mapelList,
   onSaveMapelList,
@@ -43,12 +100,16 @@ export const DataMapelView: React.FC<DataMapelProps> = ({
 
   // Mapel CRUD
   const handleOpenAddMapel = () => {
+    const defaultJenjang = 'SMA / SMK / MA / SLB';
+    const defaultKelas = 'Kelas 10';
+    const defaultFase = getAutoFase(defaultJenjang, defaultKelas);
     setEditingMapel({
       id: `mapel-${Date.now()}`,
       kodeMapel: '',
       namaMapel: '',
-      tingkatKelas: 'Kelas 10',
-      fase: 'Fase E',
+      jenjang: defaultJenjang,
+      tingkatKelas: defaultKelas,
+      fase: defaultFase,
       bebanJam: 2,
       kkm: 75,
       capaianPembelajaran: [],
@@ -58,8 +119,33 @@ export const DataMapelView: React.FC<DataMapelProps> = ({
 
   const handleOpenEditMapel = () => {
     if (!activeMapel) return;
-    setEditingMapel({ ...activeMapel });
+    const currentJenjang = getInferredJenjang(activeMapel);
+    setEditingMapel({ ...activeMapel, jenjang: currentJenjang });
     setIsMapelModalOpen(true);
+  };
+
+  const handleJenjangChange = (newJenjang: string) => {
+    if (!editingMapel) return;
+    const availableKelas = KELAS_BY_JENJANG[newJenjang] || KELAS_BY_JENJANG['SMA / SMK / MA / SLB'];
+    const newKelas = availableKelas[0];
+    const newFase = getAutoFase(newJenjang, newKelas);
+    setEditingMapel({
+      ...editingMapel,
+      jenjang: newJenjang,
+      tingkatKelas: newKelas,
+      fase: newFase,
+    });
+  };
+
+  const handleKelasChange = (newKelas: string) => {
+    if (!editingMapel) return;
+    const currentJenjang = editingMapel.jenjang || getInferredJenjang(editingMapel);
+    const newFase = getAutoFase(currentJenjang, newKelas);
+    setEditingMapel({
+      ...editingMapel,
+      tingkatKelas: newKelas,
+      fase: newFase,
+    });
   };
 
   const handleDeleteMapel = (id: string) => {
@@ -370,7 +456,7 @@ export const DataMapelView: React.FC<DataMapelProps> = ({
                     {activeMapel.namaMapel}
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    {activeMapel.fase} | {activeMapel.tingkatKelas} | Beban: {activeMapel.bebanJam} JP | KKM: {activeMapel.kkm}
+                    {activeMapel.jenjang || getInferredJenjang(activeMapel)} | {activeMapel.fase} | {activeMapel.tingkatKelas} | Beban: {activeMapel.bebanJam} JP | KKM: {activeMapel.kkm}
                   </p>
                 </div>
 
@@ -512,6 +598,23 @@ export const DataMapelView: React.FC<DataMapelProps> = ({
                 />
               </div>
 
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
+                  Jenjang Pendidikan
+                </label>
+                <select
+                  value={editingMapel.jenjang || getInferredJenjang(editingMapel)}
+                  onChange={(e) => handleJenjangChange(e.target.value)}
+                  className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
+                >
+                  {JENJANG_OPTIONS.map((j) => (
+                    <option key={j} value={j}>
+                      {j}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
@@ -519,12 +622,17 @@ export const DataMapelView: React.FC<DataMapelProps> = ({
                   </label>
                   <select
                     value={editingMapel.tingkatKelas}
-                    onChange={(e) => setEditingMapel({ ...editingMapel, tingkatKelas: e.target.value })}
+                    onChange={(e) => handleKelasChange(e.target.value)}
                     className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
                   >
-                    <option value="Kelas 10">Kelas 10</option>
-                    <option value="Kelas 11">Kelas 11</option>
-                    <option value="Kelas 12">Kelas 12</option>
+                    {(
+                      KELAS_BY_JENJANG[editingMapel.jenjang || getInferredJenjang(editingMapel)] ||
+                      KELAS_BY_JENJANG['SMA / SMK / MA / SLB']
+                    ).map((k) => (
+                      <option key={k} value={k}>
+                        {k}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
@@ -537,8 +645,13 @@ export const DataMapelView: React.FC<DataMapelProps> = ({
                     onChange={(e) => setEditingMapel({ ...editingMapel, fase: e.target.value })}
                     className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
                   >
-                    <option value="Fase E">Fase E (Kelas X)</option>
-                    <option value="Fase F">Fase F (Kelas XI - XII)</option>
+                    {getFaseOptionsByJenjang(
+                      editingMapel.jenjang || getInferredJenjang(editingMapel)
+                    ).map((f) => (
+                      <option key={f.value} value={f.value}>
+                        {f.label}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -553,7 +666,10 @@ export const DataMapelView: React.FC<DataMapelProps> = ({
                     min={1}
                     max={10}
                     value={editingMapel.bebanJam}
-                    onChange={(e) => setEditingMapel({ ...editingMapel, bebanJam: Number(e.target.value) })}
+                    onChange={(e) => {
+                      const raw = e.target.value;
+                      setEditingMapel({ ...editingMapel, bebanJam: raw === '' ? ('' as any) : Number(raw) });
+                    }}
                     className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
                   />
                 </div>
@@ -567,7 +683,10 @@ export const DataMapelView: React.FC<DataMapelProps> = ({
                     min={50}
                     max={100}
                     value={editingMapel.kkm}
-                    onChange={(e) => setEditingMapel({ ...editingMapel, kkm: Number(e.target.value) })}
+                    onChange={(e) => {
+                      const raw = e.target.value;
+                      setEditingMapel({ ...editingMapel, kkm: raw === '' ? ('' as any) : Number(raw) });
+                    }}
                     className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
                   />
                 </div>

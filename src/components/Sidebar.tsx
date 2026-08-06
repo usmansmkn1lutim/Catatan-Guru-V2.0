@@ -96,9 +96,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
     if (setIsOpenMobile) setIsOpenMobile(false);
   };
 
-  const appLogo = appConfig?.logoAplikasiUrl || sekolah?.logoSekolahUrl;
-  const appName = appConfig?.namaAplikasi || 'Catatan Guru';
-  const appDesc = appConfig?.deskripsiAplikasi || 'Administrasi';
+  const appLogo = appConfig?.logoAplikasiUrl || sekolah?.logoSekolahUrl || '/logo.svg';
+  const appName = appConfig?.namaAplikasi || 'Catatan Seorang Guru';
+  const appDesc = appConfig?.deskripsiAplikasi || 'Merawat Jejak Pengabdian';
 
   const sidebarContent = (
     <div className="h-full flex flex-col bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transition-colors w-64 select-none">

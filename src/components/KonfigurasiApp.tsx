@@ -160,7 +160,7 @@ export const KonfigurasiAppView: React.FC<KonfigurasiAppProps> = ({
               name="namaAplikasi"
               value={formData.namaAplikasi}
               onChange={handleChange}
-              placeholder="Contoh: Catatan Guru, SiGuru Mandiri, dll."
+              placeholder="Contoh: Catatan Seorang Guru"
               required
               className="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500 font-semibold"
             />
@@ -175,7 +175,7 @@ export const KonfigurasiAppView: React.FC<KonfigurasiAppProps> = ({
               name="deskripsiAplikasi"
               value={formData.deskripsiAplikasi}
               onChange={handleChange}
-              placeholder="Contoh: Administrasi & Catatan Mengajar Guru"
+              placeholder="Contoh: Merawat Jejak Pengabdian"
               className="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
             />
           </div>
@@ -203,10 +203,10 @@ export const KonfigurasiAppView: React.FC<KonfigurasiAppProps> = ({
             )}
             <div className="min-w-0">
               <h4 className="text-sm font-bold text-slate-900 dark:text-white leading-tight truncate">
-                {formData.namaAplikasi || 'Catatan Guru'}
+                {formData.namaAplikasi || 'Catatan Seorang Guru'}
               </h4>
               <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider truncate">
-                {formData.deskripsiAplikasi || 'Administrasi'}
+                {formData.deskripsiAplikasi || 'Merawat Jejak Pengabdian'}
               </p>
             </div>
           </div>

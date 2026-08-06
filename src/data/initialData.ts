@@ -1,9 +1,9 @@
 import { AppConfig, DataSekolah, ProfilGuru, Mapel, Kelas, Siswa, PresensiRecord, NilaiRecord, JurnalRecord } from '../types';
 
 export const initialAppConfig: AppConfig = {
-  namaAplikasi: 'Catatan Guru',
-  deskripsiAplikasi: 'Administrasi & Catatan Seorang Guru',
-  logoAplikasiUrl: '',
+  namaAplikasi: 'Catatan Seorang Guru',
+  deskripsiAplikasi: 'Merawat Jejak Pengabdian',
+  logoAplikasiUrl: '/logo.svg',
 };
 
 export const initialDataSekolah: DataSekolah = {

@@ -65,9 +65,14 @@ export function App() {
   });
 
   // Main State
-  const [appConfig, setAppConfig] = useState<AppConfig>(() =>
-    loadFromStorage('appConfig', initialAppConfig)
-  );
+  const [appConfig, setAppConfig] = useState<AppConfig>(() => {
+    const saved = loadFromStorage('appConfig', initialAppConfig);
+    return {
+      namaAplikasi: saved?.namaAplikasi && saved.namaAplikasi !== 'Catatan Guru' ? saved.namaAplikasi : initialAppConfig.namaAplikasi,
+      deskripsiAplikasi: saved?.deskripsiAplikasi && saved.deskripsiAplikasi !== 'Administrasi & Catatan Seorang Guru' ? saved.deskripsiAplikasi : initialAppConfig.deskripsiAplikasi,
+      logoAplikasiUrl: saved?.logoAplikasiUrl || initialAppConfig.logoAplikasiUrl,
+    };
+  });
   const [dataSekolah, setDataSekolah] = useState<DataSekolah>(() =>
     loadFromStorage('dataSekolah', initialDataSekolah)
   );
