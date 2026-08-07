@@ -45,7 +45,7 @@ export const KonfigurasiAppView: React.FC<KonfigurasiAppProps> = ({
       }
 
       try {
-        const compressedDataUrl = await compressImage(file, 400, 400, 0.85);
+        const compressedDataUrl = await compressImage(file, 1024, 1024, 0.92);
         setLogoPreview(compressedDataUrl);
         const updated = { ...formData, logoAplikasiUrl: compressedDataUrl };
         setFormData(updated);
@@ -102,12 +102,12 @@ export const KonfigurasiAppView: React.FC<KonfigurasiAppProps> = ({
             Logo Aplikasi
           </label>
           <div className="flex flex-col sm:flex-row items-center gap-6">
-            <div className="w-24 h-24 rounded-2xl bg-slate-50 dark:bg-slate-800 border-2 border-dashed border-slate-200 dark:border-slate-700 flex items-center justify-center overflow-hidden shrink-0 relative group">
+            <div className="w-24 h-24 rounded-2xl bg-transparent border-2 border-dashed border-slate-200 dark:border-slate-700 flex items-center justify-center overflow-hidden shrink-0 relative group">
               {logoPreview ? (
                 <img
                   src={logoPreview}
                   alt="Logo Aplikasi"
-                  className="w-full h-full object-contain p-2"
+                  className="w-full h-full object-contain"
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500">
@@ -189,11 +189,11 @@ export const KonfigurasiAppView: React.FC<KonfigurasiAppProps> = ({
           </div>
           <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center space-x-3 max-w-sm">
             {logoPreview ? (
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xs">
+              <div className="w-10 h-10 flex items-center justify-center shrink-0 overflow-hidden bg-transparent">
                 <img
                   src={logoPreview}
                   alt="Preview"
-                  className="w-full h-full object-contain p-0.5"
+                  className="w-full h-full object-contain"
                 />
               </div>
             ) : (

@@ -57,7 +57,7 @@ export const DataSekolahView: React.FC<DataSekolahProps> = ({
     const file = e.target.files?.[0];
     if (file) {
       try {
-        const compressedDataUrl = await compressImage(file, 400, 400, 0.85);
+        const compressedDataUrl = await compressImage(file, 1024, 1024, 0.92);
         setLogoPreview(compressedDataUrl);
         const updated = { ...formData, logoSekolahUrl: compressedDataUrl };
         setFormData(updated);
@@ -103,9 +103,9 @@ export const DataSekolahView: React.FC<DataSekolahProps> = ({
             Logo Sekolah
           </label>
           <div className="flex flex-col sm:flex-row items-center gap-6">
-            <div className="w-24 h-24 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center overflow-hidden shrink-0">
+            <div className="w-24 h-24 rounded-xl bg-transparent border border-slate-200 dark:border-slate-800 flex items-center justify-center overflow-hidden shrink-0">
               {logoPreview ? (
-                <img src={logoPreview} alt="Logo Sekolah" className="w-full h-full object-contain p-2" />
+                <img src={logoPreview} alt="Logo Sekolah" className="w-full h-full object-contain" />
               ) : (
                 <Building2 className="w-8 h-8 text-slate-400" />
               )}

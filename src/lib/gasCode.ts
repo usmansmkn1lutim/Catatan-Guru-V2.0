@@ -676,7 +676,7 @@ export const INDEX_HTML_CONTENT = `<!DOCTYPE html>
               {/* Brand Header */}
               <div className="flex items-center space-x-3 pb-4 border-b border-slate-100 dark:border-slate-800">
                 {logoUrl ? (
-                  <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-1">
+                  <div className="w-11 h-11 flex items-center justify-center shrink-0 overflow-hidden bg-transparent">
                     <img src={logoUrl} alt="Logo" className="w-full h-full object-contain" />
                   </div>
                 ) : (

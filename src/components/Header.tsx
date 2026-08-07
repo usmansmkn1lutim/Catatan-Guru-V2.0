@@ -66,17 +66,19 @@ export const Header: React.FC<HeaderProps> = ({
           <Menu className="w-6 h-6" />
         </button>
 
-        <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center shrink-0 overflow-hidden shadow-xs">
-          {currentSekolah?.logoSekolahUrl ? (
+        {currentSekolah?.logoSekolahUrl ? (
+          <div className="w-10 h-10 flex items-center justify-center shrink-0 overflow-hidden bg-transparent">
             <img
               src={currentSekolah.logoSekolahUrl}
               alt={currentSekolah.namaSekolah || 'Logo'}
-              className="w-full h-full object-contain p-0.5"
+              className="w-full h-full object-contain"
             />
-          ) : (
-            <School className="w-5 h-5 text-slate-500" />
-          )}
-        </div>
+          </div>
+        ) : (
+          <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center shrink-0 overflow-hidden">
+            <School className="w-5 h-5 text-slate-500 dark:text-slate-400" />
+          </div>
+        )}
         <div className="min-w-0">
           <h2 className="text-sm sm:text-base font-bold text-slate-800 dark:text-slate-100 leading-tight truncate">
             {currentSekolah?.namaSekolah || 'SMA Negeri 1 Permata Bangsa'}
@@ -180,7 +182,7 @@ export const Header: React.FC<HeaderProps> = ({
               {currentGuru?.nip ? `NIP. ${currentGuru.nip}` : 'Guru Mata Pelajaran'}
             </p>
           </div>
-          <div className="w-10 h-10 bg-violet-100 rounded-full border-2 border-white dark:border-slate-800 shadow-sm overflow-hidden shrink-0 flex items-center justify-center">
+          <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-full border border-slate-200 dark:border-slate-700 shadow-xs overflow-hidden shrink-0 flex items-center justify-center">
             {currentGuru?.fotoProfilUrl ? (
               <img
                 src={currentGuru.fotoProfilUrl}
@@ -188,7 +190,7 @@ export const Header: React.FC<HeaderProps> = ({
                 className="w-full h-full object-cover"
               />
             ) : (
-              <User className="w-5 h-5 text-violet-600" />
+              <User className="w-5 h-5 text-slate-500 dark:text-slate-400" />
             )}
           </div>
         </button>

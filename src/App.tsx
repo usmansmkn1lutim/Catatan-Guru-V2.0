@@ -70,15 +70,23 @@ export function App() {
     return {
       namaAplikasi: saved?.namaAplikasi && saved.namaAplikasi !== 'Catatan Guru' ? saved.namaAplikasi : initialAppConfig.namaAplikasi,
       deskripsiAplikasi: saved?.deskripsiAplikasi && saved.deskripsiAplikasi !== 'Administrasi & Catatan Seorang Guru' ? saved.deskripsiAplikasi : initialAppConfig.deskripsiAplikasi,
-      logoAplikasiUrl: saved?.logoAplikasiUrl || initialAppConfig.logoAplikasiUrl,
+      logoAplikasiUrl: (saved?.logoAplikasiUrl && saved.logoAplikasiUrl !== '/logo.svg') ? saved.logoAplikasiUrl : initialAppConfig.logoAplikasiUrl,
     };
   });
-  const [dataSekolah, setDataSekolah] = useState<DataSekolah>(() =>
-    loadFromStorage('dataSekolah', initialDataSekolah)
-  );
-  const [profilGuru, setProfilGuru] = useState<ProfilGuru>(() =>
-    loadFromStorage('profilGuru', initialProfilGuru)
-  );
+  const [dataSekolah, setDataSekolah] = useState<DataSekolah>(() => {
+    const saved = loadFromStorage('dataSekolah', initialDataSekolah);
+    return {
+      ...saved,
+      logoSekolahUrl: (saved?.logoSekolahUrl && !saved.logoSekolahUrl.includes('unsplash.com')) ? saved.logoSekolahUrl : '',
+    };
+  });
+  const [profilGuru, setProfilGuru] = useState<ProfilGuru>(() => {
+    const saved = loadFromStorage('profilGuru', initialProfilGuru);
+    return {
+      ...saved,
+      fotoProfilUrl: (saved?.fotoProfilUrl && !saved.fotoProfilUrl.includes('unsplash.com')) ? saved.fotoProfilUrl : '',
+    };
+  });
   const [mapelList, setMapelList] = useState<Mapel[]>(() =>
     loadFromStorage('mapelList', initialMapelList)
   );

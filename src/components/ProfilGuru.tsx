@@ -54,7 +54,7 @@ export const ProfilGuruView: React.FC<ProfilGuruProps> = ({
     const file = e.target.files?.[0];
     if (file) {
       try {
-        const compressedDataUrl = await compressImage(file, 400, 400, 0.85);
+        const compressedDataUrl = await compressImage(file, 1024, 1024, 0.92);
         setFotoPreview(compressedDataUrl);
         const updated = { ...formData, fotoProfilUrl: compressedDataUrl };
         setFormData(updated);
