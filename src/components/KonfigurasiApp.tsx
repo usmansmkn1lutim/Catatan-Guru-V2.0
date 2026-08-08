@@ -45,12 +45,12 @@ export const KonfigurasiAppView: React.FC<KonfigurasiAppProps> = ({
       }
 
       try {
-        const compressedDataUrl = await compressImage(file, 1024, 1024, 0.92);
+        const compressedDataUrl = await compressImage(file, 360, 360, 0.85);
         setLogoPreview(compressedDataUrl);
         const updated = { ...formData, logoAplikasiUrl: compressedDataUrl };
         setFormData(updated);
         onSaveAppConfig(updated);
-        showToast('Logo aplikasi berhasil diunggah dan disimpan!', 'success');
+        showToast('Logo aplikasi berhasil diunggah dan disimpan! Tersinkronkan otomatis.', 'success');
       } catch (err) {
         console.error('Compress logo error:', err);
         showToast('Gagal memproses gambar logo.', 'error');
@@ -59,8 +59,11 @@ export const KonfigurasiAppView: React.FC<KonfigurasiAppProps> = ({
   };
 
   const handleResetLogo = () => {
-    setLogoPreview('');
-    setFormData((prev) => ({ ...prev, logoAplikasiUrl: '' }));
+    const updated = { ...formData, logoAplikasiUrl: '/logo.jpg' };
+    setLogoPreview('/logo.jpg');
+    setFormData(updated);
+    onSaveAppConfig(updated);
+    showToast('Logo aplikasi dikembalikan ke logo default.', 'success');
   };
 
   const handleSubmit = (e: React.FormEvent) => {
