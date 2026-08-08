@@ -66,17 +66,19 @@ export const Header: React.FC<HeaderProps> = ({
           <Menu className="w-6 h-6" />
         </button>
 
-        <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center shrink-0 overflow-hidden shadow-xs">
-          {currentSekolah?.logoSekolahUrl ? (
+        {currentSekolah?.logoSekolahUrl ? (
+          <div className="w-10 h-10 flex items-center justify-center shrink-0 overflow-hidden bg-transparent">
             <img
               src={currentSekolah.logoSekolahUrl}
               alt={currentSekolah.namaSekolah || 'Logo'}
-              className="w-full h-full object-contain p-0.5"
+              className="w-full h-full object-contain"
             />
-          ) : (
+          </div>
+        ) : (
+          <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center shrink-0 overflow-hidden">
             <School className="w-5 h-5 text-slate-500" />
-          )}
-        </div>
+          </div>
+        )}
         <div className="min-w-0">
           <h2 className="text-sm sm:text-base font-bold text-slate-800 dark:text-slate-100 leading-tight truncate">
             {currentSekolah?.namaSekolah || 'SMA Negeri 1 Permata Bangsa'}
