@@ -48,17 +48,6 @@ export const Header: React.FC<HeaderProps> = ({
   const currentGuru = guru || profilGuru;
   const activeDark = isDarkMode ?? darkMode ?? false;
 
-  const [sekolahLogoError, setSekolahLogoError] = React.useState(false);
-  const [guruFotoError, setGuruFotoError] = React.useState(false);
-
-  React.useEffect(() => {
-    setSekolahLogoError(false);
-  }, [currentSekolah?.logoSekolahUrl]);
-
-  React.useEffect(() => {
-    setGuruFotoError(false);
-  }, [currentGuru?.fotoProfilUrl]);
-
   const handleToggleDark = () => {
     if (onToggleDarkMode) onToggleDarkMode();
     if (setIsDarkMode) setIsDarkMode(!activeDark);
@@ -77,18 +66,17 @@ export const Header: React.FC<HeaderProps> = ({
           <Menu className="w-6 h-6" />
         </button>
 
-        {!sekolahLogoError && currentSekolah?.logoSekolahUrl ? (
+        {currentSekolah?.logoSekolahUrl ? (
           <div className="w-10 h-10 flex items-center justify-center shrink-0 overflow-hidden bg-transparent">
             <img
               src={currentSekolah.logoSekolahUrl}
               alt={currentSekolah.namaSekolah || 'Logo'}
               className="w-full h-full object-contain"
-              onError={() => setSekolahLogoError(true)}
             />
           </div>
         ) : (
           <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center shrink-0 overflow-hidden">
-            <School className="w-5 h-5 text-slate-500 dark:text-slate-400" />
+            <School className="w-5 h-5 text-slate-500" />
           </div>
         )}
         <div className="min-w-0">
@@ -194,16 +182,15 @@ export const Header: React.FC<HeaderProps> = ({
               {currentGuru?.nip ? `NIP. ${currentGuru.nip}` : 'Guru Mata Pelajaran'}
             </p>
           </div>
-          <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-full border border-slate-200 dark:border-slate-700 shadow-xs overflow-hidden shrink-0 flex items-center justify-center">
-            {!guruFotoError && currentGuru?.fotoProfilUrl ? (
+          <div className="w-10 h-10 bg-violet-100 rounded-full border-2 border-white dark:border-slate-800 shadow-sm overflow-hidden shrink-0 flex items-center justify-center">
+            {currentGuru?.fotoProfilUrl ? (
               <img
                 src={currentGuru.fotoProfilUrl}
                 alt={currentGuru.namaGuru}
                 className="w-full h-full object-cover"
-                onError={() => setGuruFotoError(true)}
               />
             ) : (
-              <User className="w-5 h-5 text-slate-500 dark:text-slate-400" />
+              <User className="w-5 h-5 text-violet-600" />
             )}
           </div>
         </button>

@@ -54,7 +54,7 @@ export const ProfilGuruView: React.FC<ProfilGuruProps> = ({
     const file = e.target.files?.[0];
     if (file) {
       try {
-        const compressedDataUrl = await compressImage(file, 360, 360, 0.85);
+        const compressedDataUrl = await compressImage(file, 1024, 1024, 0.92);
         setFotoPreview(compressedDataUrl);
         const updated = { ...formData, fotoProfilUrl: compressedDataUrl };
         setFormData(updated);
@@ -102,7 +102,7 @@ export const ProfilGuruView: React.FC<ProfilGuruProps> = ({
           <div className="flex flex-col sm:flex-row items-center gap-6">
             <div className="w-24 h-24 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden shrink-0 ring-4 ring-violet-500/20">
               {fotoPreview ? (
-                <img src={fotoPreview} alt="Foto Profil Guru" className="w-full h-full object-cover" onError={() => setFotoPreview('')} />
+                <img src={fotoPreview} alt="Foto Profil Guru" className="w-full h-full object-cover" />
               ) : (
                 <User className="w-10 h-10 text-slate-400" />
               )}

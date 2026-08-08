@@ -3,7 +3,7 @@ import { AppConfig, DataSekolah, ProfilGuru, Mapel, Kelas, Siswa, PresensiRecord
 export const initialAppConfig: AppConfig = {
   namaAplikasi: 'Catatan Seorang Guru',
   deskripsiAplikasi: 'Merawat Jejak Pengabdian',
-  logoAplikasiUrl: '/logo.jpg',
+  logoAplikasiUrl: '/logo.svg',
 };
 
 export const initialDataSekolah: DataSekolah = {
@@ -19,7 +19,7 @@ export const initialDataSekolah: DataSekolah = {
   website: 'https://sman1mandiri.sch.id',
   akreditasi: 'A (Unggul)',
   namaKepalaSekolah: 'Dr. H. Ahmad Santoso, M.Pd.',
-  logoSekolahUrl: '',
+  logoSekolahUrl: 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=150&auto=format&fit=crop&q=80',
 };
 
 export const initialProfilGuru: ProfilGuru = {
@@ -32,7 +32,7 @@ export const initialProfilGuru: ProfilGuru = {
   nomorHp: '081234567890',
   email: 'budi.raharjo@sman1mandiri.sch.id',
   alamat: 'Jl. Merdeka No. 12, Bandung',
-  fotoProfilUrl: '',
+  fotoProfilUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
 };
 
 export const initialMapelList: Mapel[] = [

@@ -45,12 +45,12 @@ export const KonfigurasiAppView: React.FC<KonfigurasiAppProps> = ({
       }
 
       try {
-        const compressedDataUrl = await compressImage(file, 360, 360, 0.85);
+        const compressedDataUrl = await compressImage(file, 1024, 1024, 0.92);
         setLogoPreview(compressedDataUrl);
         const updated = { ...formData, logoAplikasiUrl: compressedDataUrl };
         setFormData(updated);
         onSaveAppConfig(updated);
-        showToast('Logo aplikasi berhasil diunggah dan disimpan! Tersinkronkan otomatis.', 'success');
+        showToast('Logo aplikasi berhasil diunggah dan disimpan!', 'success');
       } catch (err) {
         console.error('Compress logo error:', err);
         showToast('Gagal memproses gambar logo.', 'error');
@@ -59,11 +59,8 @@ export const KonfigurasiAppView: React.FC<KonfigurasiAppProps> = ({
   };
 
   const handleResetLogo = () => {
-    const updated = { ...formData, logoAplikasiUrl: '/logo.jpg' };
-    setLogoPreview('/logo.jpg');
-    setFormData(updated);
-    onSaveAppConfig(updated);
-    showToast('Logo aplikasi dikembalikan ke logo default.', 'success');
+    setLogoPreview('');
+    setFormData((prev) => ({ ...prev, logoAplikasiUrl: '' }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -105,13 +102,12 @@ export const KonfigurasiAppView: React.FC<KonfigurasiAppProps> = ({
             Logo Aplikasi
           </label>
           <div className="flex flex-col sm:flex-row items-center gap-6">
-            <div className="w-24 h-24 rounded-2xl bg-transparent border-2 border-dashed border-slate-200 dark:border-slate-700 flex items-center justify-center overflow-hidden shrink-0 relative group">
+            <div className="w-24 h-24 rounded-2xl bg-slate-50 dark:bg-slate-800 border-2 border-dashed border-slate-200 dark:border-slate-700 flex items-center justify-center overflow-hidden shrink-0 relative group">
               {logoPreview ? (
                 <img
                   src={logoPreview}
                   alt="Logo Aplikasi"
-                  className="w-full h-full object-contain"
-                  onError={() => setLogoPreview('/logo.jpg')}
+                  className="w-full h-full object-contain p-2"
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500">
@@ -193,11 +189,11 @@ export const KonfigurasiAppView: React.FC<KonfigurasiAppProps> = ({
           </div>
           <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center space-x-3 max-w-sm">
             {logoPreview ? (
-              <div className="w-10 h-10 flex items-center justify-center shrink-0 overflow-hidden bg-transparent">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xs">
                 <img
                   src={logoPreview}
                   alt="Preview"
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain p-0.5"
                 />
               </div>
             ) : (

@@ -127,15 +127,6 @@ function saveAppDataFull(data) {
     var ss = getSpreadsheet();
     if (!data) return { status: "error", message: "Data kosong" };
 
-    // 0. Konfigurasi App
-    if (data.appConfig) {
-      var ac = data.appConfig;
-      writeSheet(ss, "Konfigurasi App",
-        ["Nama Aplikasi", "Deskripsi Aplikasi", "Logo URL"],
-        [[ac.namaAplikasi||'', ac.deskripsiAplikasi||'', ac.logoAplikasiUrl||'']]
-      );
-    }
-
     // 1. Data Sekolah
     if (data.dataSekolah) {
       var ds = data.dataSekolah;
@@ -282,17 +273,6 @@ function loadAppDataFull() {
 
     // Fallback: Read from individual sheets directly
     var payload = {};
-
-    // 0. Konfigurasi App
-    var sheetAppConfig = ss.getSheetByName("Konfigurasi App");
-    if (sheetAppConfig && sheetAppConfig.getLastRow() >= 2) {
-      var acData = sheetAppConfig.getRange(2, 1, 1, 3).getValues()[0];
-      payload.appConfig = {
-        namaAplikasi: String(acData[0]||''),
-        deskripsiAplikasi: String(acData[1]||''),
-        logoAplikasiUrl: String(acData[2]||'')
-      };
-    }
 
     // 1. Data Sekolah
     var sheetSekolah = ss.getSheetByName("Data Sekolah");
@@ -696,7 +676,7 @@ export const INDEX_HTML_CONTENT = `<!DOCTYPE html>
               {/* Brand Header */}
               <div className="flex items-center space-x-3 pb-4 border-b border-slate-100 dark:border-slate-800">
                 {logoUrl ? (
-                  <div className="w-11 h-11 flex items-center justify-center shrink-0 overflow-hidden bg-transparent">
+                  <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-1">
                     <img src={logoUrl} alt="Logo" className="w-full h-full object-contain" />
                   </div>
                 ) : (
