@@ -1,5 +1,6 @@
 import React from 'react';
 import { ActiveTab, DataSekolah, AppConfig } from '../types';
+import { DEFAULT_APP_LOGO } from '../data/initialData';
 import {
   LayoutDashboard,
   Building2,
@@ -96,7 +97,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     if (setIsOpenMobile) setIsOpenMobile(false);
   };
 
-  const appLogo = appConfig?.logoAplikasiUrl || '/logo.svg';
+  const appLogo = appConfig?.logoAplikasiUrl || DEFAULT_APP_LOGO;
   const appName = appConfig?.namaAplikasi || 'Catatan Seorang Guru';
   const appDesc = appConfig?.deskripsiAplikasi || 'Merawat Jejak Pengabdian';
 

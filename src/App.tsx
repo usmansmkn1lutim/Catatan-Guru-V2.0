@@ -20,6 +20,7 @@ import {
   initialPresensiList,
   initialNilaiList,
   initialJurnalList,
+  DEFAULT_APP_LOGO,
 } from './data/initialData';
 import {
   loadFromStorage,
@@ -72,7 +73,7 @@ export function App() {
     return {
       namaAplikasi: saved?.namaAplikasi && saved.namaAplikasi !== 'Catatan Guru' ? saved.namaAplikasi : initialAppConfig.namaAplikasi,
       deskripsiAplikasi: saved?.deskripsiAplikasi && saved.deskripsiAplikasi !== 'Administrasi & Catatan Seorang Guru' ? saved.deskripsiAplikasi : initialAppConfig.deskripsiAplikasi,
-      logoAplikasiUrl: storedAppLogo || saved?.logoAplikasiUrl || initialAppConfig.logoAplikasiUrl,
+      logoAplikasiUrl: storedAppLogo || saved?.logoAplikasiUrl || initialAppConfig.logoAplikasiUrl || DEFAULT_APP_LOGO,
     };
   });
   const [dataSekolah, setDataSekolah] = useState<DataSekolah>(() => {
@@ -262,7 +263,7 @@ export function App() {
         if (remoteData.appConfig) {
           setAppConfig((prev) => ({
             ...remoteData.appConfig,
-            logoAplikasiUrl: remoteData.appConfig.logoAplikasiUrl || prev.logoAplikasiUrl || '',
+            logoAplikasiUrl: remoteData.appConfig.logoAplikasiUrl || prev.logoAplikasiUrl || DEFAULT_APP_LOGO,
           }));
         }
 
@@ -534,7 +535,15 @@ export function App() {
           {activeTab === 'konfigurasi' && (
             <KonfigurasiAppView
               appConfig={appConfig}
-              onSaveAppConfig={setAppConfig}
+              onSaveAppConfig={(newConfig) => {
+                const updated = {
+                  ...newConfig,
+                  logoAplikasiUrl: newConfig.logoAplikasiUrl || DEFAULT_APP_LOGO,
+                };
+                setAppConfig(updated);
+                saveToStorage('appConfig', updated);
+                localStorage.setItem('APP_LOGO_URL', updated.logoAplikasiUrl);
+              }}
               showToast={showToast}
             />
           )}

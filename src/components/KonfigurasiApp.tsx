@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AppConfig } from '../types';
 import { Sliders, Save, Upload, RotateCcw, Image as ImageIcon, Sparkles } from 'lucide-react';
 import { compressImage } from '../lib/imageUtils';
+import { DEFAULT_APP_LOGO } from '../data/initialData';
 
 interface KonfigurasiAppProps {
   appConfig: AppConfig;
@@ -15,15 +16,13 @@ export const KonfigurasiAppView: React.FC<KonfigurasiAppProps> = ({
   showToast,
 }) => {
   const [formData, setFormData] = useState<AppConfig>(appConfig);
-  const [logoPreview, setLogoPreview] = useState<string>(appConfig.logoAplikasiUrl || '');
+  const [logoPreview, setLogoPreview] = useState<string>(appConfig.logoAplikasiUrl || DEFAULT_APP_LOGO);
 
   // Keep state synchronized with incoming appConfig prop
   useEffect(() => {
     if (appConfig) {
       setFormData(appConfig);
-      if (appConfig.logoAplikasiUrl) {
-        setLogoPreview(appConfig.logoAplikasiUrl);
-      }
+      setLogoPreview(appConfig.logoAplikasiUrl || DEFAULT_APP_LOGO);
     }
   }, [appConfig]);
 
@@ -50,6 +49,7 @@ export const KonfigurasiAppView: React.FC<KonfigurasiAppProps> = ({
         const updated = { ...formData, logoAplikasiUrl: compressedDataUrl };
         setFormData(updated);
         onSaveAppConfig(updated);
+        localStorage.setItem('APP_LOGO_URL', compressedDataUrl);
         showToast('Logo aplikasi berhasil diunggah dan disimpan!', 'success');
       } catch (err) {
         console.error('Compress logo error:', err);
@@ -59,8 +59,12 @@ export const KonfigurasiAppView: React.FC<KonfigurasiAppProps> = ({
   };
 
   const handleResetLogo = () => {
-    setLogoPreview('');
-    setFormData((prev) => ({ ...prev, logoAplikasiUrl: '' }));
+    setLogoPreview(DEFAULT_APP_LOGO);
+    const updated = { ...formData, logoAplikasiUrl: DEFAULT_APP_LOGO };
+    setFormData(updated);
+    onSaveAppConfig(updated);
+    localStorage.setItem('APP_LOGO_URL', DEFAULT_APP_LOGO);
+    showToast('Logo aplikasi berhasil dikembalikan ke logo default.', 'success');
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -103,18 +107,11 @@ export const KonfigurasiAppView: React.FC<KonfigurasiAppProps> = ({
           </label>
           <div className="flex flex-col sm:flex-row items-center gap-6">
             <div className="w-24 h-24 rounded-2xl bg-slate-50 dark:bg-slate-800 border-2 border-dashed border-slate-200 dark:border-slate-700 flex items-center justify-center overflow-hidden shrink-0 relative group">
-              {logoPreview ? (
-                <img
-                  src={logoPreview}
-                  alt="Logo Aplikasi"
-                  className="w-full h-full object-contain p-2"
-                />
-              ) : (
-                <div className="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500">
-                  <ImageIcon className="w-8 h-8" />
-                  <span className="text-[10px] font-bold mt-1">Default Logo</span>
-                </div>
-              )}
+              <img
+                src={logoPreview || DEFAULT_APP_LOGO}
+                alt="Logo Aplikasi"
+                className="w-full h-full object-contain p-2"
+              />
             </div>
 
             <div className="space-y-3 text-center sm:text-left flex-1">
@@ -130,7 +127,7 @@ export const KonfigurasiAppView: React.FC<KonfigurasiAppProps> = ({
                   />
                 </label>
 
-                {logoPreview && (
+                {logoPreview && logoPreview !== DEFAULT_APP_LOGO && (
                   <button
                     type="button"
                     onClick={handleResetLogo}
@@ -188,19 +185,13 @@ export const KonfigurasiAppView: React.FC<KonfigurasiAppProps> = ({
             <span>Pratinjau Tampilan Sidebar</span>
           </div>
           <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center space-x-3 max-w-sm">
-            {logoPreview ? (
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xs">
-                <img
-                  src={logoPreview}
-                  alt="Preview"
-                  className="w-full h-full object-contain p-0.5"
-                />
-              </div>
-            ) : (
-              <div className="w-10 h-10 rounded-xl bg-violet-600 flex items-center justify-center text-white font-bold text-lg shadow-md shrink-0 overflow-hidden">
-                S
-              </div>
-            )}
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xs">
+              <img
+                src={logoPreview || DEFAULT_APP_LOGO}
+                alt="Preview"
+                className="w-full h-full object-contain p-0.5"
+              />
+            </div>
             <div className="min-w-0">
               <h4 className="text-sm font-bold text-slate-900 dark:text-white leading-tight truncate">
                 {formData.namaAplikasi || 'Catatan Seorang Guru'}
