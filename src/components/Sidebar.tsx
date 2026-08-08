@@ -100,22 +100,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const appName = appConfig?.namaAplikasi || 'Catatan Seorang Guru';
   const appDesc = appConfig?.deskripsiAplikasi || 'Merawat Jejak Pengabdian';
 
+  const [imgError, setImgError] = React.useState(false);
+
+  React.useEffect(() => {
+    setImgError(false);
+  }, [appLogo]);
+
   const sidebarContent = (
     <div className="h-full flex flex-col bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transition-colors w-64 select-none">
       {/* Sidebar Header */}
       <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
         <div className="flex items-center space-x-3 min-w-0">
-          {appLogo ? (
+          {!imgError && appLogo ? (
             <div className="w-10 h-10 flex items-center justify-center shrink-0 overflow-hidden bg-transparent">
               <img
                 src={appLogo}
                 alt="Logo"
                 className="w-full h-full object-contain"
+                onError={() => setImgError(true)}
               />
             </div>
           ) : (
             <div className="w-10 h-10 rounded-xl bg-violet-600 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-violet-500/20 shrink-0 overflow-hidden">
-              S
+              <BookOpen className="w-5 h-5 text-white" />
             </div>
           )}
           <div className="min-w-0 flex-1">

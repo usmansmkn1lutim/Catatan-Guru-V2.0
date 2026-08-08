@@ -48,6 +48,17 @@ export const Header: React.FC<HeaderProps> = ({
   const currentGuru = guru || profilGuru;
   const activeDark = isDarkMode ?? darkMode ?? false;
 
+  const [sekolahLogoError, setSekolahLogoError] = React.useState(false);
+  const [guruFotoError, setGuruFotoError] = React.useState(false);
+
+  React.useEffect(() => {
+    setSekolahLogoError(false);
+  }, [currentSekolah?.logoSekolahUrl]);
+
+  React.useEffect(() => {
+    setGuruFotoError(false);
+  }, [currentGuru?.fotoProfilUrl]);
+
   const handleToggleDark = () => {
     if (onToggleDarkMode) onToggleDarkMode();
     if (setIsDarkMode) setIsDarkMode(!activeDark);
@@ -66,12 +77,13 @@ export const Header: React.FC<HeaderProps> = ({
           <Menu className="w-6 h-6" />
         </button>
 
-        {currentSekolah?.logoSekolahUrl ? (
+        {!sekolahLogoError && currentSekolah?.logoSekolahUrl ? (
           <div className="w-10 h-10 flex items-center justify-center shrink-0 overflow-hidden bg-transparent">
             <img
               src={currentSekolah.logoSekolahUrl}
               alt={currentSekolah.namaSekolah || 'Logo'}
               className="w-full h-full object-contain"
+              onError={() => setSekolahLogoError(true)}
             />
           </div>
         ) : (
@@ -183,11 +195,12 @@ export const Header: React.FC<HeaderProps> = ({
             </p>
           </div>
           <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-full border border-slate-200 dark:border-slate-700 shadow-xs overflow-hidden shrink-0 flex items-center justify-center">
-            {currentGuru?.fotoProfilUrl ? (
+            {!guruFotoError && currentGuru?.fotoProfilUrl ? (
               <img
                 src={currentGuru.fotoProfilUrl}
                 alt={currentGuru.namaGuru}
                 className="w-full h-full object-cover"
+                onError={() => setGuruFotoError(true)}
               />
             ) : (
               <User className="w-5 h-5 text-slate-500 dark:text-slate-400" />

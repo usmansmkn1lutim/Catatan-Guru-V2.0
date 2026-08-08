@@ -28,6 +28,7 @@ import {
 } from './lib/storage';
 import { getStoredGasUrl, saveAppDataToGasUrl, loadAppDataFromGasUrl } from './lib/gasApi';
 import { getAccessToken, exportToGoogleSheets, importFromGoogleSheets } from './lib/googleSheets';
+import { isCorruptImageDataUrl } from './lib/imageUtils';
 import { sanitizePresensiList, formatDateString } from './lib/dateUtils';
 import { CODE_GS_TEMPLATE, INDEX_HTML_TEMPLATE } from './lib/gasCode';
 
@@ -67,24 +68,27 @@ export function App() {
   // Main State
   const [appConfig, setAppConfig] = useState<AppConfig>(() => {
     const saved = loadFromStorage('appConfig', initialAppConfig);
+    const savedLogo = saved?.logoAplikasiUrl;
     return {
       namaAplikasi: saved?.namaAplikasi && saved.namaAplikasi !== 'Catatan Guru' ? saved.namaAplikasi : initialAppConfig.namaAplikasi,
       deskripsiAplikasi: saved?.deskripsiAplikasi && saved.deskripsiAplikasi !== 'Administrasi & Catatan Seorang Guru' ? saved.deskripsiAplikasi : initialAppConfig.deskripsiAplikasi,
-      logoAplikasiUrl: (saved?.logoAplikasiUrl && saved.logoAplikasiUrl !== '/logo.svg') ? saved.logoAplikasiUrl : initialAppConfig.logoAplikasiUrl,
+      logoAplikasiUrl: (savedLogo && !isCorruptImageDataUrl(savedLogo)) ? savedLogo : initialAppConfig.logoAplikasiUrl,
     };
   });
   const [dataSekolah, setDataSekolah] = useState<DataSekolah>(() => {
     const saved = loadFromStorage('dataSekolah', initialDataSekolah);
+    const savedLogo = saved?.logoSekolahUrl;
     return {
       ...saved,
-      logoSekolahUrl: (saved?.logoSekolahUrl && !saved.logoSekolahUrl.includes('unsplash.com')) ? saved.logoSekolahUrl : '',
+      logoSekolahUrl: (savedLogo && !isCorruptImageDataUrl(savedLogo) && !savedLogo.includes('unsplash.com')) ? savedLogo : '',
     };
   });
   const [profilGuru, setProfilGuru] = useState<ProfilGuru>(() => {
     const saved = loadFromStorage('profilGuru', initialProfilGuru);
+    const savedFoto = saved?.fotoProfilUrl;
     return {
       ...saved,
-      fotoProfilUrl: (saved?.fotoProfilUrl && !saved.fotoProfilUrl.includes('unsplash.com')) ? saved.fotoProfilUrl : '',
+      fotoProfilUrl: (savedFoto && !isCorruptImageDataUrl(savedFoto) && !savedFoto.includes('unsplash.com')) ? savedFoto : '',
     };
   });
   const [mapelList, setMapelList] = useState<Mapel[]>(() =>
@@ -224,16 +228,24 @@ export function App() {
 
       if (remoteData) {
         if (remoteData.dataSekolah) {
-          setDataSekolah((prev) => ({
-            ...remoteData.dataSekolah,
-            logoSekolahUrl: remoteData.dataSekolah.logoSekolahUrl || prev.logoSekolahUrl || '',
-          }));
+          setDataSekolah((prev) => {
+            const remoteLogo = remoteData.dataSekolah.logoSekolahUrl;
+            const validLogo = (remoteLogo && !isCorruptImageDataUrl(remoteLogo)) ? remoteLogo : (prev.logoSekolahUrl || '');
+            return {
+              ...remoteData.dataSekolah,
+              logoSekolahUrl: validLogo,
+            };
+          });
         }
         if (remoteData.profilGuru) {
-          setProfilGuru((prev) => ({
-            ...remoteData.profilGuru,
-            fotoProfilUrl: remoteData.profilGuru.fotoProfilUrl || prev.fotoProfilUrl || '',
-          }));
+          setProfilGuru((prev) => {
+            const remoteFoto = remoteData.profilGuru.fotoProfilUrl;
+            const validFoto = (remoteFoto && !isCorruptImageDataUrl(remoteFoto)) ? remoteFoto : (prev.fotoProfilUrl || '');
+            return {
+              ...remoteData.profilGuru,
+              fotoProfilUrl: validFoto,
+            };
+          });
         }
         if (remoteData.mapelList && Array.isArray(remoteData.mapelList)) setMapelList(remoteData.mapelList);
         if (remoteData.kelasList && Array.isArray(remoteData.kelasList)) setKelasList(remoteData.kelasList);
@@ -248,10 +260,14 @@ export function App() {
           setJurnalList(remoteData.jurnalList.map((j: JurnalRecord) => ({ ...j, tanggal: formatDateString(j.tanggal) })));
         }
         if (remoteData.appConfig) {
-          setAppConfig((prev) => ({
-            ...remoteData.appConfig,
-            logoAplikasiUrl: remoteData.appConfig.logoAplikasiUrl || prev.logoAplikasiUrl || '',
-          }));
+          setAppConfig((prev) => {
+            const remoteLogo = remoteData.appConfig.logoAplikasiUrl;
+            const validLogo = (remoteLogo && !isCorruptImageDataUrl(remoteLogo)) ? remoteLogo : (prev.logoAplikasiUrl || '/logo.jpg');
+            return {
+              ...remoteData.appConfig,
+              logoAplikasiUrl: validLogo,
+            };
+          });
         }
 
         const timeStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });

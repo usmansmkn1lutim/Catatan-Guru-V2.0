@@ -105,7 +105,7 @@ export const DataSekolahView: React.FC<DataSekolahProps> = ({
           <div className="flex flex-col sm:flex-row items-center gap-6">
             <div className="w-24 h-24 rounded-xl bg-transparent border border-slate-200 dark:border-slate-800 flex items-center justify-center overflow-hidden shrink-0">
               {logoPreview ? (
-                <img src={logoPreview} alt="Logo Sekolah" className="w-full h-full object-contain" />
+                <img src={logoPreview} alt="Logo Sekolah" className="w-full h-full object-contain" onError={() => setLogoPreview('')} />
               ) : (
                 <Building2 className="w-8 h-8 text-slate-400" />
               )}

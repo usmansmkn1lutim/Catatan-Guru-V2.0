@@ -111,6 +111,7 @@ export const KonfigurasiAppView: React.FC<KonfigurasiAppProps> = ({
                   src={logoPreview}
                   alt="Logo Aplikasi"
                   className="w-full h-full object-contain"
+                  onError={() => setLogoPreview('/logo.jpg')}
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500">
