@@ -68,15 +68,21 @@ export function App() {
   // Main State
   const [appConfig, setAppConfig] = useState<AppConfig>(() => {
     const saved = loadFromStorage('appConfig', initialAppConfig);
+    const storedAppLogo = localStorage.getItem('APP_LOGO_URL');
     return {
       namaAplikasi: saved?.namaAplikasi && saved.namaAplikasi !== 'Catatan Guru' ? saved.namaAplikasi : initialAppConfig.namaAplikasi,
       deskripsiAplikasi: saved?.deskripsiAplikasi && saved.deskripsiAplikasi !== 'Administrasi & Catatan Seorang Guru' ? saved.deskripsiAplikasi : initialAppConfig.deskripsiAplikasi,
-      logoAplikasiUrl: saved?.logoAplikasiUrl || initialAppConfig.logoAplikasiUrl,
+      logoAplikasiUrl: storedAppLogo || saved?.logoAplikasiUrl || initialAppConfig.logoAplikasiUrl,
     };
   });
-  const [dataSekolah, setDataSekolah] = useState<DataSekolah>(() =>
-    loadFromStorage('dataSekolah', initialDataSekolah)
-  );
+  const [dataSekolah, setDataSekolah] = useState<DataSekolah>(() => {
+    const saved = loadFromStorage('dataSekolah', initialDataSekolah);
+    const storedSchoolLogo = localStorage.getItem('SCHOOL_LOGO_URL');
+    return {
+      ...saved,
+      logoSekolahUrl: storedSchoolLogo || saved?.logoSekolahUrl || initialDataSekolah.logoSekolahUrl,
+    };
+  });
   const [profilGuru, setProfilGuru] = useState<ProfilGuru>(() =>
     loadFromStorage('profilGuru', initialProfilGuru)
   );
@@ -144,10 +150,16 @@ export function App() {
   // Persist to local storage on changes
   useEffect(() => {
     saveToStorage('appConfig', appConfig);
+    if (appConfig?.logoAplikasiUrl) {
+      localStorage.setItem('APP_LOGO_URL', appConfig.logoAplikasiUrl);
+    }
   }, [appConfig]);
 
   useEffect(() => {
     saveToStorage('dataSekolah', dataSekolah);
+    if (dataSekolah?.logoSekolahUrl) {
+      localStorage.setItem('SCHOOL_LOGO_URL', dataSekolah.logoSekolahUrl);
+    }
   }, [dataSekolah]);
 
   useEffect(() => {

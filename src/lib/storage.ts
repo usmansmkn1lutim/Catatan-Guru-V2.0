@@ -23,6 +23,8 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 const KEYS = {
+  APP_LOGO: 'APP_LOGO_URL',
+  SCHOOL_LOGO: 'SCHOOL_LOGO_URL',
   SEKOLAH: 'catatan_guru_sekolah_v1',
   GURU: 'catatan_guru_profil_v1',
   MAPEL: 'catatan_guru_mapel_v1',

@@ -96,7 +96,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     if (setIsOpenMobile) setIsOpenMobile(false);
   };
 
-  const appLogo = appConfig?.logoAplikasiUrl || sekolah?.logoSekolahUrl || '/logo.svg';
+  const appLogo = appConfig?.logoAplikasiUrl || '/logo.svg';
   const appName = appConfig?.namaAplikasi || 'Catatan Seorang Guru';
   const appDesc = appConfig?.deskripsiAplikasi || 'Merawat Jejak Pengabdian';
 
