@@ -26,11 +26,12 @@ export function updateDynamicFavicons(logoUrl: string | undefined): void {
       link.href = href;
     };
 
-    // Update semua media tag favicon & touch icon
+    // Update semua media tag favicon & touch icon untuk semua jenis device
     setLinkTag('icon', 'image/png', '96x96', logoUrl);
     setLinkTag('icon', 'image/svg+xml', null, logoUrl);
     setLinkTag('shortcut icon', null, null, logoUrl);
     setLinkTag('apple-touch-icon', null, '180x180', logoUrl);
+    setLinkTag('apple-touch-icon-precomposed', null, '180x180', logoUrl);
   } catch (err) {
     console.error('Gagal memperbarui dynamic favicon:', err);
   }
