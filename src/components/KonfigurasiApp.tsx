@@ -45,7 +45,7 @@ export const KonfigurasiAppView: React.FC<KonfigurasiAppProps> = ({
       }
 
       try {
-        const compressedDataUrl = await compressImage(file, 1024, 1024, 0.92);
+        const compressedDataUrl = await compressImage(file, 400, 400, 0.85);
         setLogoPreview(compressedDataUrl);
         const updated = { ...formData, logoAplikasiUrl: compressedDataUrl };
         setFormData(updated);

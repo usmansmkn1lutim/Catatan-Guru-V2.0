@@ -57,7 +57,7 @@ export const DataSekolahView: React.FC<DataSekolahProps> = ({
     const file = e.target.files?.[0];
     if (file) {
       try {
-        const compressedDataUrl = await compressImage(file, 1024, 1024, 0.92);
+        const compressedDataUrl = await compressImage(file, 400, 400, 0.85);
         setLogoPreview(compressedDataUrl);
         const updated = { ...formData, logoSekolahUrl: compressedDataUrl };
         setFormData(updated);
