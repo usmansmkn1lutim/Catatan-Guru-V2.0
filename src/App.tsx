@@ -30,6 +30,7 @@ import { getStoredGasUrl, saveAppDataToGasUrl, loadAppDataFromGasUrl } from './l
 import { getAccessToken, exportToGoogleSheets, importFromGoogleSheets } from './lib/googleSheets';
 import { sanitizePresensiList, formatDateString } from './lib/dateUtils';
 import { CODE_GS_TEMPLATE, INDEX_HTML_TEMPLATE } from './lib/gasCode';
+import { updateDynamicFavicons } from './lib/faviconUtils';
 
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
@@ -132,6 +133,13 @@ export function App() {
       localStorage.setItem('theme_mode', 'light');
     }
   }, [darkMode]);
+
+  // Dynamic Favicon and App Icon sync across devices
+  useEffect(() => {
+    if (appConfig?.logoAplikasiUrl) {
+      updateDynamicFavicons(appConfig.logoAplikasiUrl);
+    }
+  }, [appConfig?.logoAplikasiUrl]);
 
   // Persist to local storage on changes
   useEffect(() => {
