@@ -273,11 +273,11 @@ export function App() {
     }
   };
 
-  // Initial Boot & Window Focus Remote Sync
+  // Initial Boot, Window Focus, Visibility Change, Periodic Auto-Fetch & Multi-Tab Sync
   useEffect(() => {
     handleFetchRemoteData(true);
 
-    const onFocus = () => {
+    const onSyncTrigger = () => {
       const gasUrl = getStoredGasUrl();
       const activeSheetId = localStorage.getItem('catatan_guru_active_sheet_id');
       if (gasUrl || activeSheetId) {
@@ -285,9 +285,47 @@ export function App() {
       }
     };
 
-    window.addEventListener('focus', onFocus);
+    window.addEventListener('focus', onSyncTrigger);
+    document.addEventListener('visibilitychange', onSyncTrigger);
+
+    // Periodic auto-pull every 30 seconds for background sync across HP, Laptop, and Tablet
+    const syncInterval = setInterval(() => {
+      const gasUrl = getStoredGasUrl();
+      const activeSheetId = localStorage.getItem('catatan_guru_active_sheet_id');
+      if (gasUrl || activeSheetId) {
+        handleFetchRemoteData(true);
+      }
+    }, 30000);
+
+    // Multi-tab local storage sync for same device
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'catatan_guru_appConfig_v1' && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (parsed) setAppConfig(parsed);
+        } catch (err) {}
+      }
+      if (e.key === 'catatan_guru_dataSekolah_v1' && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (parsed) setDataSekolah(parsed);
+        } catch (err) {}
+      }
+      if (e.key === 'catatan_guru_profilGuru_v1' && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (parsed) setProfilGuru(parsed);
+        } catch (err) {}
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
     return () => {
-      window.removeEventListener('focus', onFocus);
+      window.removeEventListener('focus', onSyncTrigger);
+      document.removeEventListener('visibilitychange', onSyncTrigger);
+      clearInterval(syncInterval);
+      window.removeEventListener('storage', handleStorageChange);
     };
   }, []);
 

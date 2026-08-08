@@ -9,6 +9,7 @@ import {
 } from 'firebase/auth';
 import firebaseConfig from '../../firebase-applet-config.json';
 import {
+  AppConfig,
   DataSekolah,
   ProfilGuru,
   Mapel,
@@ -169,6 +170,7 @@ export async function exportToGoogleSheets(
   spreadsheetId: string,
   accessToken: string,
   data: {
+    appConfig?: AppConfig;
     dataSekolah: DataSekolah;
     profilGuru: ProfilGuru;
     mapelList: Mapel[];
@@ -181,6 +183,12 @@ export async function exportToGoogleSheets(
 ) {
   try {
     // 1. Prepare sheet data rows
+    const appConfigRows = [
+      ['KEY', 'VALUE'],
+      ['Nama Aplikasi', data.appConfig?.namaAplikasi || ''],
+      ['Deskripsi Aplikasi', data.appConfig?.deskripsiAplikasi || ''],
+      ['Logo Aplikasi URL', data.appConfig?.logoAplikasiUrl || ''],
+    ];
     const dataSekolahRows = [
       ['KEY', 'VALUE'],
       ['NPSN', data.dataSekolah.npsn],
@@ -293,6 +301,7 @@ export async function exportToGoogleSheets(
     const payload = {
       valueInputOption: 'USER_ENTERED',
       data: [
+        { range: 'Konfigurasi_App!A1', values: appConfigRows },
         { range: 'Data_Sekolah!A1', values: dataSekolahRows },
         { range: 'Profil_Guru!A1', values: profilGuruRows },
         { range: 'Data_Mapel!A1', values: mapelRows },
@@ -332,6 +341,7 @@ export async function exportToGoogleSheets(
 export async function importFromGoogleSheets(spreadsheetId: string, accessToken: string) {
   try {
     const ranges = [
+      'Konfigurasi_App!A1:B10',
       'Data_Sekolah!A1:B20',
       'Profil_Guru!A1:B20',
       'Data_Mapel!A2:G100',
@@ -355,22 +365,29 @@ export async function importFromGoogleSheets(spreadsheetId: string, accessToken:
     const result = await res.json();
     const valueRanges = result.valueRanges || [];
 
+    // Parse Konfigurasi App
+    const acValues = valueRanges[0]?.values || [];
+    const acObj: Record<string, string> = {};
+    acValues.forEach((row: string[]) => {
+      if (row[0] && row[1]) acObj[row[0]] = row[1];
+    });
+
     // Parse Data Sekolah
-    const dsValues = valueRanges[0]?.values || [];
+    const dsValues = valueRanges[1]?.values || [];
     const dsObj: Record<string, string> = {};
     dsValues.forEach((row: string[]) => {
       if (row[0] && row[1]) dsObj[row[0]] = row[1];
     });
 
     // Parse Profil Guru
-    const pgValues = valueRanges[1]?.values || [];
+    const pgValues = valueRanges[2]?.values || [];
     const pgObj: Record<string, string> = {};
     pgValues.forEach((row: string[]) => {
       if (row[0] && row[1]) pgObj[row[0]] = row[1];
     });
 
     // Parse Mapel
-    const mapelValues = valueRanges[2]?.values || [];
+    const mapelValues = valueRanges[3]?.values || [];
     const mapelList: Mapel[] = mapelValues.map((r: string[], idx: number) => ({
       id: r[0] || `m_${idx}`,
       kodeMapel: r[1] || '',
@@ -382,7 +399,7 @@ export async function importFromGoogleSheets(spreadsheetId: string, accessToken:
     }));
 
     // Parse Kelas
-    const kelasValues = valueRanges[3]?.values || [];
+    const kelasValues = valueRanges[4]?.values || [];
     const kelasList: Kelas[] = kelasValues.map((r: string[], idx: number) => ({
       id: r[0] || `k_${idx}`,
       namaKelas: r[1] || '',
@@ -391,7 +408,7 @@ export async function importFromGoogleSheets(spreadsheetId: string, accessToken:
     }));
 
     // Parse Siswa
-    const siswaValues = valueRanges[4]?.values || [];
+    const siswaValues = valueRanges[5]?.values || [];
     const siswaList: Siswa[] = siswaValues.map((r: string[], idx: number) => ({
       id: r[0] || `s_${idx}`,
       nisn: r[1] || '',
@@ -407,6 +424,11 @@ export async function importFromGoogleSheets(spreadsheetId: string, accessToken:
     }));
 
     return {
+      appConfig: Object.keys(acObj).length > 0 ? {
+        namaAplikasi: acObj['Nama Aplikasi'] || '',
+        deskripsiAplikasi: acObj['Deskripsi Aplikasi'] || '',
+        logoAplikasiUrl: acObj['Logo Aplikasi URL'] || acObj['Logo URL'] || '',
+      } : null,
       dataSekolah: Object.keys(dsObj).length > 0 ? {
         npsn: dsObj['NPSN'] || '',
         namaSekolah: dsObj['Nama Sekolah'] || '',
