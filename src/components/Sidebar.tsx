@@ -106,17 +106,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Sidebar Header */}
       <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
         <div className="flex items-center space-x-3 min-w-0">
-          {appLogo ? (
+          {appLogo && (
             <div className="w-10 h-10 flex items-center justify-center shrink-0 overflow-hidden bg-transparent">
               <img
                 src={appLogo}
                 alt="Logo"
                 className="w-full h-full object-contain"
               />
-            </div>
-          ) : (
-            <div className="w-10 h-10 rounded-xl bg-violet-600 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-violet-500/20 shrink-0 overflow-hidden">
-              S
             </div>
           )}
           <div className="min-w-0 flex-1">

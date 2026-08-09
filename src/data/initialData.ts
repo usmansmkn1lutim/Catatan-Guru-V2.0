@@ -21,7 +21,7 @@ export const initialDataSekolah: DataSekolah = {
   website: 'https://sman1mandiri.sch.id',
   akreditasi: 'A (Unggul)',
   namaKepalaSekolah: 'Dr. H. Ahmad Santoso, M.Pd.',
-  logoSekolahUrl: 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=150&auto=format&fit=crop&q=80',
+  logoSekolahUrl: '',
 };
 
 export const initialProfilGuru: ProfilGuru = {
@@ -34,7 +34,7 @@ export const initialProfilGuru: ProfilGuru = {
   nomorHp: '081234567890',
   email: 'budi.raharjo@sman1mandiri.sch.id',
   alamat: 'Jl. Merdeka No. 12, Bandung',
-  fotoProfilUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
+  fotoProfilUrl: '',
 };
 
 export const initialMapelList: Mapel[] = [

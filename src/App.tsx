@@ -70,23 +70,53 @@ export function App() {
   const [appConfig, setAppConfig] = useState<AppConfig>(() => {
     const saved = loadFromStorage('appConfig', initialAppConfig);
     const storedAppLogo = localStorage.getItem('APP_LOGO_URL');
+    const effectiveLogo = storedAppLogo || saved?.logoAplikasiUrl || initialAppConfig.logoAplikasiUrl || DEFAULT_APP_LOGO;
+    if (!storedAppLogo) {
+      try {
+        localStorage.setItem('APP_LOGO_URL', effectiveLogo);
+      } catch (e) {
+        console.warn('Could not store APP_LOGO_URL:', e);
+      }
+    }
     return {
       namaAplikasi: saved?.namaAplikasi && saved.namaAplikasi !== 'Catatan Guru' ? saved.namaAplikasi : initialAppConfig.namaAplikasi,
       deskripsiAplikasi: saved?.deskripsiAplikasi && saved.deskripsiAplikasi !== 'Administrasi & Catatan Seorang Guru' ? saved.deskripsiAplikasi : initialAppConfig.deskripsiAplikasi,
-      logoAplikasiUrl: storedAppLogo || saved?.logoAplikasiUrl || initialAppConfig.logoAplikasiUrl || DEFAULT_APP_LOGO,
+      logoAplikasiUrl: effectiveLogo,
     };
   });
   const [dataSekolah, setDataSekolah] = useState<DataSekolah>(() => {
     const saved = loadFromStorage('dataSekolah', initialDataSekolah);
-    const storedSchoolLogo = localStorage.getItem('SCHOOL_LOGO_URL');
+    let storedSchoolLogo = localStorage.getItem('SCHOOL_LOGO_URL');
+    let savedLogo = saved?.logoSekolahUrl;
+    
+    // Clear old unsplash default if it exists
+    if (storedSchoolLogo && storedSchoolLogo.includes('unsplash.com/photo-1546410531')) {
+      storedSchoolLogo = '';
+      localStorage.removeItem('SCHOOL_LOGO_URL');
+    }
+    if (savedLogo && savedLogo.includes('unsplash.com/photo-1546410531')) {
+      savedLogo = '';
+    }
+
     return {
       ...saved,
-      logoSekolahUrl: storedSchoolLogo || saved?.logoSekolahUrl || initialDataSekolah.logoSekolahUrl,
+      logoSekolahUrl: storedSchoolLogo || savedLogo || initialDataSekolah.logoSekolahUrl,
     };
   });
-  const [profilGuru, setProfilGuru] = useState<ProfilGuru>(() =>
-    loadFromStorage('profilGuru', initialProfilGuru)
-  );
+  const [profilGuru, setProfilGuru] = useState<ProfilGuru>(() => {
+    const saved = loadFromStorage('profilGuru', initialProfilGuru);
+    let savedFoto = saved?.fotoProfilUrl;
+    
+    // Clear old unsplash default if it exists
+    if (savedFoto && savedFoto.includes('unsplash.com/photo-1534528741775')) {
+      savedFoto = '';
+    }
+
+    return {
+      ...saved,
+      fotoProfilUrl: savedFoto || initialProfilGuru.fotoProfilUrl,
+    };
+  });
   const [mapelList, setMapelList] = useState<Mapel[]>(() =>
     loadFromStorage('mapelList', initialMapelList)
   );
