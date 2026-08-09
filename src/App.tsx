@@ -69,7 +69,13 @@ export function App() {
   // Main State
   const [appConfig, setAppConfig] = useState<AppConfig>(() => {
     const saved = loadFromStorage('appConfig', initialAppConfig);
-    const storedAppLogo = localStorage.getItem('APP_LOGO_URL');
+    let storedAppLogo = localStorage.getItem('APP_LOGO_URL');
+    
+    // Force cache bust for the default logo
+    if (storedAppLogo && storedAppLogo.startsWith('/logo.')) {
+      storedAppLogo = DEFAULT_APP_LOGO;
+    }
+
     const effectiveLogo = storedAppLogo || saved?.logoAplikasiUrl || initialAppConfig.logoAplikasiUrl || DEFAULT_APP_LOGO;
     if (!storedAppLogo) {
       try {

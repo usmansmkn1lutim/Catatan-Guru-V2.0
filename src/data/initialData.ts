@@ -1,6 +1,6 @@
 import { AppConfig, DataSekolah, ProfilGuru, Mapel, Kelas, Siswa, PresensiRecord, NilaiRecord, JurnalRecord } from '../types';
 
-export const DEFAULT_APP_LOGO = '/logo.svg';
+export const DEFAULT_APP_LOGO = '/logo.png';
 
 export const initialAppConfig: AppConfig = {
   namaAplikasi: 'Catatan Seorang Guru',
