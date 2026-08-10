@@ -104,6 +104,13 @@ export function App() {
       savedLogo = '';
     }
 
+    if (saved?.namaSekolah === 'SMA NEGERI 1 MANDIRI') {
+      return {
+        ...initialDataSekolah,
+        logoSekolahUrl: storedSchoolLogo || initialDataSekolah.logoSekolahUrl,
+      };
+    }
+
     return {
       ...saved,
       logoSekolahUrl: storedSchoolLogo || savedLogo || initialDataSekolah.logoSekolahUrl,
@@ -116,6 +123,13 @@ export function App() {
     // Clear old unsplash default if it exists
     if (savedFoto && savedFoto.includes('unsplash.com/photo-1534528741775')) {
       savedFoto = '';
+    }
+
+    if (saved?.namaGuru === 'Budi Raharjo, S.Pd., M.T.') {
+      return {
+        ...initialProfilGuru,
+        fotoProfilUrl: savedFoto || initialProfilGuru.fotoProfilUrl,
+      };
     }
 
     return {
