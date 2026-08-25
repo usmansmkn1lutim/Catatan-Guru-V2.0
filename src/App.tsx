@@ -46,6 +46,9 @@ import { PresensiSiswaView } from './components/PresensiSiswa';
 import { NilaiSiswaView } from './components/NilaiSiswa';
 import { JurnalGuruView } from './components/JurnalGuru';
 import { GoogleSheetsView } from './components/GoogleSheetsView';
+import { BottomTabBar } from './components/BottomTabBar';
+import { AdministrasiMenu } from './components/AdministrasiMenu';
+import { AkademikMenu } from './components/AkademikMenu';
 
 import {
   Code,
@@ -530,6 +533,7 @@ export function App() {
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
         {/* Header Bar */}
         <Header
+          appConfig={appConfig}
           dataSekolah={dataSekolah}
           profilGuru={profilGuru}
           darkMode={darkMode}
@@ -547,7 +551,7 @@ export function App() {
         />
 
         {/* Page Views Routing */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 max-w-7xl mx-auto w-full">
+        <main className="flex-1 overflow-y-auto p-4 pb-24 sm:p-6 lg:pb-8 lg:p-8 max-w-7xl mx-auto w-full">
           {activeTab === 'dashboard' && (
             <Dashboard
               dataSekolah={dataSekolah}
@@ -777,10 +781,19 @@ export function App() {
               </div>
             </div>
           )}
+          {activeTab === 'administrasi_menu' && (
+            <AdministrasiMenu onNavigate={(tab) => setActiveTab(tab)} />
+          )}
+
+          {activeTab === 'akademik_menu' && (
+            <AkademikMenu onNavigate={(tab) => setActiveTab(tab)} />
+          )}
         </main>
 
+        <BottomTabBar activeTab={activeTab} onSelectTab={setActiveTab} />
+
         {/* Status Bar / Footer */}
-        <footer className="h-10 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 px-6 sm:px-8 flex items-center justify-between text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest shrink-0">
+        <footer className="hidden lg:flex h-10 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 px-6 sm:px-8 items-center justify-between text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest shrink-0">
           <div className="flex items-center gap-4">
             <span>v2.4.0 Stable</span>
             <div className="w-1 h-1 bg-slate-200 dark:bg-slate-700 rounded-full"></div>

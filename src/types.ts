@@ -10,7 +10,9 @@ export type ActiveTab =
   | 'nilai'
   | 'jurnal'
   | 'google_sheets'
-  | 'gas_deploy';
+  | 'gas_deploy'
+  | 'administrasi_menu'
+  | 'akademik_menu';
 
 export interface AppConfig {
   namaAplikasi: string;

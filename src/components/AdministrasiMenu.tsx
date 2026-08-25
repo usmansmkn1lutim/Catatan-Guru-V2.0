@@ -1,0 +1,58 @@
+import React from 'react';
+import { ActiveTab } from '../types';
+import { School, UserCheck, FileSpreadsheet, Code2 } from 'lucide-react';
+
+interface AdministrasiMenuProps {
+  onNavigate: (tab: ActiveTab) => void;
+}
+
+export const AdministrasiMenu: React.FC<AdministrasiMenuProps> = ({ onNavigate }) => {
+  const menus = [
+    {
+      id: 'sekolah' as ActiveTab,
+      label: 'Identitas Sekolah',
+      icon: <School className="w-8 h-8 text-violet-500 mb-2" />,
+      color: 'bg-violet-50 hover:bg-violet-100 border-violet-100',
+    },
+    {
+      id: 'profil' as ActiveTab,
+      label: 'Profil Guru',
+      icon: <UserCheck className="w-8 h-8 text-blue-500 mb-2" />,
+      color: 'bg-blue-50 hover:bg-blue-100 border-blue-100',
+    },
+    {
+      id: 'google_sheets' as ActiveTab,
+      label: 'Google Sheets',
+      icon: <FileSpreadsheet className="w-8 h-8 text-emerald-500 mb-2" />,
+      color: 'bg-emerald-50 hover:bg-emerald-100 border-emerald-100',
+    },
+    {
+      id: 'gas_deploy' as ActiveTab,
+      label: 'Deploy GAS',
+      icon: <Code2 className="w-8 h-8 text-amber-500 mb-2" />,
+      color: 'bg-amber-50 hover:bg-amber-100 border-amber-100',
+    },
+  ];
+
+  return (
+    <div className="space-y-6 pb-12">
+      <div className="flex items-center space-x-3 mb-6">
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Administrasi</h2>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        {menus.map((menu) => (
+          <button
+            key={menu.id}
+            onClick={() => onNavigate(menu.id)}
+            className={`flex flex-col items-center justify-center p-6 rounded-2xl border transition-all ${menu.color} dark:bg-slate-800 dark:border-slate-700 dark:hover:bg-slate-750`}
+          >
+            {menu.icon}
+            <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 text-center">
+              {menu.label}
+            </span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};

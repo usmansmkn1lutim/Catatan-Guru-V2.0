@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Siswa, Kelas, Mapel, PresensiRecord, ActiveTab } from '../types';
 import { formatDateString } from '../lib/dateUtils';
-import { Users, GraduationCap, BookOpen, TrendingUp, ClipboardCheck, Award, BookMarked, ArrowUpRight, Sparkles, DoorClosed, School } from 'lucide-react';
+import { Users, GraduationCap, BookOpen, TrendingUp, ClipboardCheck, Award, BookMarked, ArrowUpRight, Sparkles, DoorClosed, School, User, Building, Settings, FileSpreadsheet } from 'lucide-react';
 import {
   ResponsiveContainer,
   LineChart,
@@ -60,6 +60,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   onFetchRemoteData,
 }) => {
   const [selectedKelasFilter, setSelectedKelasFilter] = useState<string>('Semua');
+  const [isMenuExpanded, setIsMenuExpanded] = useState<boolean>(false);
 
   const goToTab = (tab: ActiveTab) => {
     if (setActiveTab) setActiveTab(tab);
@@ -146,10 +147,71 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
   return (
     <div className="space-y-6 pb-12">
+      {/* Mobile Horizontal Categories Menu (visible only on mobile) */}
+      <div className="block lg:hidden pt-2">
+        <div className="flex items-center justify-between px-2 mb-3">
+          <h3 className="font-bold text-slate-800 dark:text-slate-100">Menu Utama</h3>
+          <button 
+            onClick={() => setIsMenuExpanded(!isMenuExpanded)}
+            className="text-xs font-bold text-violet-600 dark:text-violet-400 hover:underline"
+          >
+            {isMenuExpanded ? 'Tutup' : 'See All'}
+          </button>
+        </div>
+        
+        <div className="flex items-start justify-between gap-2 px-1">
+          {[
+            { id: 'presensi', label: 'Presensi', icon: ClipboardCheck, bg: 'bg-rose-50 dark:bg-rose-950/40', text: 'text-rose-500 dark:text-rose-400' },
+            { id: 'nilai', label: 'Nilai', icon: Award, bg: 'bg-amber-50 dark:bg-amber-950/40', text: 'text-amber-500 dark:text-amber-400' },
+            { id: 'jurnal', label: 'Jurnal', icon: BookMarked, bg: 'bg-teal-50 dark:bg-teal-950/40', text: 'text-teal-500 dark:text-teal-400' },
+            { id: 'profil', label: 'Profil Guru', icon: User, bg: 'bg-blue-50 dark:bg-blue-950/40', text: 'text-blue-500 dark:text-blue-400' },
+          ].map((menu) => (
+            <button
+              key={menu.id}
+              onClick={() => goToTab(menu.id as ActiveTab)}
+              className="flex flex-col items-center gap-2 w-[72px]"
+            >
+              <div className={`w-14 h-14 rounded-[1.25rem] flex items-center justify-center ${menu.bg} ${menu.text} shadow-sm border border-white/50 dark:border-slate-800/50`}>
+                <menu.icon className="w-7 h-7" strokeWidth={1.5} />
+              </div>
+              <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 text-center leading-tight">
+                {menu.label}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        {isMenuExpanded && (
+          <div className="grid grid-cols-4 gap-y-4 gap-x-2 px-1 mt-4">
+            {[
+              { id: 'sekolah', label: 'Data Sekolah', icon: Building, bg: 'bg-indigo-50 dark:bg-indigo-950/40', text: 'text-indigo-500 dark:text-indigo-400' },
+              { id: 'mapel', label: 'Data Mapel', icon: BookOpen, bg: 'bg-emerald-50 dark:bg-emerald-950/40', text: 'text-emerald-500 dark:text-emerald-400' },
+              { id: 'kelas', label: 'Data Kelas', icon: DoorClosed, bg: 'bg-fuchsia-50 dark:bg-fuchsia-950/40', text: 'text-fuchsia-500 dark:text-fuchsia-400' },
+              { id: 'siswa', label: 'Data Siswa', icon: Users, bg: 'bg-cyan-50 dark:bg-cyan-950/40', text: 'text-cyan-500 dark:text-cyan-400' },
+              { id: 'konfigurasi', label: 'Konfig App', icon: Settings, bg: 'bg-slate-100 dark:bg-slate-800', text: 'text-slate-600 dark:text-slate-400' },
+              { id: 'google_sheets', label: 'Sheet API', icon: FileSpreadsheet, bg: 'bg-green-50 dark:bg-green-950/40', text: 'text-green-600 dark:text-green-400' },
+            ].map((menu) => (
+              <button
+                key={menu.id}
+                onClick={() => goToTab(menu.id as ActiveTab)}
+                className="flex flex-col items-center gap-2 w-full"
+              >
+                <div className={`w-14 h-14 rounded-[1.25rem] flex items-center justify-center ${menu.bg} ${menu.text} shadow-sm border border-white/50 dark:border-slate-800/50`}>
+                  <menu.icon className="w-7 h-7" strokeWidth={1.5} />
+                </div>
+                <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 text-center leading-tight">
+                  {menu.label}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* 4 Stat Cards */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         {/* Card 1: Total Siswa */}
-        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between hover:border-violet-300 dark:hover:border-violet-800 transition-all">
+        <div className="bg-white dark:bg-slate-900 p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between hover:border-violet-300 dark:hover:border-violet-800 transition-all">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
               Total Siswa
@@ -172,7 +234,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
 
         {/* Card 2: Jumlah Kelas */}
-        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between hover:border-indigo-300 dark:hover:border-indigo-800 transition-all">
+        <div className="bg-white dark:bg-slate-900 p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between hover:border-indigo-300 dark:hover:border-indigo-800 transition-all">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
               Jumlah Kelas
@@ -195,7 +257,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
 
         {/* Card 3: Mata Pelajaran */}
-        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between hover:border-emerald-300 dark:hover:border-emerald-800 transition-all">
+        <div className="bg-white dark:bg-slate-900 p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between hover:border-emerald-300 dark:hover:border-emerald-800 transition-all">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
               Mata Pelajaran
@@ -218,7 +280,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
 
         {/* Card 4: Rata-rata Kehadiran */}
-        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between hover:border-amber-300 dark:hover:border-amber-800 transition-all">
+        <div className="bg-white dark:bg-slate-900 p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between hover:border-amber-300 dark:hover:border-amber-800 transition-all">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
               Rata-rata Kehadiran
