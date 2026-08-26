@@ -102,7 +102,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const appDesc = appConfig?.deskripsiAplikasi || 'Merawat Jejak Pengabdian';
 
   const sidebarContent = (
-    <div className="h-full flex flex-col bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transition-colors w-64 select-none">
+    <div className="h-full flex flex-col bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border-r border-white/60 dark:border-slate-700/50 dark:border-slate-800 transition-colors w-64 select-none">
       {/* Sidebar Header */}
       <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
         <div className="flex items-center space-x-3 min-w-0">

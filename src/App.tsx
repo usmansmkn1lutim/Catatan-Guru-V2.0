@@ -491,7 +491,13 @@ export function App() {
   };
 
   return (
-    <div className="h-screen w-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex font-sans antialiased overflow-hidden">
+    <div className="h-screen w-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex font-sans antialiased overflow-hidden relative z-0">
+      {/* Glassmorphism Abstract Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-400/20 dark:bg-blue-600/20 rounded-full blur-[100px]" />
+        <div className="absolute top-[20%] right-[-10%] w-[40%] h-[40%] bg-cyan-400/20 dark:bg-cyan-500/20 rounded-full blur-[100px]" />
+        <div className="absolute bottom-[-10%] left-[20%] w-[60%] h-[60%] bg-violet-400/20 dark:bg-violet-600/20 rounded-full blur-[120px]" />
+      </div>
       {/* Toast Notification (Fixed Position) */}
       {toast && (
         <div className="fixed bottom-12 right-8 z-50 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-2xl rounded-2xl p-4 flex items-center gap-4 border-l-4 border-l-violet-600 transition-all animate-in fade-in slide-in-from-bottom-5 duration-300">

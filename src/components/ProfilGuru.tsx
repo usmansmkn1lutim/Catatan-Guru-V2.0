@@ -79,7 +79,7 @@ export const ProfilGuruView: React.FC<ProfilGuruProps> = ({
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-12">
       {/* Header Banner */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm flex items-center justify-between">
+      <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border border-white/60 dark:border-slate-700/50 dark:border-slate-800 rounded-xl p-6 shadow-lg shadow-slate-200/40 dark:shadow-none flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 rounded-xl bg-violet-600 text-white flex items-center justify-center">
             <UserCheck className="w-5 h-5" />
@@ -93,7 +93,7 @@ export const ProfilGuruView: React.FC<ProfilGuruProps> = ({
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 sm:p-8 space-y-6 shadow-sm">
+      <form onSubmit={handleSubmit} className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border border-white/60 dark:border-slate-700/50 dark:border-slate-800 rounded-xl p-6 sm:p-8 space-y-6 shadow-lg shadow-slate-200/40 dark:shadow-none">
         {/* Foto Profil Section */}
         <div className="border-b border-slate-100 dark:border-slate-800 pb-6">
           <label className="block text-sm font-bold text-slate-800 dark:text-slate-200 mb-3">
@@ -108,7 +108,7 @@ export const ProfilGuruView: React.FC<ProfilGuruProps> = ({
               )}
             </div>
             <div className="space-y-2 text-center sm:text-left">
-              <label className="inline-flex items-center space-x-2 px-4 py-2 bg-violet-600 text-white text-xs font-semibold rounded-full hover:bg-violet-700 transition-colors cursor-pointer shadow-sm">
+              <label className="inline-flex items-center space-x-2 px-4 py-2 bg-violet-600 text-white text-xs font-semibold rounded-full hover:bg-violet-700 transition-colors cursor-pointer shadow-lg shadow-slate-200/40 dark:shadow-none">
                 <Upload className="w-4 h-4" />
                 <span>Upload Foto (JPG / PNG)</span>
                 <input type="file" accept="image/*" onChange={handleFotoUpload} className="hidden" />

@@ -70,7 +70,7 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <>
       {/* Mobile Top Bar */}
-      <div className="block lg:hidden bg-white dark:bg-slate-900 px-5 py-4 border-b border-slate-100 dark:border-slate-800 shrink-0 z-30">
+      <div className="block lg:hidden bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl px-5 py-4 border-b border-white/50 dark:border-slate-800 shrink-0 z-30">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 min-w-0">
             {appConfig?.logoAplikasiUrl ? (
@@ -138,7 +138,7 @@ export const Header: React.FC<HeaderProps> = ({
           </p>
         </div>
       </header>
-      <header className="hidden lg:flex h-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-8 items-center justify-between shrink-0 z-30 transition-colors shadow-xs">
+      <header className="hidden lg:flex h-20 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border-b border-white/50 dark:border-slate-800 px-8 items-center justify-between shrink-0 z-30 transition-colors shadow-xs">
         {/* School Branding & Mobile Menu Hamburger Button */}
         <div className="flex items-center gap-3 sm:gap-4 min-w-0">
           <button
@@ -177,7 +177,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Header Right Actions */}
         <div className="flex items-center gap-2 sm:gap-4">
           {/* Auto Sync Badge & Trigger */}
-          <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-xl text-xs">
+          <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-slate-50 dark:bg-slate-800/80 border border-white/50 dark:border-slate-700/80 rounded-xl text-xs">
             {autoSyncStatus === "syncing" && (
               <span className="flex items-center gap-1.5 text-violet-600 dark:text-violet-400 font-bold animate-pulse">
                 <RefreshCw className="w-3.5 h-3.5 animate-spin" />
