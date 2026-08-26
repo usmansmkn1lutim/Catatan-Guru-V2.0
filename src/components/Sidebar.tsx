@@ -102,9 +102,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const appDesc = appConfig?.deskripsiAplikasi || 'Merawat Jejak Pengabdian';
 
   const sidebarContent = (
-    <div className="h-full flex flex-col bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border-r border-white/60 dark:border-slate-700/50 dark:border-slate-800 transition-colors w-64 select-none">
+    <div className="flex flex-col transition-colors w-64 select-none h-full bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border-r border-white/60 dark:border-slate-700/50 dark:border-slate-800 lg:h-[calc(100vh-2rem)] lg:bg-white/20 lg:dark:bg-slate-900/20 lg:backdrop-blur-md lg:rounded-3xl lg:border-r lg:border lg:border-white/40 lg:dark:border-slate-700/40 lg:m-4 lg:shadow-xl lg:shadow-slate-200/10 lg:dark:shadow-none overflow-hidden">
       {/* Sidebar Header */}
-      <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+      <div className="p-5 border-b border-white/20 dark:border-slate-700/40 flex items-center justify-between">
         <div className="flex items-center space-x-3 min-w-0">
           {appLogo && (
             <div className="w-10 h-10 flex items-center justify-center shrink-0 overflow-hidden bg-transparent">
@@ -167,7 +167,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Sidebar Footer info */}
-      <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20">
+      <div className="p-4 border-t border-white/20 dark:border-slate-700/40 bg-slate-50/30 lg:bg-transparent dark:bg-slate-800/20">
         <div className="flex items-center space-x-2 text-xs text-slate-500 dark:text-slate-400">
           <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
           <span>Google Sheets Synchronized</span>
