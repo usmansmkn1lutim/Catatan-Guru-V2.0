@@ -159,7 +159,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </button>
         </div>
         
-        <div className="flex items-start justify-between gap-2 px-1">
+        <div className="grid grid-cols-4 gap-y-4 gap-x-2 px-1">
           {[
             { id: 'presensi', label: 'Presensi', icon: ClipboardCheck, bg: 'bg-rose-50 dark:bg-rose-950/40', text: 'text-rose-500 dark:text-rose-400' },
             { id: 'nilai', label: 'Nilai', icon: Award, bg: 'bg-amber-50 dark:bg-amber-950/40', text: 'text-amber-500 dark:text-amber-400' },
@@ -169,7 +169,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
             <button
               key={menu.id}
               onClick={() => goToTab(menu.id as ActiveTab)}
-              className="flex flex-col items-center gap-2 w-[72px]"
+              className="flex flex-col items-center gap-2 w-full"
             >
               <div className={`w-14 h-14 rounded-[1.25rem] flex items-center justify-center ${menu.bg} ${menu.text} shadow-sm border border-white/50 dark:border-slate-800/50`}>
                 <menu.icon className="w-7 h-7" strokeWidth={1.5} />
@@ -188,8 +188,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
               { id: 'mapel', label: 'Data Mapel', icon: BookOpen, bg: 'bg-emerald-50 dark:bg-emerald-950/40', text: 'text-emerald-500 dark:text-emerald-400' },
               { id: 'kelas', label: 'Data Kelas', icon: DoorClosed, bg: 'bg-fuchsia-50 dark:bg-fuchsia-950/40', text: 'text-fuchsia-500 dark:text-fuchsia-400' },
               { id: 'siswa', label: 'Data Siswa', icon: Users, bg: 'bg-cyan-50 dark:bg-cyan-950/40', text: 'text-cyan-500 dark:text-cyan-400' },
-              { id: 'konfigurasi', label: 'Konfig App', icon: Settings, bg: 'bg-slate-100 dark:bg-slate-800', text: 'text-slate-600 dark:text-slate-400' },
-              { id: 'google_sheets', label: 'Sheet API', icon: FileSpreadsheet, bg: 'bg-green-50 dark:bg-green-950/40', text: 'text-green-600 dark:text-green-400' },
             ].map((menu) => (
               <button
                 key={menu.id}
@@ -208,106 +206,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
         )}
       </div>
 
-      {/* 4 Stat Cards */}
-      <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-        {/* Card 1: Total Siswa */}
-        <div className="bg-white dark:bg-slate-900 p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between hover:border-violet-300 dark:hover:border-violet-800 transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-              Total Siswa
-            </span>
-            <div className="p-2.5 bg-violet-100 dark:bg-violet-950/70 text-violet-600 dark:text-violet-400 rounded-xl">
-              <Users className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="flex items-end justify-between">
-            <div>
-              <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white">
-                {totalSiswa}
-              </h3>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Siswa terdaftar</p>
-            </div>
-            <span className="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold rounded-lg border border-emerald-200/50 dark:border-emerald-800/50">
-              Aktif
-            </span>
-          </div>
-        </div>
-
-        {/* Card 2: Jumlah Kelas */}
-        <div className="bg-white dark:bg-slate-900 p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between hover:border-indigo-300 dark:hover:border-indigo-800 transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-              Jumlah Kelas
-            </span>
-            <div className="p-2.5 bg-indigo-100 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 rounded-xl">
-              <DoorClosed className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="flex items-end justify-between">
-            <div>
-              <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white">
-                {totalKelas}
-              </h3>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Rombongan belajar</p>
-            </div>
-            <span className="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold rounded-lg border border-indigo-200/50 dark:border-indigo-800/50">
-              {totalKelas > 0 ? 'Tersedia' : 'Belum ada'}
-            </span>
-          </div>
-        </div>
-
-        {/* Card 3: Mata Pelajaran */}
-        <div className="bg-white dark:bg-slate-900 p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between hover:border-emerald-300 dark:hover:border-emerald-800 transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-              Mata Pelajaran
-            </span>
-            <div className="p-2.5 bg-emerald-100 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 rounded-xl">
-              <BookOpen className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="flex items-end justify-between">
-            <div>
-              <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white">
-                {totalMapel}
-              </h3>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Mata pelajaran diampu</p>
-            </div>
-            <span className="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold rounded-lg border border-emerald-200/50 dark:border-emerald-800/50">
-              Terdaftar
-            </span>
-          </div>
-        </div>
-
-        {/* Card 4: Rata-rata Kehadiran */}
-        <div className="bg-white dark:bg-slate-900 p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between hover:border-amber-300 dark:hover:border-amber-800 transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-              Rata-rata Kehadiran
-            </span>
-            <div className="p-2.5 bg-amber-100 dark:bg-amber-950/70 text-amber-600 dark:text-amber-400 rounded-xl">
-              <ClipboardCheck className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="flex items-end justify-between">
-            <div>
-              <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white">
-                {avgKehadiran}%
-              </h3>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Persentase hadir</p>
-            </div>
-            <span className="px-2.5 py-1 bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 text-[10px] font-bold rounded-lg border border-amber-200/50 dark:border-amber-800/50 flex items-center space-x-1">
-              <TrendingUp className="w-3 h-3" />
-              <span>Baik</span>
-            </span>
-          </div>
-        </div>
-      </section>
-
-      {/* Main Content Grid (Chart + Quick Action Panel) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Chart Section */}
-        <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col p-6">
+      {/* Chart Section */}
+        <section className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100">
@@ -411,8 +311,107 @@ export const Dashboard: React.FC<DashboardProps> = ({
               </LineChart>
             </ResponsiveContainer>
           </div>
+        </section>
+
+        
+
+      {/* Main Content Grid (Chart + Quick Action Panel) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* 4 Stat Cards */}
+      <div className="lg:col-span-2 grid grid-cols-2 gap-3 sm:gap-6">
+        {/* Card 1: Total Siswa */}
+        <div className="bg-white dark:bg-slate-900 p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between hover:border-violet-300 dark:hover:border-violet-800 transition-all">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+              Total Siswa
+            </span>
+            <div className="p-2.5 bg-violet-100 dark:bg-violet-950/70 text-violet-600 dark:text-violet-400 rounded-xl">
+              <Users className="w-5 h-5" />
+            </div>
+          </div>
+          <div className="flex items-end justify-between">
+            <div>
+              <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white">
+                {totalSiswa}
+              </h3>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Siswa terdaftar</p>
+            </div>
+            <span className="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold rounded-lg border border-emerald-200/50 dark:border-emerald-800/50">
+              Aktif
+            </span>
+          </div>
         </div>
 
+        {/* Card 2: Jumlah Kelas */}
+        <div className="bg-white dark:bg-slate-900 p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between hover:border-indigo-300 dark:hover:border-indigo-800 transition-all">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+              Jumlah Kelas
+            </span>
+            <div className="p-2.5 bg-indigo-100 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 rounded-xl">
+              <DoorClosed className="w-5 h-5" />
+            </div>
+          </div>
+          <div className="flex items-end justify-between">
+            <div>
+              <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white">
+                {totalKelas}
+              </h3>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Rombongan belajar</p>
+            </div>
+            <span className="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold rounded-lg border border-indigo-200/50 dark:border-indigo-800/50">
+              {totalKelas > 0 ? 'Tersedia' : 'Belum ada'}
+            </span>
+          </div>
+        </div>
+
+        {/* Card 3: Mata Pelajaran */}
+        <div className="bg-white dark:bg-slate-900 p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between hover:border-emerald-300 dark:hover:border-emerald-800 transition-all">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+              Mata Pelajaran
+            </span>
+            <div className="p-2.5 bg-emerald-100 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 rounded-xl">
+              <BookOpen className="w-5 h-5" />
+            </div>
+          </div>
+          <div className="flex items-end justify-between">
+            <div>
+              <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white">
+                {totalMapel}
+              </h3>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Mata pelajaran diampu</p>
+            </div>
+            <span className="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold rounded-lg border border-emerald-200/50 dark:border-emerald-800/50">
+              Terdaftar
+            </span>
+          </div>
+        </div>
+
+        {/* Card 4: Rata-rata Kehadiran */}
+        <div className="bg-white dark:bg-slate-900 p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between hover:border-amber-300 dark:hover:border-amber-800 transition-all">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+              Rata-rata Kehadiran
+            </span>
+            <div className="p-2.5 bg-amber-100 dark:bg-amber-950/70 text-amber-600 dark:text-amber-400 rounded-xl">
+              <ClipboardCheck className="w-5 h-5" />
+            </div>
+          </div>
+          <div className="flex items-end justify-between">
+            <div>
+              <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white">
+                {avgKehadiran}%
+              </h3>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Persentase hadir</p>
+            </div>
+            <span className="px-2.5 py-1 bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 text-[10px] font-bold rounded-lg border border-amber-200/50 dark:border-amber-800/50 flex items-center space-x-1">
+              <TrendingUp className="w-3 h-3" />
+              <span>Baik</span>
+            </span>
+          </div>
+        </div>
+      </div>
         {/* Action Panel */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 flex flex-col justify-between">
           <div>

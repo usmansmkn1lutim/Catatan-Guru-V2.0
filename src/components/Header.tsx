@@ -150,11 +150,11 @@ export const Header: React.FC<HeaderProps> = ({
             <Menu className="w-6 h-6" />
           </button>
 
-          {appConfig?.logoAplikasiUrl ? (
+          {currentSekolah?.logoSekolahUrl ? (
             <div className="w-10 h-10 flex items-center justify-center shrink-0 overflow-hidden bg-transparent">
               <img
-                src={appConfig.logoAplikasiUrl}
-                alt={appConfig.namaAplikasi || "Logo"}
+                src={currentSekolah.logoSekolahUrl}
+                alt={currentSekolah.namaSekolah || "Logo"}
                 className="w-full h-full object-contain"
               />
             </div>
@@ -165,7 +165,7 @@ export const Header: React.FC<HeaderProps> = ({
           )}
           <div className="min-w-0">
             <h2 className="text-sm sm:text-base font-bold text-slate-800 dark:text-slate-100 leading-tight truncate">
-              {appConfig?.namaAplikasi || "SIS App"}
+              {currentSekolah?.namaSekolah || "SMA Negeri 1 Permata Bangsa"}
             </h2>
             <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium truncate max-w-[140px] xs:max-w-[200px] sm:max-w-md">
               {currentSekolah?.alamatLengkap ||
