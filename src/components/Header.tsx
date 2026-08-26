@@ -123,21 +123,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Mobile Purple Header */}
-      <header className="block lg:hidden bg-violet-600 dark:bg-violet-800 rounded-[2rem] mx-4 mt-4 px-5 pt-6 pb-8 shrink-0 z-20 shadow-md text-white relative">
-        <div>
-          <h1 className="text-2xl font-bold mb-1">
-            Hello,{" "}
-            {currentGuru?.namaGuru
-              ? currentGuru.namaGuru.split(",")[0].split(" ")[0]
-              : "Guru"}{" "}
-            👋
-          </h1>
-          <p className="text-violet-200 text-sm">
-            Semoga harimu menyenangkan
-          </p>
-        </div>
-      </header>
+      
       <header className="hidden lg:flex h-20 bg-white/20 dark:bg-slate-900/20 backdrop-blur-md rounded-3xl border border-white/40 dark:border-slate-700/40 px-8 items-center justify-between shrink-0 z-30 transition-colors shadow-xl shadow-slate-200/10 dark:shadow-none w-[calc(100%-4rem)] max-w-[76rem] mx-auto mt-4">
         {/* School Branding & Mobile Menu Hamburger Button */}
         <div className="flex items-center gap-3 sm:gap-4 min-w-0">

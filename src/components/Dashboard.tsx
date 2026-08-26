@@ -146,7 +146,23 @@ export const Dashboard: React.FC<DashboardProps> = ({
   }, [presensiList, selectedKelasFilter]);
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="space-y-6 pb-28">
+      {/* Mobile Purple Header */}
+      <div className="block lg:hidden bg-violet-600 dark:bg-violet-800 rounded-[2rem] mx-4 mt-4 px-5 pt-6 pb-8 shrink-0 shadow-md text-white relative">
+        <div>
+          <h1 className="text-2xl font-bold mb-1">
+            Hello,{" "}
+            {profilGuru?.namaGuru
+              ? profilGuru.namaGuru.split(",")[0].split(" ")[0]
+              : "Guru"}{" "}
+            👋
+          </h1>
+          <p className="text-violet-200 text-sm">
+            Semoga harimu menyenangkan
+          </p>
+        </div>
+      </div>
+
       {/* Mobile Horizontal Categories Menu (visible only on mobile) */}
       <div className="block lg:hidden pt-2">
         <div className="flex items-center justify-between px-2 mb-3">
