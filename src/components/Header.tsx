@@ -70,7 +70,7 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <>
       {/* Mobile Top Bar */}
-      <div className="block lg:hidden bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl px-5 py-4 border-b border-white/50 dark:border-slate-800 shrink-0 z-30">
+      <div className="block lg:hidden bg-transparent px-5 py-4 shrink-0 z-30">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 min-w-0">
             {appConfig?.logoAplikasiUrl ? (
