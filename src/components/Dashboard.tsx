@@ -187,7 +187,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
               onClick={() => goToTab(menu.id as ActiveTab)}
               className="flex flex-col items-center gap-2 w-full"
             >
-              <div className={`w-14 h-14 rounded-[1.25rem] flex items-center justify-center ${menu.bg} ${menu.text} shadow-lg shadow-slate-200/40 dark:shadow-none border border-white/50 dark:border-slate-800/50`}>
+              <div className={`w-14 h-14 rounded-[1.25rem] flex items-center justify-center ${menu.bg} ${menu.text} shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.25)] border border-white/50 dark:border-slate-800/50`}>
                 <menu.icon className="w-7 h-7" strokeWidth={1.5} />
               </div>
               <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 text-center leading-tight">
@@ -210,7 +210,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 onClick={() => goToTab(menu.id as ActiveTab)}
                 className="flex flex-col items-center gap-2 w-full"
               >
-                <div className={`w-14 h-14 rounded-[1.25rem] flex items-center justify-center ${menu.bg} ${menu.text} shadow-lg shadow-slate-200/40 dark:shadow-none border border-white/50 dark:border-slate-800/50`}>
+                <div className={`w-14 h-14 rounded-[1.25rem] flex items-center justify-center ${menu.bg} ${menu.text} shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.25)] border border-white/50 dark:border-slate-800/50`}>
                   <menu.icon className="w-7 h-7" strokeWidth={1.5} />
                 </div>
                 <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 text-center leading-tight">
@@ -225,7 +225,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
       {/* 4 Stat Cards */}
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         {/* Card 1: Total Siswa */}
-        <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-white/60 dark:border-slate-700/50 dark:border-slate-800 shadow-lg shadow-slate-200/40 dark:shadow-none flex flex-col justify-between hover:border-violet-300 dark:hover:border-violet-800 transition-all">
+        <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-lg p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-white/60 dark:border-white/20 shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.25)] flex flex-col justify-between hover:border-violet-300 dark:hover:border-violet-800 transition-all">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
               Total Siswa
@@ -248,7 +248,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
 
         {/* Card 2: Jumlah Kelas */}
-        <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-white/60 dark:border-slate-700/50 dark:border-slate-800 shadow-lg shadow-slate-200/40 dark:shadow-none flex flex-col justify-between hover:border-indigo-300 dark:hover:border-indigo-800 transition-all">
+        <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-lg p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-white/60 dark:border-white/20 shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.25)] flex flex-col justify-between hover:border-indigo-300 dark:hover:border-indigo-800 transition-all">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
               Jumlah Kelas
@@ -271,7 +271,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
 
         {/* Card 3: Mata Pelajaran */}
-        <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-white/60 dark:border-slate-700/50 dark:border-slate-800 shadow-lg shadow-slate-200/40 dark:shadow-none flex flex-col justify-between hover:border-emerald-300 dark:hover:border-emerald-800 transition-all">
+        <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-lg p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-white/60 dark:border-white/20 shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.25)] flex flex-col justify-between hover:border-emerald-300 dark:hover:border-emerald-800 transition-all">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
               Mata Pelajaran
@@ -294,7 +294,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
 
         {/* Card 4: Rata-rata Kehadiran */}
-        <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-white/60 dark:border-slate-700/50 dark:border-slate-800 shadow-lg shadow-slate-200/40 dark:shadow-none flex flex-col justify-between hover:border-amber-300 dark:hover:border-amber-800 transition-all">
+        <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-lg p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-white/60 dark:border-white/20 shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.25)] flex flex-col justify-between hover:border-amber-300 dark:hover:border-amber-800 transition-all">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
               Rata-rata Kehadiran
@@ -326,7 +326,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
       {/* Main Content Grid (Chart + Quick Action Panel) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Chart Section */}
-        <div className="lg:col-span-2 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl rounded-2xl border border-white/60 dark:border-slate-700/50 dark:border-slate-800 shadow-lg shadow-slate-200/40 dark:shadow-none flex flex-col p-6">
+        <div className="lg:col-span-2 bg-white/10 dark:bg-slate-900/10 backdrop-blur-lg rounded-2xl border border-white/60 dark:border-white/20 shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.25)] flex flex-col p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100">
@@ -433,7 +433,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
 
         {/* Action Panel */}
-        <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl rounded-2xl border border-white/60 dark:border-slate-700/50 dark:border-slate-800 shadow-lg shadow-slate-200/40 dark:shadow-none p-6 flex flex-col justify-between">
+        <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-lg rounded-2xl border border-white/60 dark:border-white/20 shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.25)] p-6 flex flex-col justify-between">
           <div>
             <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Aksi Cepat</h4>
             <div className="space-y-3">
@@ -442,7 +442,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 className="w-full flex items-center justify-between p-4 bg-violet-50 hover:bg-violet-100 dark:bg-violet-950/30 dark:hover:bg-violet-900/40 rounded-xl transition-all border border-violet-100 dark:border-violet-900/50 group text-left"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-white dark:bg-slate-800 rounded-lg flex items-center justify-center text-violet-600 dark:text-violet-400 shadow-lg shadow-slate-200/40 dark:shadow-none shrink-0">
+                  <div className="w-10 h-10 bg-white dark:bg-slate-800 rounded-lg flex items-center justify-center text-violet-600 dark:text-violet-400 shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.25)] shrink-0">
                     <ClipboardCheck className="w-5 h-5" />
                   </div>
                   <div>
@@ -458,7 +458,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 className="w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/50 dark:hover:bg-slate-800 rounded-xl transition-all border border-slate-100 dark:border-slate-800 group text-left"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-white dark:bg-slate-800 rounded-lg flex items-center justify-center text-slate-600 dark:text-slate-300 shadow-lg shadow-slate-200/40 dark:shadow-none shrink-0">
+                  <div className="w-10 h-10 bg-white dark:bg-slate-800 rounded-lg flex items-center justify-center text-slate-600 dark:text-slate-300 shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.25)] shrink-0">
                     <Award className="w-5 h-5" />
                   </div>
                   <div>
@@ -474,7 +474,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 className="w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/50 dark:hover:bg-slate-800 rounded-xl transition-all border border-slate-100 dark:border-slate-800 group text-left"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-white dark:bg-slate-800 rounded-lg flex items-center justify-center text-slate-600 dark:text-slate-300 shadow-lg shadow-slate-200/40 dark:shadow-none shrink-0">
+                  <div className="w-10 h-10 bg-white dark:bg-slate-800 rounded-lg flex items-center justify-center text-slate-600 dark:text-slate-300 shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.25)] shrink-0">
                     <BookMarked className="w-5 h-5" />
                   </div>
                   <div>

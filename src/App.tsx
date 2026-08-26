@@ -536,8 +536,9 @@ export function App() {
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden relative">
         {/* Header Bar */}
+        <div className="shrink-0 z-40" style={{ scrollbarGutter: 'stable' }}>
         <Header
           appConfig={appConfig}
           dataSekolah={dataSekolah}
@@ -555,9 +556,11 @@ export function App() {
           isFetchingRemote={isFetchingRemote}
           onToggleMobileMenu={() => setIsOpenMobile((prev) => !prev)}
         />
+        </div>
 
         {/* Page Views Routing */}
-        <main className="flex-1 overflow-y-auto p-4 pb-24 sm:p-6 lg:pb-8 lg:p-8 max-w-7xl mx-auto w-full">
+        <div className="flex-1 overflow-y-auto" style={{ scrollbarGutter: 'stable' }}>
+        <main className="flex-1 p-4 pb-24 sm:p-6 lg:pb-8 lg:p-8 max-w-7xl mx-auto w-full">
           {activeTab === 'dashboard' && (
             <Dashboard
               dataSekolah={dataSekolah}
@@ -794,12 +797,22 @@ export function App() {
           {activeTab === 'akademik_menu' && (
             <AkademikMenu onNavigate={(tab) => setActiveTab(tab)} />
           )}
+
+          {/* Footer Text */}
+          <div className="mt-12 pb-6 flex flex-col items-center justify-center text-center space-y-1">
+            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+              © 2026 Catatan Seorang Guru. Dibuat dengan ❤️ untuk Pendidik Indonesia
+            </p>
+            <p className="text-[11px] font-medium text-slate-400 dark:text-slate-500">
+              Developed by Usman Abdullah
+            </p>
+          </div>
         </main>
 
         <BottomTabBar activeTab={activeTab} onSelectTab={setActiveTab} />
 
         {/* Status Bar / Footer */}
-        <footer className="hidden lg:flex h-10 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 px-6 sm:px-8 items-center justify-between text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest shrink-0">
+        <footer className="hidden lg:flex h-10 bg-transparent px-6 sm:px-8 items-center justify-between text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest shrink-0">
           <div className="flex items-center gap-4">
             <span>v2.4.0 Stable</span>
             <div className="w-1 h-1 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
@@ -810,6 +823,7 @@ export function App() {
             <span>Semua sistem berjalan normal</span>
           </div>
         </footer>
+        </div>
       </div>
     </div>
   );

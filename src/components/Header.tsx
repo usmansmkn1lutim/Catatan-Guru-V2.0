@@ -124,7 +124,8 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       
-      <header className="hidden lg:flex h-20 bg-white/20 dark:bg-slate-900/20 backdrop-blur-md rounded-3xl border border-white/40 dark:border-slate-700/40 px-8 items-center justify-between shrink-0 z-30 transition-colors shadow-xl shadow-slate-200/10 dark:shadow-none w-[calc(100%-4rem)] max-w-[76rem] mx-auto mt-4">
+      <header className="hidden lg:flex w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+        <div className="flex h-20 bg-white/10 dark:bg-slate-900/10 backdrop-blur-lg rounded-3xl border border-white/60 dark:border-white/20 px-8 items-center justify-between shrink-0 z-30 transition-colors shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.25)] w-full">
         {/* School Branding & Mobile Menu Hamburger Button */}
         <div className="flex items-center gap-3 sm:gap-4 min-w-0">
           <button
@@ -280,6 +281,7 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </button>
         </div>
+      </div>
       </header>
     </>
   );
