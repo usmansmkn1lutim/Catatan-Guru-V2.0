@@ -632,9 +632,9 @@ export function App() {
 
         {/* Page Views Routing */}
         <div className="flex-1 w-full h-full overflow-y-auto" style={{ scrollbarGutter: 'stable' }}>
-          <main className="w-full h-full max-w-7xl mx-auto p-6 pb-28">
+          <main className="w-full h-full max-w-7xl mx-auto p-4 pb-28 lg:p-6 lg:pb-28">
             {/* Main Content Glassmorphism Container */}
-            <div className="w-full bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl rounded-2xl border border-white/20 p-6 shadow-lg transition-all min-h-[calc(100vh-13rem)] flex flex-col justify-between overflow-hidden">
+            <div className="w-full lg:bg-white/10 lg:dark:bg-slate-900/10 lg:backdrop-blur-xl lg:rounded-2xl lg:border lg:border-white/20 p-0 lg:p-6 lg:shadow-lg transition-all min-h-[calc(100vh-13rem)] flex flex-col justify-between overflow-x-hidden overflow-y-visible">
               <div className="w-full">
                 {activeTab === 'dashboard' && (
                   <Dashboard
