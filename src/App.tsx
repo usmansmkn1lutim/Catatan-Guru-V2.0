@@ -49,6 +49,7 @@ import { GoogleSheetsView } from './components/GoogleSheetsView';
 import { BottomTabBar } from './components/BottomTabBar';
 import { AdministrasiMenu } from './components/AdministrasiMenu';
 import { AkademikMenu } from './components/AkademikMenu';
+import { SettingMenu } from './components/SettingMenu';
 
 import {
   Code,
@@ -796,6 +797,10 @@ export function App() {
 
           {activeTab === 'akademik_menu' && (
             <AkademikMenu onNavigate={(tab) => setActiveTab(tab)} />
+          )}
+
+          {activeTab === 'setting_menu' && (
+            <SettingMenu onNavigate={(tab) => setActiveTab(tab)} />
           )}
 
           {/* Footer Text */}

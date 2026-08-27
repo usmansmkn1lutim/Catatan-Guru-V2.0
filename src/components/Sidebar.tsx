@@ -72,20 +72,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
     {
       title: 'AKADEMIK',
       items: [
-        { id: 'presensi', label: 'Presensi Siswa', icon: ClipboardCheck },
-        { id: 'nilai', label: 'Nilai Siswa', icon: Award },
-        { id: 'jurnal', label: 'Jurnal Guru', icon: BookMarked },
+        { id: 'presensi', label: 'Presensi', icon: ClipboardCheck },
+        { id: 'nilai', label: 'Nilai', icon: Award },
+        { id: 'jurnal', label: 'Jurnal', icon: BookMarked },
       ],
     },
     {
-      title: 'KUSTOMISASI',
+      title: 'SETTING',
       items: [
-        { id: 'konfigurasi', label: 'Konfigurasi App', icon: Sliders },
-      ],
-    },
-    {
-      title: 'OLAH DATA',
-      items: [
+        { id: 'konfigurasi', label: 'Konfigurasi Aplikasi', icon: Sliders },
         { id: 'google_sheets', label: 'Google Sheets API', icon: FileSpreadsheet },
       ],
     },

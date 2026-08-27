@@ -70,9 +70,9 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <>
       {/* Mobile Top Bar */}
-      <div className="block lg:hidden bg-transparent px-5 py-4 shrink-0 z-30">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 min-w-0">
+      <div className="block lg:hidden bg-transparent px-4 sm:px-5 py-3.5 shrink-0 z-30">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 min-w-0 flex-1">
             {appConfig?.logoAplikasiUrl ? (
               <div className="w-8 h-8 flex shrink-0 items-center justify-center overflow-hidden bg-transparent">
                 <img
@@ -86,17 +86,19 @@ export const Header: React.FC<HeaderProps> = ({
                 <School className="w-5 h-5 text-white" />
               </div>
             )}
-            <span className="text-base sm:text-lg font-black text-slate-800 dark:text-white tracking-tight truncate max-w-[150px] xs:max-w-[200px]">
-              {appConfig?.namaAplikasi ? (
-                appConfig.namaAplikasi
-              ) : (
-                <>
-                  SIS<span className="text-violet-600">App</span>
-                </>
-              )}
-            </span>
+            <div className="min-w-0 flex-1">
+              <span className="text-base sm:text-lg font-black text-slate-800 dark:text-white tracking-tight leading-tight block truncate sm:whitespace-normal">
+                {appConfig?.namaAplikasi ? (
+                  appConfig.namaAplikasi
+                ) : (
+                  <>
+                    Catatan Seorang <span className="text-violet-600">Guru</span>
+                  </>
+                )}
+              </span>
+            </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <button
               onClick={handleToggleDark}
               className="p-2 text-slate-400 hover:text-violet-600 transition-colors rounded-full"
@@ -108,7 +110,10 @@ export const Header: React.FC<HeaderProps> = ({
                 <Moon className="w-5 h-5" />
               )}
             </button>
-            <div className="w-10 h-10 bg-violet-100 rounded-full border-2 border-white dark:border-slate-800 shadow-sm overflow-hidden shrink-0 flex items-center justify-center">
+            <div 
+              onClick={() => setActiveTab && setActiveTab("profil")}
+              className="w-9 h-9 sm:w-10 sm:h-10 bg-violet-100 rounded-full border-2 border-white dark:border-slate-800 shadow-sm overflow-hidden shrink-0 flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-violet-400 transition-all"
+            >
               {currentGuru?.fotoProfilUrl ? (
                 <img
                   src={currentGuru.fotoProfilUrl}

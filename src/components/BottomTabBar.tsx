@@ -30,7 +30,7 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({ activeTab, onSelectT
         <button
           onClick={() => onSelectTab('administrasi_menu')}
           className={getTabStyle(
-            ['sekolah', 'profil', 'google_sheets', 'gas_deploy', 'administrasi_menu'].includes(activeTab)
+            ['sekolah', 'profil', 'mapel', 'kelas', 'siswa', 'administrasi_menu'].includes(activeTab)
           )}
         >
           <Building2 className="w-6 h-6" />
@@ -40,7 +40,7 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({ activeTab, onSelectT
         <button
           onClick={() => onSelectTab('akademik_menu')}
           className={getTabStyle(
-            ['mapel', 'kelas', 'siswa', 'presensi', 'nilai', 'jurnal', 'akademik_menu'].includes(activeTab)
+            ['presensi', 'nilai', 'jurnal', 'akademik_menu'].includes(activeTab)
           )}
         >
           <GraduationCap className="w-6 h-6" />
@@ -48,8 +48,10 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({ activeTab, onSelectT
         </button>
 
         <button
-          onClick={() => onSelectTab('konfigurasi')}
-          className={getTabStyle(activeTab === 'konfigurasi')}
+          onClick={() => onSelectTab('setting_menu')}
+          className={getTabStyle(
+            ['konfigurasi', 'google_sheets', 'gas_deploy', 'setting_menu'].includes(activeTab)
+          )}
         >
           <Settings className="w-6 h-6" />
           <span className="text-[10px]">Setting</span>

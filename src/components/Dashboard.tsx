@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Siswa, Kelas, Mapel, PresensiRecord, ActiveTab } from '../types';
 import { formatDateString } from '../lib/dateUtils';
-import { Users, GraduationCap, BookOpen, TrendingUp, ClipboardCheck, Award, BookMarked, ArrowUpRight, Sparkles, DoorClosed, School, User, Building, Settings, FileSpreadsheet } from 'lucide-react';
+import { Users, GraduationCap, BookOpen, TrendingUp, ClipboardCheck, Award, BookMarked, ArrowUpRight, Sparkles, DoorClosed, School, User, Building, Settings, FileSpreadsheet, MapPin } from 'lucide-react';
 import {
   ResponsiveContainer,
   LineChart,
@@ -147,19 +147,45 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
   return (
     <div className="space-y-6 pb-28">
-      {/* Mobile Purple Header */}
-      <div className="block lg:hidden bg-violet-600 dark:bg-violet-800 rounded-[2rem] mx-4 mt-4 px-5 pt-6 pb-8 shrink-0 shadow-md text-white relative">
-        <div>
-          <h1 className="text-2xl font-bold mb-1">
-            Hello,{" "}
-            {profilGuru?.namaGuru
-              ? profilGuru.namaGuru.split(",")[0].split(" ")[0]
-              : "Guru"}{" "}
-            👋
-          </h1>
-          <p className="text-violet-200 text-sm">
-            Semoga harimu menyenangkan
-          </p>
+      {/* Mobile & Tablet Purple Header */}
+      <div className="block lg:hidden bg-gradient-to-br from-violet-600 to-indigo-700 dark:from-violet-800 dark:to-indigo-900 rounded-[2rem] mx-1 sm:mx-2 mt-2 px-5 pt-6 pb-6 shrink-0 shadow-md text-white relative overflow-hidden">
+        {/* Subtle decorative circles */}
+        <div className="absolute -right-6 -bottom-6 w-28 h-28 bg-white/10 rounded-full blur-xl pointer-events-none" />
+        <div className="absolute right-6 top-2 w-16 h-16 bg-white/5 rounded-full blur-lg pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col justify-between space-y-4">
+          {/* Greeting */}
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold mb-0.5">
+              Hello,{" "}
+              {profilGuru?.namaGuru
+                ? profilGuru.namaGuru.split(",")[0].split(" ")[0]
+                : "Guru"}{" "}
+              👋
+            </h1>
+            <p className="text-violet-200 text-xs sm:text-sm">
+              Semoga harimu menyenangkan
+            </p>
+          </div>
+
+          {/* School Information (Bottom Left) */}
+          <div className="pt-2 border-t border-white/20">
+            {/* Baris 1: Nama Sekolah */}
+            <p className="text-sm sm:text-base font-bold text-white tracking-wide truncate">
+              {dataSekolah?.namaSekolah || "SMA NEGERI 1 BANGSA YANG BESAR"}
+            </p>
+            {/* Baris 2: Icon lokasi + Alamat sekolah */}
+            <div className="flex items-center gap-1.5 mt-0.5 text-violet-200 text-xs sm:text-sm">
+              <MapPin className="w-3.5 h-3.5 shrink-0 text-violet-300" />
+              <span className="truncate">
+                {dataSekolah?.alamatLengkap ||
+                  [dataSekolah?.kelurahan, dataSekolah?.kecamatan, dataSekolah?.kabupatenKota, dataSekolah?.provinsi]
+                    .filter(Boolean)
+                    .join(", ") ||
+                  "Alamat sekolah belum diatur"}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 

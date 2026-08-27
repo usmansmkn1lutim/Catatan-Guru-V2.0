@@ -12,7 +12,8 @@ export type ActiveTab =
   | 'google_sheets'
   | 'gas_deploy'
   | 'administrasi_menu'
-  | 'akademik_menu';
+  | 'akademik_menu'
+  | 'setting_menu';
 
 export interface AppConfig {
   namaAplikasi: string;
