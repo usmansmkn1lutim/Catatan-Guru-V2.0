@@ -50,6 +50,7 @@ import { BottomTabBar } from './components/BottomTabBar';
 import { AdministrasiMenu } from './components/AdministrasiMenu';
 import { AkademikMenu } from './components/AkademikMenu';
 import { SettingMenu } from './components/SettingMenu';
+import { AppearanceLayout, BgStyleType } from './components/AppearanceLayout';
 
 import {
   Code,
@@ -69,6 +70,43 @@ export function App() {
   const [darkMode, setDarkMode] = useState<boolean>(() => {
     return localStorage.getItem('theme_mode') === 'dark';
   });
+
+  // Custom Appearance & Background State
+  const [customBgImage, setCustomBgImage] = useState<string>(() => {
+    return localStorage.getItem('app_custom_bg_image') || '';
+  });
+  const [customBgStyle, setCustomBgStyle] = useState<BgStyleType>(() => {
+    return (localStorage.getItem('app_custom_bg_style') as BgStyleType) || 'cover';
+  });
+  const [customBgOpacity, setCustomBgOpacity] = useState<number>(() => {
+    const saved = localStorage.getItem('app_custom_bg_opacity');
+    return saved !== null ? parseFloat(saved) : 0.85;
+  });
+
+  // Sync Root CSS Variables & Appearance Event Listener
+  useEffect(() => {
+    const fontSize = localStorage.getItem('app_font_size') || '16';
+    const glassBlur = localStorage.getItem('glass_blur') || '16';
+    const glassOpacity = localStorage.getItem('glass_opacity') || '0.65';
+    const bgOpacity = localStorage.getItem('app_custom_bg_opacity') || '0.85';
+
+    document.documentElement.style.setProperty('--app-font-size', `${fontSize}px`);
+    document.documentElement.style.setProperty('--glass-blur', `${glassBlur}px`);
+    document.documentElement.style.setProperty('--glass-opacity', glassOpacity);
+    document.documentElement.style.setProperty('--bg-opacity', bgOpacity);
+
+    const handleAppearanceChange = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail) {
+        if (customEvent.detail.bgImage !== undefined) setCustomBgImage(customEvent.detail.bgImage);
+        if (customEvent.detail.bgStyle !== undefined) setCustomBgStyle(customEvent.detail.bgStyle);
+        if (customEvent.detail.bgOpacity !== undefined) setCustomBgOpacity(customEvent.detail.bgOpacity);
+      }
+    };
+
+    window.addEventListener('app_appearance_changed', handleAppearanceChange);
+    return () => window.removeEventListener('app_appearance_changed', handleAppearanceChange);
+  }, []);
 
   // Main State
   const [appConfig, setAppConfig] = useState<AppConfig>(() => {
@@ -491,8 +529,41 @@ export function App() {
     showToast('Kode berhasil disalin ke clipboard!', 'success');
   };
 
+  const getCustomBgInlineStyle = (): React.CSSProperties => {
+    if (!customBgImage) return {};
+    const base: React.CSSProperties = {
+      backgroundImage: `url(${customBgImage})`,
+      opacity: customBgOpacity,
+    };
+
+    switch (customBgStyle) {
+      case 'cover':
+        return { ...base, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' };
+      case 'fill':
+        return { ...base, backgroundSize: '100% 100%', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' };
+      case 'stretch':
+        return { ...base, backgroundSize: '100% 100%', backgroundPosition: '0 0', backgroundRepeat: 'no-repeat' };
+      case 'center':
+        return { ...base, backgroundSize: 'auto', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' };
+      case 'contain':
+        return { ...base, backgroundSize: 'contain', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' };
+      case 'repeat':
+        return { ...base, backgroundSize: 'auto', backgroundPosition: '0 0', backgroundRepeat: 'repeat' };
+      default:
+        return { ...base, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' };
+    }
+  };
+
   return (
     <div className="h-screen w-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex font-sans antialiased overflow-hidden relative z-0">
+      {/* Custom Background Image Layer */}
+      {customBgImage && (
+        <div
+          className="fixed inset-0 pointer-events-none -z-20 transition-all duration-300"
+          style={getCustomBgInlineStyle()}
+        />
+      )}
+
       {/* Glassmorphism Abstract Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
         <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-400/20 dark:bg-blue-600/20 rounded-full blur-[100px]" />
@@ -560,259 +631,273 @@ export function App() {
         </div>
 
         {/* Page Views Routing */}
-        <div className="flex-1 overflow-y-auto" style={{ scrollbarGutter: 'stable' }}>
-        <main className="flex-1 p-4 pb-24 sm:p-6 lg:pb-8 lg:p-8 max-w-7xl mx-auto w-full">
-          {activeTab === 'dashboard' && (
-            <Dashboard
-              dataSekolah={dataSekolah}
-              profilGuru={profilGuru}
-              siswaList={siswaList}
-              kelasList={kelasList}
-              mapelList={mapelList}
-              presensiList={presensiList}
-              nilaiList={nilaiList}
-              jurnalList={jurnalList}
-              onNavigate={(tab) => setActiveTab(tab)}
-              autoSyncStatus={autoSyncStatus}
-              lastSyncedTime={lastSyncedTime}
-              autoSyncEnabled={autoSyncEnabled}
-              onFetchRemoteData={() => handleFetchRemoteData(false)}
-            />
-          )}
+        <div className="flex-1 w-full h-full overflow-y-auto" style={{ scrollbarGutter: 'stable' }}>
+          <main className="w-full h-full max-w-7xl mx-auto p-6 pb-28">
+            {/* Main Content Glassmorphism Container */}
+            <div className="w-full bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl rounded-2xl border border-white/20 p-6 shadow-lg transition-all min-h-[calc(100vh-13rem)] flex flex-col justify-between overflow-hidden">
+              <div className="w-full">
+                {activeTab === 'dashboard' && (
+                  <Dashboard
+                    dataSekolah={dataSekolah}
+                    profilGuru={profilGuru}
+                    siswaList={siswaList}
+                    kelasList={kelasList}
+                    mapelList={mapelList}
+                    presensiList={presensiList}
+                    nilaiList={nilaiList}
+                    jurnalList={jurnalList}
+                    onNavigate={(tab) => setActiveTab(tab)}
+                    autoSyncStatus={autoSyncStatus}
+                    lastSyncedTime={lastSyncedTime}
+                    autoSyncEnabled={autoSyncEnabled}
+                    onFetchRemoteData={() => handleFetchRemoteData(false)}
+                  />
+                )}
 
-          {activeTab === 'sekolah' && (
-            <DataSekolahView
-              dataSekolah={dataSekolah}
-              onSaveDataSekolah={setDataSekolah}
-              showToast={showToast}
-            />
-          )}
+                {activeTab === 'sekolah' && (
+                  <DataSekolahView
+                    dataSekolah={dataSekolah}
+                    onSaveDataSekolah={setDataSekolah}
+                    showToast={showToast}
+                  />
+                )}
 
-          {activeTab === 'profil' && (
-            <ProfilGuruView
-              profilGuru={profilGuru}
-              onSaveProfilGuru={setProfilGuru}
-              showToast={showToast}
-            />
-          )}
+                {activeTab === 'profil' && (
+                  <ProfilGuruView
+                    profilGuru={profilGuru}
+                    onSaveProfilGuru={setProfilGuru}
+                    showToast={showToast}
+                  />
+                )}
 
-          {activeTab === 'konfigurasi' && (
-            <KonfigurasiAppView
-              appConfig={appConfig}
-              onSaveAppConfig={(newConfig) => {
-                const updated = {
-                  ...newConfig,
-                  logoAplikasiUrl: newConfig.logoAplikasiUrl || DEFAULT_APP_LOGO,
-                };
-                setAppConfig(updated);
-                saveToStorage('appConfig', updated);
-                localStorage.setItem('APP_LOGO_URL', updated.logoAplikasiUrl);
-              }}
-              showToast={showToast}
-            />
-          )}
+                {activeTab === 'konfigurasi' && (
+                  <KonfigurasiAppView
+                    appConfig={appConfig}
+                    onSaveAppConfig={(newConfig) => {
+                      const updated = {
+                        ...newConfig,
+                        logoAplikasiUrl: newConfig.logoAplikasiUrl || DEFAULT_APP_LOGO,
+                      };
+                      setAppConfig(updated);
+                      saveToStorage('appConfig', updated);
+                      localStorage.setItem('APP_LOGO_URL', updated.logoAplikasiUrl);
+                    }}
+                    showToast={showToast}
+                  />
+                )}
 
-          {activeTab === 'mapel' && (
-            <DataMapelView
-              mapelList={mapelList}
-              onSaveMapelList={setMapelList}
-              showToast={showToast}
-            />
-          )}
+                {activeTab === 'mapel' && (
+                  <DataMapelView
+                    mapelList={mapelList}
+                    onSaveMapelList={setMapelList}
+                    showToast={showToast}
+                  />
+                )}
 
-          {activeTab === 'kelas' && (
-            <DataKelasView
-              kelasList={kelasList}
-              siswaList={siswaList}
-              onSaveKelasList={setKelasList}
-              onSaveSiswaList={setSiswaList}
-              showToast={showToast}
-            />
-          )}
+                {activeTab === 'kelas' && (
+                  <DataKelasView
+                    kelasList={kelasList}
+                    siswaList={siswaList}
+                    onSaveKelasList={setKelasList}
+                    onSaveSiswaList={setSiswaList}
+                    showToast={showToast}
+                  />
+                )}
 
-          {activeTab === 'siswa' && (
-            <DataSiswaView
-              siswaList={siswaList}
-              kelasList={kelasList}
-              presensiList={presensiList}
-              nilaiList={nilaiList}
-              onSaveSiswaList={setSiswaList}
-              showToast={showToast}
-            />
-          )}
+                {activeTab === 'siswa' && (
+                  <DataSiswaView
+                    siswaList={siswaList}
+                    kelasList={kelasList}
+                    presensiList={presensiList}
+                    nilaiList={nilaiList}
+                    onSaveSiswaList={setSiswaList}
+                    showToast={showToast}
+                  />
+                )}
 
-          {activeTab === 'presensi' && (
-            <PresensiSiswaView
-              presensiList={presensiList}
-              siswaList={siswaList}
-              kelasList={kelasList}
-              mapelList={mapelList}
-              onSavePresensiList={setPresensiList}
-              showToast={showToast}
-            />
-          )}
+                {activeTab === 'presensi' && (
+                  <PresensiSiswaView
+                    presensiList={presensiList}
+                    siswaList={siswaList}
+                    kelasList={kelasList}
+                    mapelList={mapelList}
+                    onSavePresensiList={setPresensiList}
+                    showToast={showToast}
+                  />
+                )}
 
-          {activeTab === 'nilai' && (
-            <NilaiSiswaView
-              nilaiList={nilaiList}
-              siswaList={siswaList}
-              kelasList={kelasList}
-              mapelList={mapelList}
-              onSaveNilaiList={setNilaiList}
-              showToast={showToast}
-            />
-          )}
+                {activeTab === 'nilai' && (
+                  <NilaiSiswaView
+                    nilaiList={nilaiList}
+                    siswaList={siswaList}
+                    kelasList={kelasList}
+                    mapelList={mapelList}
+                    onSaveNilaiList={setNilaiList}
+                    showToast={showToast}
+                  />
+                )}
 
-          {activeTab === 'jurnal' && (
-            <JurnalGuruView
-              jurnalList={jurnalList}
-              mapelList={mapelList}
-              kelasList={kelasList}
-              onSaveJurnalList={setJurnalList}
-              showToast={showToast}
-            />
-          )}
+                {activeTab === 'jurnal' && (
+                  <JurnalGuruView
+                    jurnalList={jurnalList}
+                    mapelList={mapelList}
+                    kelasList={kelasList}
+                    onSaveJurnalList={setJurnalList}
+                    showToast={showToast}
+                  />
+                )}
 
-          {activeTab === 'google_sheets' && (
-            <GoogleSheetsView
-              dataSekolah={dataSekolah}
-              profilGuru={profilGuru}
-              mapelList={mapelList}
-              kelasList={kelasList}
-              siswaList={siswaList}
-              presensiList={presensiList}
-              nilaiList={nilaiList}
-              jurnalList={jurnalList}
-              onImportData={(data) => {
-                if (data.dataSekolah) setDataSekolah(data.dataSekolah);
-                if (data.profilGuru) setProfilGuru(data.profilGuru);
-                if (data.mapelList && data.mapelList.length > 0) setMapelList(data.mapelList);
-                if (data.kelasList && data.kelasList.length > 0) setKelasList(data.kelasList);
-                if (data.siswaList && data.siswaList.length > 0) setSiswaList(data.siswaList);
-              }}
-              showToast={showToast}
-              autoSyncEnabled={autoSyncEnabled}
-              onToggleAutoSync={handleToggleAutoSync}
-              autoSyncStatus={autoSyncStatus}
-              lastSyncedTime={lastSyncedTime}
-            />
-          )}
+                {activeTab === 'google_sheets' && (
+                  <GoogleSheetsView
+                    dataSekolah={dataSekolah}
+                    profilGuru={profilGuru}
+                    mapelList={mapelList}
+                    kelasList={kelasList}
+                    siswaList={siswaList}
+                    presensiList={presensiList}
+                    nilaiList={nilaiList}
+                    jurnalList={jurnalList}
+                    onImportData={(data) => {
+                      if (data.dataSekolah) setDataSekolah(data.dataSekolah);
+                      if (data.profilGuru) setProfilGuru(data.profilGuru);
+                      if (data.mapelList && data.mapelList.length > 0) setMapelList(data.mapelList);
+                      if (data.kelasList && data.kelasList.length > 0) setKelasList(data.kelasList);
+                      if (data.siswaList && data.siswaList.length > 0) setSiswaList(data.siswaList);
+                    }}
+                    showToast={showToast}
+                    autoSyncEnabled={autoSyncEnabled}
+                    onToggleAutoSync={handleToggleAutoSync}
+                    autoSyncStatus={autoSyncStatus}
+                    lastSyncedTime={lastSyncedTime}
+                  />
+                )}
 
-          {/* Deployment to Google Apps Script View */}
-          {activeTab === 'gas_deploy' && (
-            <div className="space-y-6 pb-12">
-              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-xl bg-violet-600 text-white flex items-center justify-center">
-                  <CloudUpload className="w-5 h-5" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-                    Panduan Deployment ke Google Apps Script (GAS)
-                  </h2>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Instruksi lengkap menyambungkan aplikasi ini secara gratis dengan Google Spreadsheet
-                  </p>
-                </div>
+                {/* Deployment to Google Apps Script View */}
+                {activeTab === 'gas_deploy' && (
+                  <div className="space-y-6 pb-12">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm flex items-center space-x-3">
+                      <div className="w-10 h-10 rounded-xl bg-violet-600 text-white flex items-center justify-center">
+                        <CloudUpload className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+                          Panduan Deployment ke Google Apps Script (GAS)
+                        </h2>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                          Instruksi lengkap menyambungkan aplikasi ini secara gratis dengan Google Spreadsheet
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Step-by-Step Guide */}
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm space-y-4 text-xs">
+                      <h3 className="text-sm font-bold text-violet-600 dark:text-violet-400 uppercase tracking-wider">
+                        Langkah-Langkah Pemasangan (Deployment)
+                      </h3>
+
+                      <ol className="list-decimal list-inside space-y-3 text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
+                        <li>
+                          Buka <strong>Google Drive</strong>, buat satu file <strong>Google Spreadsheet Baru</strong>, dan beri nama misalnya: <code className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-violet-600">Database Catatan Guru</code>.
+                        </li>
+                        <li>
+                          Di dalam Google Spreadsheet tersebut, klik menu <strong>Ekstensi (Extensions)</strong> &gt; <strong>Apps Script</strong>.
+                        </li>
+                        <li>
+                          Di dalam editor Google Apps Script, ganti seluruh isi file <code className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-violet-600">Code.gs</code> dengan kode backend di bawah ini.
+                        </li>
+                        <li>
+                          Klik tombol <strong>+ (Tambah File)</strong> &gt; pilih <strong>HTML</strong>, beri nama file <code className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-violet-600">Index</code> (sehingga menjadi <code className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-violet-600">Index.html</code>), lalu tempelkan kode wrapper HTML di bawah ini.
+                        </li>
+                        <li>
+                          Klik tombol <strong>Deploy (Terapkan)</strong> di sudut kanan atas &gt; pilih <strong>Deployment Baru (New Deployment)</strong>.
+                        </li>
+                        <li>
+                          Pilih jenis <strong>Aplikasi Web (Web App)</strong>. Atur:
+                          <ul className="list-disc list-inside ml-6 mt-1 text-slate-600 dark:text-slate-400">
+                            <li><strong>Jalankan sebagai:</strong> Saya (Alamat email Anda)</li>
+                            <li><strong>Siapa yang memiliki akses:</strong> Siapa saja (Anyone)</li>
+                          </ul>
+                        </li>
+                        <li>
+                          Klik <strong>Terapkan (Deploy)</strong>, berikan izin akses ke Spreadsheet Anda, dan salin <strong>URL Aplikasi Web</strong> yang dihasilkan. Aplikasi siap digunakan permanen!
+                        </li>
+                      </ol>
+                    </div>
+
+                    {/* Code.gs Viewer & Copy */}
+                    <div className="bg-slate-900 text-slate-100 rounded-2xl overflow-hidden shadow-xl border border-slate-800">
+                      <div className="px-6 py-3 bg-slate-800 flex items-center justify-between border-b border-slate-700">
+                        <span className="font-mono text-xs font-bold text-violet-400 flex items-center space-x-2">
+                          <Code className="w-4 h-4" />
+                          <span>Code.gs</span>
+                        </span>
+                        <button
+                          onClick={() => copyToClipboard(CODE_GS_TEMPLATE, 'gs')}
+                          className="flex items-center space-x-1.5 px-3 py-1 bg-violet-600 text-white rounded-lg text-xs font-semibold hover:bg-violet-700 transition-colors"
+                        >
+                          {copiedGs ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                          <span>{copiedGs ? 'Tersalin!' : 'Salin Code.gs'}</span>
+                        </button>
+                      </div>
+                      <pre className="p-6 text-[11px] font-mono overflow-x-auto max-h-80 custom-scrollbar text-slate-300">
+                        {CODE_GS_TEMPLATE}
+                      </pre>
+                    </div>
+
+                    {/* Index.html Viewer & Copy */}
+                    <div className="bg-slate-900 text-slate-100 rounded-2xl overflow-hidden shadow-xl border border-slate-800">
+                      <div className="px-6 py-3 bg-slate-800 flex items-center justify-between border-b border-slate-700">
+                        <span className="font-mono text-xs font-bold text-violet-400 flex items-center space-x-2">
+                          <Code className="w-4 h-4" />
+                          <span>Index.html</span>
+                        </span>
+                        <button
+                          onClick={() => copyToClipboard(INDEX_HTML_TEMPLATE, 'html')}
+                          className="flex items-center space-x-1.5 px-3 py-1 bg-violet-600 text-white rounded-lg text-xs font-semibold hover:bg-violet-700 transition-colors"
+                        >
+                          {copiedHtml ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                          <span>{copiedHtml ? 'Tersalin!' : 'Salin Index.html'}</span>
+                        </button>
+                      </div>
+                      <pre className="p-6 text-[11px] font-mono overflow-x-auto max-h-80 custom-scrollbar text-slate-300">
+                        {INDEX_HTML_TEMPLATE}
+                      </pre>
+                    </div>
+                  </div>
+                )}
+                {activeTab === 'administrasi_menu' && (
+                  <AdministrasiMenu onNavigate={(tab) => setActiveTab(tab)} />
+                )}
+
+                {activeTab === 'akademik_menu' && (
+                  <AkademikMenu onNavigate={(tab) => setActiveTab(tab)} />
+                )}
+
+                {activeTab === 'setting_menu' && (
+                  <SettingMenu onNavigate={(tab) => setActiveTab(tab)} />
+                )}
+
+                {activeTab === 'tampilan' && (
+                  <AppearanceLayout
+                    darkMode={darkMode}
+                    setDarkMode={setDarkMode}
+                    onToggleDarkMode={() => setDarkMode(!darkMode)}
+                    onShowToast={showToast}
+                  />
+                )}
               </div>
 
-              {/* Step-by-Step Guide */}
-              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm space-y-4 text-xs">
-                <h3 className="text-sm font-bold text-violet-600 dark:text-violet-400 uppercase tracking-wider">
-                  Langkah-Langkah Pemasangan (Deployment)
-                </h3>
-
-                <ol className="list-decimal list-inside space-y-3 text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
-                  <li>
-                    Buka <strong>Google Drive</strong>, buat satu file <strong>Google Spreadsheet Baru</strong>, dan beri nama misalnya: <code className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-violet-600">Database Catatan Guru</code>.
-                  </li>
-                  <li>
-                    Di dalam Google Spreadsheet tersebut, klik menu <strong>Ekstensi (Extensions)</strong> &gt; <strong>Apps Script</strong>.
-                  </li>
-                  <li>
-                    Di dalam editor Google Apps Script, ganti seluruh isi file <code className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-violet-600">Code.gs</code> dengan kode backend di bawah ini.
-                  </li>
-                  <li>
-                    Klik tombol <strong>+ (Tambah File)</strong> &gt; pilih <strong>HTML</strong>, beri nama file <code className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-violet-600">Index</code> (sehingga menjadi <code className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-violet-600">Index.html</code>), lalu tempelkan kode wrapper HTML di bawah ini.
-                  </li>
-                  <li>
-                    Klik tombol <strong>Deploy (Terapkan)</strong> di sudut kanan atas &gt; pilih <strong>Deployment Baru (New Deployment)</strong>.
-                  </li>
-                  <li>
-                    Pilih jenis <strong>Aplikasi Web (Web App)</strong>. Atur:
-                    <ul className="list-disc list-inside ml-6 mt-1 text-slate-600 dark:text-slate-400">
-                      <li><strong>Jalankan sebagai:</strong> Saya (Alamat email Anda)</li>
-                      <li><strong>Siapa yang memiliki akses:</strong> Siapa saja (Anyone)</li>
-                    </ul>
-                  </li>
-                  <li>
-                    Klik <strong>Terapkan (Deploy)</strong>, berikan izin akses ke Spreadsheet Anda, dan salin <strong>URL Aplikasi Web</strong> yang dihasilkan. Aplikasi siap digunakan permanen!
-                  </li>
-                </ol>
-              </div>
-
-              {/* Code.gs Viewer & Copy */}
-              <div className="bg-slate-900 text-slate-100 rounded-2xl overflow-hidden shadow-xl border border-slate-800">
-                <div className="px-6 py-3 bg-slate-800 flex items-center justify-between border-b border-slate-700">
-                  <span className="font-mono text-xs font-bold text-violet-400 flex items-center space-x-2">
-                    <Code className="w-4 h-4" />
-                    <span>Code.gs</span>
-                  </span>
-                  <button
-                    onClick={() => copyToClipboard(CODE_GS_TEMPLATE, 'gs')}
-                    className="flex items-center space-x-1.5 px-3 py-1 bg-violet-600 text-white rounded-lg text-xs font-semibold hover:bg-violet-700 transition-colors"
-                  >
-                    {copiedGs ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copiedGs ? 'Tersalin!' : 'Salin Code.gs'}</span>
-                  </button>
-                </div>
-                <pre className="p-6 text-[11px] font-mono overflow-x-auto max-h-80 custom-scrollbar text-slate-300">
-                  {CODE_GS_TEMPLATE}
-                </pre>
-              </div>
-
-              {/* Index.html Viewer & Copy */}
-              <div className="bg-slate-900 text-slate-100 rounded-2xl overflow-hidden shadow-xl border border-slate-800">
-                <div className="px-6 py-3 bg-slate-800 flex items-center justify-between border-b border-slate-700">
-                  <span className="font-mono text-xs font-bold text-violet-400 flex items-center space-x-2">
-                    <Code className="w-4 h-4" />
-                    <span>Index.html</span>
-                  </span>
-                  <button
-                    onClick={() => copyToClipboard(INDEX_HTML_TEMPLATE, 'html')}
-                    className="flex items-center space-x-1.5 px-3 py-1 bg-violet-600 text-white rounded-lg text-xs font-semibold hover:bg-violet-700 transition-colors"
-                  >
-                    {copiedHtml ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copiedHtml ? 'Tersalin!' : 'Salin Index.html'}</span>
-                  </button>
-                </div>
-                <pre className="p-6 text-[11px] font-mono overflow-x-auto max-h-80 custom-scrollbar text-slate-300">
-                  {INDEX_HTML_TEMPLATE}
-                </pre>
+              {/* Footer Text */}
+              <div className="mt-12 pt-6 border-t border-white/20 dark:border-white/10 flex flex-col items-center justify-center text-center space-y-1">
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                  © 2026 Catatan Seorang Guru. Dibuat dengan ❤️ untuk Pendidik Indonesia
+                </p>
+                <p className="text-[11px] font-medium text-slate-400 dark:text-slate-500">
+                  Developed by Usman Abdullah
+                </p>
               </div>
             </div>
-          )}
-          {activeTab === 'administrasi_menu' && (
-            <AdministrasiMenu onNavigate={(tab) => setActiveTab(tab)} />
-          )}
-
-          {activeTab === 'akademik_menu' && (
-            <AkademikMenu onNavigate={(tab) => setActiveTab(tab)} />
-          )}
-
-          {activeTab === 'setting_menu' && (
-            <SettingMenu onNavigate={(tab) => setActiveTab(tab)} />
-          )}
-
-          {/* Footer Text */}
-          <div className="mt-12 pb-6 flex flex-col items-center justify-center text-center space-y-1">
-            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-              © 2026 Catatan Seorang Guru. Dibuat dengan ❤️ untuk Pendidik Indonesia
-            </p>
-            <p className="text-[11px] font-medium text-slate-400 dark:text-slate-500">
-              Developed by Usman Abdullah
-            </p>
-          </div>
-        </main>
+          </main>
 
         <BottomTabBar activeTab={activeTab} onSelectTab={setActiveTab} />
 

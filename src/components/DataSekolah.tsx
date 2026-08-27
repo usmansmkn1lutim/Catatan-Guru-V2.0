@@ -80,30 +80,30 @@ export const DataSekolahView: React.FC<DataSekolahProps> = ({
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-12">
+    <div className="w-full max-w-5xl mx-auto space-y-6 pb-12">
       {/* Header Banner */}
-      <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border border-white/60 dark:border-slate-700/50 dark:border-slate-800 rounded-xl p-6 shadow-lg shadow-slate-200/40 dark:shadow-none flex items-center justify-between">
+      <div className="bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border border-white/20 rounded-2xl p-6 shadow-lg flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-xl bg-violet-600 text-white flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-violet-600 text-white flex items-center justify-center shadow-md">
             <Building2 className="w-5 h-5" />
           </div>
           <div>
             <h2 className="text-lg font-bold text-slate-900 dark:text-white">Data Sekolah</h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-slate-600 dark:text-slate-400">
               Kelola informasi profil satuan pendidikan yang tersimpan di Google Spreadsheet
             </p>
           </div>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border border-white/60 dark:border-slate-700/50 dark:border-slate-800 rounded-xl p-6 sm:p-8 space-y-6 shadow-lg shadow-slate-200/40 dark:shadow-none">
+      <form onSubmit={handleSubmit} className="bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border border-white/20 rounded-2xl p-6 sm:p-8 space-y-6 shadow-lg">
         {/* Logo Section */}
-        <div className="border-b border-slate-100 dark:border-slate-800 pb-6">
+        <div className="border-b border-white/10 pb-6">
           <label className="block text-sm font-bold text-slate-800 dark:text-slate-200 mb-3">
             Logo Sekolah
           </label>
           <div className="flex flex-col sm:flex-row items-center gap-6">
-            <div className="w-24 h-24 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center overflow-hidden shrink-0">
+            <div className="w-24 h-24 rounded-2xl bg-white/50 dark:bg-slate-800/50 border border-white/20 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
               {logoPreview ? (
                 <img src={logoPreview} alt="Logo Sekolah" className="w-full h-full object-contain p-2" />
               ) : (
@@ -111,12 +111,12 @@ export const DataSekolahView: React.FC<DataSekolahProps> = ({
               )}
             </div>
             <div className="space-y-2 text-center sm:text-left">
-              <label className="inline-flex items-center space-x-2 px-4 py-2 bg-violet-600 text-white text-xs font-semibold rounded-full hover:bg-violet-700 transition-colors cursor-pointer shadow-lg shadow-slate-200/40 dark:shadow-none">
+              <label className="inline-flex items-center space-x-2 px-4 py-2 bg-violet-600 text-white text-xs font-semibold rounded-xl hover:bg-violet-700 transition-colors cursor-pointer shadow-md">
                 <Upload className="w-4 h-4" />
                 <span>Upload Logo (JPG / PNG)</span>
                 <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
               </label>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400">
+              <p className="text-[11px] text-slate-600 dark:text-slate-400">
                 Disimpan secara permanen di Google Drive dan terhubung langsung ke Google Spreadsheet.
               </p>
             </div>
@@ -291,10 +291,10 @@ export const DataSekolahView: React.FC<DataSekolahProps> = ({
         </div>
 
         {/* Submit */}
-        <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+        <div className="pt-4 border-t border-white/10 flex justify-end">
           <button
             type="submit"
-            className="flex items-center space-x-2 px-6 py-2.5 bg-violet-600 text-white text-sm font-semibold rounded-full hover:bg-violet-700 transition-colors shadow-md shadow-violet-500/20"
+            className="flex items-center space-x-2 px-6 py-2.5 bg-violet-600 text-white text-sm font-semibold rounded-xl hover:bg-violet-700 transition-colors shadow-md shadow-violet-500/20"
           >
             <Save className="w-4 h-4" />
             <span>Simpan Data Sekolah</span>

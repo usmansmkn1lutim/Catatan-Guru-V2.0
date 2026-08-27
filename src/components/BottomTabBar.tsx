@@ -50,7 +50,7 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({ activeTab, onSelectT
         <button
           onClick={() => onSelectTab('setting_menu')}
           className={getTabStyle(
-            ['konfigurasi', 'google_sheets', 'gas_deploy', 'setting_menu'].includes(activeTab)
+            ['konfigurasi', 'google_sheets', 'gas_deploy', 'setting_menu', 'tampilan'].includes(activeTab)
           )}
         >
           <Settings className="w-6 h-6" />

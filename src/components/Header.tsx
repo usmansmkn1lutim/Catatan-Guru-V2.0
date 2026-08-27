@@ -70,7 +70,7 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <>
       {/* Mobile Top Bar */}
-      <div className="block lg:hidden bg-transparent px-4 sm:px-5 py-3.5 shrink-0 z-30">
+      <div className="block lg:hidden bg-transparent px-4 sm:px-6 py-3.5 shrink-0 z-30 max-w-7xl mx-auto w-full">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-0 flex-1">
             {appConfig?.logoAplikasiUrl ? (
@@ -87,12 +87,12 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
             )}
             <div className="min-w-0 flex-1">
-              <span className="text-base sm:text-lg font-black text-slate-800 dark:text-white tracking-tight leading-tight block truncate sm:whitespace-normal">
+              <span className="text-base sm:text-lg font-black text-white tracking-tight leading-tight block truncate sm:whitespace-normal">
                 {appConfig?.namaAplikasi ? (
                   appConfig.namaAplikasi
                 ) : (
                   <>
-                    Catatan Seorang <span className="text-violet-600">Guru</span>
+                    Catatan Seorang <span className="text-white">Guru</span>
                   </>
                 )}
               </span>
@@ -102,12 +102,13 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={handleToggleDark}
               className="p-2 text-slate-400 hover:text-violet-600 transition-colors rounded-full"
-              title={activeDark ? "Mode Terang" : "Mode Gelap"}
+              title={activeDark ? "Beralih ke Light Glassmorphism" : "Beralih ke Dark Glassmorphism"}
+              aria-label={activeDark ? "Beralih ke Light Glassmorphism" : "Beralih ke Dark Glassmorphism"}
             >
               {activeDark ? (
                 <Sun className="w-5 h-5 text-amber-400" />
               ) : (
-                <Moon className="w-5 h-5" />
+                <Moon className="w-5 h-5 text-slate-600" />
               )}
             </button>
             <div 
@@ -156,10 +157,10 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           )}
           <div className="min-w-0">
-            <h2 className="text-sm sm:text-base font-bold text-slate-800 dark:text-slate-100 leading-tight truncate">
+            <h2 className="text-sm sm:text-base font-bold text-white leading-tight truncate">
               {currentSekolah?.namaSekolah || "SMA Negeri 1 Permata Bangsa"}
             </h2>
-            <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium truncate max-w-[140px] xs:max-w-[200px] sm:max-w-md">
+            <p className="text-[11px] sm:text-xs text-white font-medium truncate max-w-[140px] xs:max-w-[200px] sm:max-w-md">
               {currentSekolah?.alamatLengkap ||
                 "Jl. Merdeka No. 123, Kota Pendidikan"}
             </p>
@@ -247,13 +248,14 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={handleToggleDark}
-            title={activeDark ? "Mode Terang" : "Mode Gelap"}
-            className="p-2 text-slate-400 hover:text-violet-600 transition-colors rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800"
+            title={activeDark ? "Beralih ke Light Glassmorphism" : "Beralih ke Dark Glassmorphism"}
+            aria-label={activeDark ? "Beralih ke Light Glassmorphism" : "Beralih ke Dark Glassmorphism"}
+            className="p-2 text-slate-500 hover:text-violet-600 dark:text-slate-300 dark:hover:text-amber-400 transition-colors rounded-xl hover:bg-white/40 dark:hover:bg-slate-800/60 flex items-center gap-1.5"
           >
             {activeDark ? (
-              <Sun className="w-5 h-5 text-amber-400" />
+              <Sun className="w-5 h-5 text-amber-400 animate-spin-slow" />
             ) : (
-              <Moon className="w-5 h-5" />
+              <Moon className="w-5 h-5 text-slate-700" />
             )}
           </button>
 
@@ -264,10 +266,10 @@ export const Header: React.FC<HeaderProps> = ({
             className="flex items-center gap-3 text-right hover:opacity-90 transition-opacity"
           >
             <div className="hidden sm:block">
-              <p className="text-sm font-bold text-slate-800 dark:text-slate-100 leading-tight">
+              <p className="text-sm font-bold text-white leading-tight">
                 {currentGuru?.namaGuru || "Drs. Bambang Haryanto"}
               </p>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-tight">
+              <p className="text-[10px] text-white font-bold uppercase tracking-tight">
                 {currentGuru?.nip
                   ? `NIP. ${currentGuru.nip}`
                   : "Guru Mata Pelajaran"}

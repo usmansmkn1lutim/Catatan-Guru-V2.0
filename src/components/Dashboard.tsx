@@ -148,7 +148,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   return (
     <div className="space-y-6 pb-28">
       {/* Mobile & Tablet Purple Header */}
-      <div className="block lg:hidden bg-gradient-to-br from-violet-600 to-indigo-700 dark:from-violet-800 dark:to-indigo-900 rounded-[2rem] mx-1 sm:mx-2 mt-2 px-5 pt-6 pb-6 shrink-0 shadow-md text-white relative overflow-hidden">
+      <div className="block lg:hidden bg-gradient-to-br from-violet-600 to-indigo-700 dark:from-violet-800 dark:to-indigo-900 rounded-2xl w-full p-6 shrink-0 shadow-lg text-white relative overflow-hidden border border-white/20">
         {/* Subtle decorative circles */}
         <div className="absolute -right-6 -bottom-6 w-28 h-28 bg-white/10 rounded-full blur-xl pointer-events-none" />
         <div className="absolute right-6 top-2 w-16 h-16 bg-white/5 rounded-full blur-lg pointer-events-none" />
@@ -190,9 +190,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
       </div>
 
       {/* Mobile Horizontal Categories Menu (visible only on mobile) */}
-      <div className="block lg:hidden pt-2">
-        <div className="flex items-center justify-between px-2 mb-3">
-          <h3 className="font-bold text-slate-800 dark:text-slate-100">Menu Utama</h3>
+      <div className="block lg:hidden w-full bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-lg p-5 overflow-hidden">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-bold text-slate-800 dark:text-slate-100 text-sm">Menu Utama</h3>
           <button 
             onClick={() => setIsMenuExpanded(!isMenuExpanded)}
             className="text-xs font-bold text-violet-600 dark:text-violet-400 hover:underline"
@@ -201,7 +201,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </button>
         </div>
         
-        <div className="grid grid-cols-4 gap-y-4 gap-x-2 px-1">
+        <div className="grid grid-cols-4 gap-3 w-full">
           {[
             { id: 'presensi', label: 'Presensi', icon: ClipboardCheck, bg: 'bg-rose-50 dark:bg-rose-950/40', text: 'text-rose-500 dark:text-rose-400' },
             { id: 'nilai', label: 'Nilai', icon: Award, bg: 'bg-amber-50 dark:bg-amber-950/40', text: 'text-amber-500 dark:text-amber-400' },
@@ -213,10 +213,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
               onClick={() => goToTab(menu.id as ActiveTab)}
               className="flex flex-col items-center gap-2 w-full"
             >
-              <div className={`w-14 h-14 rounded-[1.25rem] flex items-center justify-center ${menu.bg} ${menu.text} shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.25)] border border-white/50 dark:border-slate-800/50`}>
-                <menu.icon className="w-7 h-7" strokeWidth={1.5} />
+              <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center ${menu.bg} ${menu.text} shadow-sm border border-white/20`}>
+                <menu.icon className="w-6 h-6" strokeWidth={1.5} />
               </div>
-              <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 text-center leading-tight">
+              <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 text-center leading-tight truncate w-full">
                 {menu.label}
               </span>
             </button>
@@ -224,7 +224,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
 
         {isMenuExpanded && (
-          <div className="grid grid-cols-4 gap-y-4 gap-x-2 px-1 mt-4">
+          <div className="grid grid-cols-4 gap-3 w-full mt-4 pt-4 border-t border-white/10">
             {[
               { id: 'sekolah', label: 'Data Sekolah', icon: Building, bg: 'bg-indigo-50 dark:bg-indigo-950/40', text: 'text-indigo-500 dark:text-indigo-400' },
               { id: 'mapel', label: 'Data Mapel', icon: BookOpen, bg: 'bg-emerald-50 dark:bg-emerald-950/40', text: 'text-emerald-500 dark:text-emerald-400' },
@@ -236,10 +236,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 onClick={() => goToTab(menu.id as ActiveTab)}
                 className="flex flex-col items-center gap-2 w-full"
               >
-                <div className={`w-14 h-14 rounded-[1.25rem] flex items-center justify-center ${menu.bg} ${menu.text} shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.25)] border border-white/50 dark:border-slate-800/50`}>
-                  <menu.icon className="w-7 h-7" strokeWidth={1.5} />
+                <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center ${menu.bg} ${menu.text} shadow-sm border border-white/20`}>
+                  <menu.icon className="w-6 h-6" strokeWidth={1.5} />
                 </div>
-                <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 text-center leading-tight">
+                <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 text-center leading-tight truncate w-full">
                   {menu.label}
                 </span>
               </button>
@@ -249,11 +249,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
       </div>
 
       {/* 4 Stat Cards */}
-      <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch w-full">
         {/* Card 1: Total Siswa */}
-        <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-lg p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-white/60 dark:border-white/20 shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.25)] flex flex-col justify-between hover:border-violet-300 dark:hover:border-violet-800 transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+        <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20 shadow-lg flex flex-col justify-between items-stretch overflow-hidden hover:border-violet-300/50 dark:hover:border-violet-700/50 transition-all h-full">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-xs font-bold text-white uppercase tracking-widest">
               Total Siswa
             </span>
             <div className="p-2.5 bg-violet-100 dark:bg-violet-950/70 text-violet-600 dark:text-violet-400 rounded-xl">
@@ -262,10 +262,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </div>
           <div className="flex items-end justify-between">
             <div>
-              <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white">
+              <h3 className="text-3xl font-extrabold text-white">
                 {totalSiswa}
               </h3>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Siswa terdaftar</p>
+              <p className="text-xs text-white/80 mt-0.5">Siswa terdaftar</p>
             </div>
             <span className="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold rounded-lg border border-emerald-200/50 dark:border-emerald-800/50">
               Aktif
@@ -274,9 +274,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
 
         {/* Card 2: Jumlah Kelas */}
-        <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-lg p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-white/60 dark:border-white/20 shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.25)] flex flex-col justify-between hover:border-indigo-300 dark:hover:border-indigo-800 transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+        <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20 shadow-lg flex flex-col justify-between items-stretch overflow-hidden hover:border-indigo-300/50 dark:hover:border-indigo-800/50 transition-all h-full">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-xs font-bold text-white uppercase tracking-widest">
               Jumlah Kelas
             </span>
             <div className="p-2.5 bg-indigo-100 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 rounded-xl">
@@ -285,10 +285,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </div>
           <div className="flex items-end justify-between">
             <div>
-              <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white">
+              <h3 className="text-3xl font-extrabold text-white">
                 {totalKelas}
               </h3>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Rombongan belajar</p>
+              <p className="text-xs text-white/80 mt-0.5">Rombongan belajar</p>
             </div>
             <span className="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold rounded-lg border border-indigo-200/50 dark:border-indigo-800/50">
               {totalKelas > 0 ? 'Tersedia' : 'Belum ada'}
@@ -297,9 +297,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
 
         {/* Card 3: Mata Pelajaran */}
-        <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-lg p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-white/60 dark:border-white/20 shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.25)] flex flex-col justify-between hover:border-emerald-300 dark:hover:border-emerald-800 transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+        <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20 shadow-lg flex flex-col justify-between items-stretch overflow-hidden hover:border-emerald-300/50 dark:hover:border-emerald-800/50 transition-all h-full">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-xs font-bold text-white uppercase tracking-widest">
               Mata Pelajaran
             </span>
             <div className="p-2.5 bg-emerald-100 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 rounded-xl">
@@ -308,10 +308,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </div>
           <div className="flex items-end justify-between">
             <div>
-              <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white">
+              <h3 className="text-3xl font-extrabold text-white">
                 {totalMapel}
               </h3>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Mata pelajaran diampu</p>
+              <p className="text-xs text-white/80 mt-0.5">Mata pelajaran diampu</p>
             </div>
             <span className="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold rounded-lg border border-emerald-200/50 dark:border-emerald-800/50">
               Terdaftar
@@ -320,9 +320,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
 
         {/* Card 4: Rata-rata Kehadiran */}
-        <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-lg p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-white/60 dark:border-white/20 shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.25)] flex flex-col justify-between hover:border-amber-300 dark:hover:border-amber-800 transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+        <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20 shadow-lg flex flex-col justify-between items-stretch overflow-hidden hover:border-amber-300/50 dark:hover:border-amber-800/50 transition-all h-full">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-xs font-bold text-white uppercase tracking-widest">
               Rata-rata Kehadiran
             </span>
             <div className="p-2.5 bg-amber-100 dark:bg-amber-950/70 text-amber-600 dark:text-amber-400 rounded-xl">
@@ -331,10 +331,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </div>
           <div className="flex items-end justify-between">
             <div>
-              <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white">
+              <h3 className="text-3xl font-extrabold text-white">
                 {avgKehadiran}%
               </h3>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Persentase hadir</p>
+              <p className="text-xs text-white/80 mt-0.5">Persentase hadir</p>
             </div>
             <span className="px-2.5 py-1 bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 text-[10px] font-bold rounded-lg border border-amber-200/50 dark:border-amber-800/50 flex items-center space-x-1">
               <TrendingUp className="w-3 h-3" />
@@ -350,26 +350,26 @@ export const Dashboard: React.FC<DashboardProps> = ({
         
 
       {/* Main Content Grid (Chart + Quick Action Panel) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch w-full">
         {/* Chart Section */}
-        <div className="lg:col-span-2 bg-white/10 dark:bg-slate-900/10 backdrop-blur-lg rounded-2xl border border-white/60 dark:border-white/20 shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.25)] flex flex-col p-6">
+        <div className="lg:col-span-2 bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-lg flex flex-col justify-between p-6 overflow-hidden h-full">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100">
+              <h4 className="text-sm font-bold text-white">
                 Statistik Kehadiran Harian
               </h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-white">
                 Grafik kehadiran siswa dalam pertemuan pembelajaran
               </p>
             </div>
             <select
               value={selectedKelasFilter}
               onChange={(e) => setSelectedKelasFilter(e.target.value)}
-              className="bg-slate-50 dark:bg-slate-800 border border-white/60 dark:border-slate-700/50 dark:border-slate-700 rounded-lg px-3 py-1 text-xs font-semibold text-slate-600 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-500"
+              className="bg-slate-900/60 border border-white/30 rounded-lg px-3 py-1.5 text-xs font-semibold text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
             >
-              <option value="Semua">Semua Kelas</option>
+              <option value="Semua" className="text-slate-900 bg-white">Semua Kelas</option>
               {kelasList.map((k) => (
-                <option key={k.id} value={k.namaKelas}>
+                <option key={k.id} value={k.namaKelas} className="text-slate-900 bg-white">
                   {k.namaKelas}
                 </option>
               ))}
@@ -379,9 +379,20 @@ export const Dashboard: React.FC<DashboardProps> = ({
           <div className="h-64 w-full pt-2">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#64748b' }} />
-                <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: '#64748b' }} unit="%" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255, 255, 255, 0.2)" />
+                <XAxis 
+                  dataKey="label" 
+                  tick={{ fontSize: 11, fill: '#ffffff' }} 
+                  stroke="#ffffff"
+                  tickLine={{ stroke: '#ffffff' }}
+                />
+                <YAxis 
+                  domain={[0, 100]} 
+                  tick={{ fontSize: 11, fill: '#ffffff' }} 
+                  unit="%" 
+                  stroke="#ffffff"
+                  tickLine={{ stroke: '#ffffff' }}
+                />
                 <Tooltip
                   content={({ active, payload, label }: any) => {
                     if (!active || !payload || !payload.length) return null;
@@ -402,7 +413,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
                     return (
                       <div className="bg-slate-900 text-white p-3 rounded-xl border border-slate-800 shadow-xl text-xs space-y-2">
-                        <p className="font-semibold text-slate-200 border-b border-slate-800 pb-1">
+                        <p className="font-semibold text-white border-b border-slate-800 pb-1">
                           Tanggal: {displayLabel} {rawDate ? `(${rawDate})` : ''}
                         </p>
                         <div className="space-y-1">
@@ -410,7 +421,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                             <div key={`item-${index}`} className="flex items-center justify-between space-x-4">
                               <span className="flex items-center space-x-1.5">
                                 <span className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
-                                <span className="text-slate-300">{entry.name}:</span>
+                                <span className="text-white">{entry.name}:</span>
                               </span>
                               <span className="font-bold" style={{ color: entry.color }}>
                                 {entry.value}%
@@ -427,23 +438,23 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     <div className="flex flex-wrap items-center justify-center gap-4 pt-3 text-xs">
                       <div className="flex items-center space-x-1.5">
                         <span className="w-3 h-0.5 rounded-full bg-[#10b981] inline-block"></span>
-                        <span className="text-slate-600 dark:text-slate-300 font-medium">Hadir</span>
+                        <span className="text-white font-medium">Hadir</span>
                       </div>
                       <div className="flex items-center space-x-1.5">
                         <span className="w-3 h-0.5 rounded-full bg-[#f59e0b] inline-block"></span>
-                        <span className="text-slate-600 dark:text-slate-300 font-medium">Terlambat</span>
+                        <span className="text-white font-medium">Terlambat</span>
                       </div>
                       <div className="flex items-center space-x-1.5">
                         <span className="w-3 h-0.5 rounded-full bg-[#3b82f6] inline-block"></span>
-                        <span className="text-slate-600 dark:text-slate-300 font-medium">Sakit</span>
+                        <span className="text-white font-medium">Sakit</span>
                       </div>
                       <div className="flex items-center space-x-1.5">
                         <span className="w-3 h-0.5 rounded-full bg-[#a855f7] inline-block"></span>
-                        <span className="text-slate-600 dark:text-slate-300 font-medium">Izin</span>
+                        <span className="text-white font-medium">Izin</span>
                       </div>
                       <div className="flex items-center space-x-1.5">
                         <span className="w-3 h-0.5 rounded-full bg-[#f43f5e] inline-block"></span>
-                        <span className="text-slate-600 dark:text-slate-300 font-medium">Alpha</span>
+                        <span className="text-white font-medium">Alpha</span>
                       </div>
                     </div>
                   )}
@@ -459,63 +470,63 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
 
         {/* Action Panel */}
-        <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-lg rounded-2xl border border-white/60 dark:border-white/20 shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.25)] p-6 flex flex-col justify-between">
+        <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-lg p-6 flex flex-col justify-between overflow-hidden h-full">
           <div>
-            <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Aksi Cepat</h4>
+            <h4 className="text-sm font-bold text-white mb-4">Aksi Cepat</h4>
             <div className="space-y-3">
               <button
                 onClick={() => goToTab('presensi')}
-                className="w-full flex items-center justify-between p-4 bg-violet-50 hover:bg-violet-100 dark:bg-violet-950/30 dark:hover:bg-violet-900/40 rounded-xl transition-all border border-violet-100 dark:border-violet-900/50 group text-left"
+                className="w-full flex items-center justify-between p-4 bg-white/10 hover:bg-white/20 dark:bg-white/5 dark:hover:bg-white/10 rounded-2xl transition-all border border-white/20 group text-left shadow-sm overflow-hidden"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-white dark:bg-slate-800 rounded-lg flex items-center justify-center text-violet-600 dark:text-violet-400 shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.25)] shrink-0">
+                  <div className="w-10 h-10 bg-violet-600 rounded-xl flex items-center justify-center text-white shadow-md shrink-0">
                     <ClipboardCheck className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-violet-900 dark:text-violet-200">Input Presensi</p>
-                    <p className="text-[10px] text-violet-500 uppercase font-bold tracking-tight">Pilih Kelas & Mapel</p>
+                    <p className="text-sm font-bold text-white">Input Presensi</p>
+                    <p className="text-[10px] text-white/80 uppercase font-bold tracking-tight">Pilih Kelas & Mapel</p>
                   </div>
                 </div>
-                <ArrowUpRight className="w-5 h-5 text-violet-400 group-hover:text-violet-600 transition-colors" />
+                <ArrowUpRight className="w-5 h-5 text-white/70 group-hover:text-white transition-colors" />
               </button>
 
               <button
                 onClick={() => goToTab('nilai')}
-                className="w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/50 dark:hover:bg-slate-800 rounded-xl transition-all border border-slate-100 dark:border-slate-800 group text-left"
+                className="w-full flex items-center justify-between p-4 bg-white/10 hover:bg-white/20 dark:bg-white/5 dark:hover:bg-white/10 rounded-2xl transition-all border border-white/20 group text-left shadow-sm overflow-hidden"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-white dark:bg-slate-800 rounded-lg flex items-center justify-center text-slate-600 dark:text-slate-300 shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.25)] shrink-0">
+                  <div className="w-10 h-10 bg-amber-600 rounded-xl flex items-center justify-center text-white shadow-md shrink-0">
                     <Award className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-slate-800 dark:text-slate-100">Input Nilai</p>
-                    <p className="text-[10px] text-slate-500 uppercase font-bold tracking-tight">TP, Tugas, & Ulangan</p>
+                    <p className="text-sm font-bold text-white">Input Nilai</p>
+                    <p className="text-[10px] text-white/80 uppercase font-bold tracking-tight">TP, Tugas, & Ulangan</p>
                   </div>
                 </div>
-                <ArrowUpRight className="w-5 h-5 text-slate-300 group-hover:text-slate-600 transition-colors" />
+                <ArrowUpRight className="w-5 h-5 text-white/70 group-hover:text-white transition-colors" />
               </button>
 
               <button
                 onClick={() => goToTab('jurnal')}
-                className="w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/50 dark:hover:bg-slate-800 rounded-xl transition-all border border-slate-100 dark:border-slate-800 group text-left"
+                className="w-full flex items-center justify-between p-4 bg-white/10 hover:bg-white/20 dark:bg-white/5 dark:hover:bg-white/10 rounded-2xl transition-all border border-white/20 group text-left shadow-sm overflow-hidden"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-white dark:bg-slate-800 rounded-lg flex items-center justify-center text-slate-600 dark:text-slate-300 shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.25)] shrink-0">
+                  <div className="w-10 h-10 bg-teal-600 rounded-xl flex items-center justify-center text-white shadow-md shrink-0">
                     <BookMarked className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-slate-800 dark:text-slate-100">Jurnal Guru</p>
-                    <p className="text-[10px] text-slate-500 uppercase font-bold tracking-tight">Catatan Pembelajaran</p>
+                    <p className="text-sm font-bold text-white">Jurnal Guru</p>
+                    <p className="text-[10px] text-white/80 uppercase font-bold tracking-tight">Catatan Pembelajaran</p>
                   </div>
                 </div>
-                <ArrowUpRight className="w-5 h-5 text-slate-300 group-hover:text-slate-600 transition-colors" />
+                <ArrowUpRight className="w-5 h-5 text-white/70 group-hover:text-white transition-colors" />
               </button>
             </div>
           </div>
 
           <div
             onClick={() => goToTab('google_sheets')}
-            className="mt-6 p-4 bg-slate-900 text-white rounded-xl cursor-pointer hover:bg-slate-800 transition-colors border border-slate-800"
+            className="mt-6 p-5 bg-slate-900/90 text-white rounded-2xl cursor-pointer hover:bg-slate-800 transition-colors border border-white/20 overflow-hidden shadow-sm"
           >
             <div className="flex items-center justify-between">
               <p className="text-xs font-bold">Sinkron Otomatis Google Sheets</p>

@@ -17,6 +17,7 @@ import {
   Menu,
   School,
   Sliders,
+  Palette,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -80,6 +81,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     {
       title: 'SETTING',
       items: [
+        { id: 'tampilan', label: 'Appearance & Layout', icon: Palette },
         { id: 'konfigurasi', label: 'Konfigurasi Aplikasi', icon: Sliders },
         { id: 'google_sheets', label: 'Google Sheets API', icon: FileSpreadsheet },
       ],
@@ -111,10 +113,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           )}
           <div className="min-w-0 flex-1">
-            <h2 className="text-sm font-bold text-slate-900 dark:text-white leading-tight truncate">
+            <h2 className="text-sm font-bold text-white leading-tight truncate">
               {appName}
             </h2>
-            <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider truncate">
+            <p className="text-[10px] text-white/80 font-medium uppercase tracking-wider truncate">
               {appDesc}
             </p>
           </div>
@@ -122,7 +124,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {setIsOpenMobile && (
           <button
             onClick={() => setIsOpenMobile(false)}
-            className="lg:hidden text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 shrink-0 ml-1"
+            className="lg:hidden text-white/80 hover:text-white p-1 shrink-0 ml-1"
           >
             <X className="w-5 h-5" />
           </button>
@@ -134,7 +136,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className="flex-1 overflow-y-auto py-4 px-3 space-y-6 custom-scrollbar">
         {menuGroups.map((group, idx) => (
           <div key={idx} className="space-y-1.5">
-            <h3 className="px-4 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+            <h3 className="px-4 text-[11px] font-bold text-white uppercase tracking-wider">
               {group.title}
             </h3>
             <div className="space-y-1">
@@ -148,11 +150,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     className={`w-full flex items-center space-x-3 px-4 py-2.5 transition-all text-sm font-medium ${
                       isActive
                         ? 'bg-violet-600 text-white rounded-full shadow-md shadow-violet-500/20 translate-x-1'
-                        : 'text-slate-600 dark:text-slate-300 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 rounded-full'
+                        : 'text-white hover:text-white hover:bg-white/10 rounded-full'
                     }`}
                   >
-                    <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500'}`} />
-                    <span className="truncate">{item.label}</span>
+                    <Icon className="w-4 h-4 text-white" />
+                    <span className="truncate text-white font-medium">{item.label}</span>
                   </button>
                 );
               })}
@@ -163,8 +165,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Sidebar Footer info */}
       <div className="p-4 border-t border-white/20 dark:border-slate-700/40 bg-slate-50/30 lg:bg-transparent dark:bg-slate-800/20">
-        <div className="flex items-center space-x-2 text-xs text-slate-500 dark:text-slate-400">
-          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+        <div className="flex items-center space-x-2 text-xs text-white">
+          <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
           <span>Google Sheets Synchronized</span>
         </div>
       </div>

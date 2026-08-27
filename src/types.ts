@@ -13,7 +13,8 @@ export type ActiveTab =
   | 'gas_deploy'
   | 'administrasi_menu'
   | 'akademik_menu'
-  | 'setting_menu';
+  | 'setting_menu'
+  | 'tampilan';
 
 export interface AppConfig {
   namaAplikasi: string;

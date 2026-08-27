@@ -1,3 +1,14 @@
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --app-font-size: 16px;
+  --glass-blur: 16px;
+  --glass-opacity: 0.65;
+  --bg-opacity: 0.85;
+}
+
+html {
+  font-size: var(--app-font-size, 16px);
+}
