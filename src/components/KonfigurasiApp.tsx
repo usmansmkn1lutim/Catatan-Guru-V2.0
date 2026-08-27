@@ -196,7 +196,7 @@ export const KonfigurasiAppView: React.FC<KonfigurasiAppProps> = ({
               <h4 className="text-sm font-bold text-slate-900 dark:text-white leading-tight truncate">
                 {formData.namaAplikasi || 'Catatan Seorang Guru'}
               </h4>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider truncate">
+              <p className="text-[10px] text-black dark:text-slate-400 font-medium uppercase tracking-wider truncate">
                 {formData.deskripsiAplikasi || 'Merawat Jejak Pengabdian'}
               </p>
             </div>

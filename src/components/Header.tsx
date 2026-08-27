@@ -160,7 +160,7 @@ export const Header: React.FC<HeaderProps> = ({
             <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white leading-tight truncate">
               {currentSekolah?.namaSekolah || "SMA Negeri 1 Permata Bangsa"}
             </h2>
-            <p className="text-[11px] sm:text-xs text-slate-600 dark:text-white/70 font-medium truncate max-w-[140px] xs:max-w-[200px] sm:max-w-md">
+            <p className="text-[11px] sm:text-xs text-black dark:text-white/70 font-medium truncate max-w-[140px] xs:max-w-[200px] sm:max-w-md">
               {currentSekolah?.alamatLengkap ||
                 "Jl. Merdeka No. 123, Kota Pendidikan"}
             </p>
