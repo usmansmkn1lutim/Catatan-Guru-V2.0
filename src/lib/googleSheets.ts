@@ -169,6 +169,7 @@ export async function exportToGoogleSheets(
   spreadsheetId: string,
   accessToken: string,
   data: {
+    appConfig?: AppConfig;
     dataSekolah: DataSekolah;
     profilGuru: ProfilGuru;
     mapelList: Mapel[];
@@ -196,6 +197,12 @@ export async function exportToGoogleSheets(
       ['Akreditasi', data.dataSekolah.akreditasi],
       ['Nama Kepala Sekolah', data.dataSekolah.namaKepalaSekolah],
       ['Logo Sekolah URL', data.dataSekolah.logoSekolahUrl || ''],
+      ['APP_NAMA', data.appConfig?.namaAplikasi || ''],
+      ['APP_DESKRIPSI', data.appConfig?.deskripsiAplikasi || ''],
+      ['APP_LOGO', data.appConfig?.logoAplikasiUrl || ''],
+      ['APP_BG_IMAGE', data.appConfig?.customBgImage || ''],
+      ['APP_BG_STYLE', data.appConfig?.customBgStyle || ''],
+      ['APP_BG_OPACITY', data.appConfig?.customBgOpacity?.toString() || ''],
     ];
 
     const profilGuruRows = [
@@ -332,9 +339,9 @@ export async function exportToGoogleSheets(
 export async function importFromGoogleSheets(spreadsheetId: string, accessToken: string) {
   try {
     const ranges = [
-      'Data_Sekolah!A1:B20',
-      'Profil_Guru!A1:B20',
-      'Data_Mapel!A2:G100',
+      'Data_Sekolah!A1:B30',
+      'Profil_Guru!A1:B30',
+      'Data_Mapel!A2:H100',
       'Data_Kelas!A2:D100',
       'Data_Siswa!A2:K500',
     ];
@@ -433,6 +440,14 @@ export async function importFromGoogleSheets(spreadsheetId: string, accessToken:
         email: pgObj['Email'] || '',
         alamat: pgObj['Alamat'] || '',
         fotoProfilUrl: pgObj['Foto Profil URL'] || pgObj['Foto Profil'] || pgObj['Foto URL'] || '',
+      } : null,
+      appConfig: Object.keys(dsObj).length > 0 ? {
+        namaAplikasi: dsObj['APP_NAMA'] || '',
+        deskripsiAplikasi: dsObj['APP_DESKRIPSI'] || '',
+        logoAplikasiUrl: dsObj['APP_LOGO'] || '',
+        customBgImage: dsObj['APP_BG_IMAGE'] || '',
+        customBgStyle: dsObj['APP_BG_STYLE'] || '',
+        customBgOpacity: dsObj['APP_BG_OPACITY'] ? parseFloat(dsObj['APP_BG_OPACITY']) : undefined,
       } : null,
       mapelList: mapelList.filter((m) => m.namaMapel),
       kelasList: kelasList.filter((k) => k.namaKelas),

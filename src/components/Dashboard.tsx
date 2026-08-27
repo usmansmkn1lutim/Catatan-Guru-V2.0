@@ -229,7 +229,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
 
         {isMenuExpanded && (
-          <div className="grid grid-cols-4 gap-3 w-full mt-4 pt-4 border-t border-white/10">
+          <div className="grid grid-cols-4 gap-3 w-full mt-4 pt-4">
             {[
               { id: 'sekolah', label: 'Data Sekolah', icon: Building, bg: 'bg-indigo-50 dark:bg-indigo-950/40', text: 'text-indigo-500 dark:text-indigo-400' },
               { id: 'mapel', label: 'Data Mapel', icon: BookOpen, bg: 'bg-emerald-50 dark:bg-emerald-950/40', text: 'text-emerald-500 dark:text-emerald-400' },
@@ -254,95 +254,95 @@ export const Dashboard: React.FC<DashboardProps> = ({
       </div>
 
       {/* 4 Stat Cards */}
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch w-full">
+      <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 items-stretch w-full">
         {/* Card 1: Total Siswa */}
-        <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20 shadow-lg flex flex-col justify-between items-stretch overflow-hidden hover:border-violet-300/50 dark:hover:border-violet-700/50 transition-all h-full">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-bold text-slate-600 dark:text-white/70 uppercase tracking-widest">
+        <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl p-3.5 sm:p-6 rounded-2xl border border-white/20 shadow-lg flex flex-col justify-between items-stretch overflow-hidden hover:border-violet-300/50 dark:hover:border-violet-700/50 transition-all h-full">
+          <div className="flex items-center justify-between mb-3 sm:mb-4 gap-2">
+            <span className="text-[9px] sm:text-xs font-bold text-slate-600 dark:text-white/70 uppercase tracking-wider sm:tracking-widest truncate">
               Total Siswa
             </span>
-            <div className="p-2.5 bg-violet-100 dark:bg-violet-950/70 text-violet-600 dark:text-violet-400 rounded-xl">
-              <Users className="w-5 h-5" />
+            <div className="p-1.5 sm:p-2.5 bg-violet-100 dark:bg-violet-950/70 text-violet-600 dark:text-violet-400 rounded-lg sm:rounded-xl shrink-0">
+              <Users className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
           </div>
-          <div className="flex items-end justify-between">
-            <div>
-              <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white">
+          <div className="flex flex-col xl:flex-row items-start xl:items-end justify-between gap-1.5 xl:gap-0 mt-auto">
+            <div className="min-w-0">
+              <h3 className="text-xl sm:text-3xl font-extrabold text-slate-900 dark:text-white truncate">
                 {totalSiswa}
               </h3>
-              <p className="text-xs text-slate-600 dark:text-white/70 mt-0.5">Siswa terdaftar</p>
+              <p className="text-[9px] sm:text-xs text-slate-600 dark:text-white/70 mt-0.5 truncate">Siswa terdaftar</p>
             </div>
-            <span className="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold rounded-lg border border-emerald-200/50 dark:border-emerald-800/50">
+            <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 text-[9px] sm:text-[10px] font-bold rounded-md sm:rounded-lg border border-emerald-200/50 dark:border-emerald-800/50 self-start xl:self-auto shrink-0">
               Aktif
             </span>
           </div>
         </div>
 
         {/* Card 2: Jumlah Kelas */}
-        <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20 shadow-lg flex flex-col justify-between items-stretch overflow-hidden hover:border-indigo-300/50 dark:hover:border-indigo-800/50 transition-all h-full">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-bold text-slate-600 dark:text-white/70 uppercase tracking-widest">
+        <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl p-3.5 sm:p-6 rounded-2xl border border-white/20 shadow-lg flex flex-col justify-between items-stretch overflow-hidden hover:border-indigo-300/50 dark:hover:border-indigo-800/50 transition-all h-full">
+          <div className="flex items-center justify-between mb-3 sm:mb-4 gap-2">
+            <span className="text-[9px] sm:text-xs font-bold text-slate-600 dark:text-white/70 uppercase tracking-wider sm:tracking-widest truncate">
               Jumlah Kelas
             </span>
-            <div className="p-2.5 bg-indigo-100 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 rounded-xl">
-              <DoorClosed className="w-5 h-5" />
+            <div className="p-1.5 sm:p-2.5 bg-indigo-100 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 rounded-lg sm:rounded-xl shrink-0">
+              <DoorClosed className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
           </div>
-          <div className="flex items-end justify-between">
-            <div>
-              <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white">
+          <div className="flex flex-col xl:flex-row items-start xl:items-end justify-between gap-1.5 xl:gap-0 mt-auto">
+            <div className="min-w-0">
+              <h3 className="text-xl sm:text-3xl font-extrabold text-slate-900 dark:text-white truncate">
                 {totalKelas}
               </h3>
-              <p className="text-xs text-slate-600 dark:text-white/70 mt-0.5">Rombongan belajar</p>
+              <p className="text-[9px] sm:text-xs text-slate-600 dark:text-white/70 mt-0.5 truncate">Rombongan belajar</p>
             </div>
-            <span className="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold rounded-lg border border-indigo-200/50 dark:border-indigo-800/50">
+            <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 text-[9px] sm:text-[10px] font-bold rounded-md sm:rounded-lg border border-indigo-200/50 dark:border-indigo-800/50 self-start xl:self-auto shrink-0">
               {totalKelas > 0 ? 'Tersedia' : 'Belum ada'}
             </span>
           </div>
         </div>
 
         {/* Card 3: Mata Pelajaran */}
-        <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20 shadow-lg flex flex-col justify-between items-stretch overflow-hidden hover:border-emerald-300/50 dark:hover:border-emerald-800/50 transition-all h-full">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-bold text-slate-600 dark:text-white/70 uppercase tracking-widest">
+        <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl p-3.5 sm:p-6 rounded-2xl border border-white/20 shadow-lg flex flex-col justify-between items-stretch overflow-hidden hover:border-emerald-300/50 dark:hover:border-emerald-800/50 transition-all h-full">
+          <div className="flex items-center justify-between mb-3 sm:mb-4 gap-2">
+            <span className="text-[9px] sm:text-xs font-bold text-slate-600 dark:text-white/70 uppercase tracking-wider sm:tracking-widest truncate">
               Mata Pelajaran
             </span>
-            <div className="p-2.5 bg-emerald-100 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 rounded-xl">
-              <BookOpen className="w-5 h-5" />
+            <div className="p-1.5 sm:p-2.5 bg-emerald-100 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 rounded-lg sm:rounded-xl shrink-0">
+              <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
           </div>
-          <div className="flex items-end justify-between">
-            <div>
-              <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white">
+          <div className="flex flex-col xl:flex-row items-start xl:items-end justify-between gap-1.5 xl:gap-0 mt-auto">
+            <div className="min-w-0">
+              <h3 className="text-xl sm:text-3xl font-extrabold text-slate-900 dark:text-white truncate">
                 {totalMapel}
               </h3>
-              <p className="text-xs text-slate-600 dark:text-white/70 mt-0.5">Mata pelajaran diampu</p>
+              <p className="text-[9px] sm:text-xs text-slate-600 dark:text-white/70 mt-0.5 truncate">Mata pelajaran diampu</p>
             </div>
-            <span className="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold rounded-lg border border-emerald-200/50 dark:border-emerald-800/50">
+            <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 text-[9px] sm:text-[10px] font-bold rounded-md sm:rounded-lg border border-emerald-200/50 dark:border-emerald-800/50 self-start xl:self-auto shrink-0">
               Terdaftar
             </span>
           </div>
         </div>
 
         {/* Card 4: Rata-rata Kehadiran */}
-        <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20 shadow-lg flex flex-col justify-between items-stretch overflow-hidden hover:border-amber-300/50 dark:hover:border-amber-800/50 transition-all h-full">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-bold text-slate-600 dark:text-white/70 uppercase tracking-widest">
+        <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl p-3.5 sm:p-6 rounded-2xl border border-white/20 shadow-lg flex flex-col justify-between items-stretch overflow-hidden hover:border-amber-300/50 dark:hover:border-amber-800/50 transition-all h-full">
+          <div className="flex items-center justify-between mb-3 sm:mb-4 gap-2">
+            <span className="text-[9px] sm:text-xs font-bold text-slate-600 dark:text-white/70 uppercase tracking-wider sm:tracking-widest truncate">
               Rata-rata Kehadiran
             </span>
-            <div className="p-2.5 bg-amber-100 dark:bg-amber-950/70 text-amber-600 dark:text-amber-400 rounded-xl">
-              <ClipboardCheck className="w-5 h-5" />
+            <div className="p-1.5 sm:p-2.5 bg-amber-100 dark:bg-amber-950/70 text-amber-600 dark:text-amber-400 rounded-lg sm:rounded-xl shrink-0">
+              <ClipboardCheck className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
           </div>
-          <div className="flex items-end justify-between">
-            <div>
-              <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white">
+          <div className="flex flex-col xl:flex-row items-start xl:items-end justify-between gap-1.5 xl:gap-0 mt-auto">
+            <div className="min-w-0">
+              <h3 className="text-xl sm:text-3xl font-extrabold text-slate-900 dark:text-white truncate">
                 {avgKehadiran}%
               </h3>
-              <p className="text-xs text-slate-600 dark:text-white/70 mt-0.5">Persentase hadir</p>
+              <p className="text-[9px] sm:text-xs text-slate-600 dark:text-white/70 mt-0.5 truncate">Persentase hadir</p>
             </div>
-            <span className="px-2.5 py-1 bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 text-[10px] font-bold rounded-lg border border-amber-200/50 dark:border-amber-800/50 flex items-center space-x-1">
-              <TrendingUp className="w-3 h-3" />
+            <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 text-[9px] sm:text-[10px] font-bold rounded-md sm:rounded-lg border border-amber-200/50 dark:border-amber-800/50 flex items-center space-x-1 self-start xl:self-auto shrink-0">
+              <TrendingUp className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
               <span>Baik</span>
             </span>
           </div>

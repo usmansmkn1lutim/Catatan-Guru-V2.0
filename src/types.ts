@@ -20,6 +20,9 @@ export interface AppConfig {
   namaAplikasi: string;
   deskripsiAplikasi: string;
   logoAplikasiUrl: string;
+  customBgImage?: string;
+  customBgStyle?: string;
+  customBgOpacity?: number;
 }
 
 export interface DataSekolah {

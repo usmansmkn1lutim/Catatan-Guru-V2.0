@@ -357,6 +357,19 @@ export function App() {
             ...remoteData.appConfig,
             logoAplikasiUrl: remoteData.appConfig.logoAplikasiUrl || prev.logoAplikasiUrl || DEFAULT_APP_LOGO,
           }));
+          
+          if (remoteData.appConfig.customBgImage !== undefined) {
+            setCustomBgImage(remoteData.appConfig.customBgImage);
+            localStorage.setItem('app_custom_bg_image', remoteData.appConfig.customBgImage);
+          }
+          if (remoteData.appConfig.customBgStyle) {
+            setCustomBgStyle(remoteData.appConfig.customBgStyle as any);
+            localStorage.setItem('app_custom_bg_style', remoteData.appConfig.customBgStyle);
+          }
+          if (remoteData.appConfig.customBgOpacity !== undefined) {
+            setCustomBgOpacity(remoteData.appConfig.customBgOpacity);
+            localStorage.setItem('app_custom_bg_opacity', remoteData.appConfig.customBgOpacity.toString());
+          }
         }
 
         const timeStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -433,7 +446,12 @@ export function App() {
         presensiList,
         nilaiList,
         jurnalList,
-        appConfig,
+        appConfig: {
+          ...appConfig,
+          customBgImage,
+          customBgStyle,
+          customBgOpacity
+        },
       };
 
       try {
@@ -595,8 +613,10 @@ export function App() {
         </div>
       )}
 
-      {/* Navigation Sidebar */}
-      <Sidebar
+      {/* Centered App Wrapper */}
+      <div className="w-full max-w-[1400px] mx-auto flex gap-0 lg:gap-6 h-full relative">
+        {/* Navigation Sidebar */}
+        <Sidebar
         appConfig={appConfig}
         sekolah={dataSekolah}
         activeTab={activeTab}
@@ -632,7 +652,7 @@ export function App() {
 
         {/* Page Views Routing */}
         <div className="flex-1 w-full h-full overflow-y-auto" style={{ scrollbarGutter: 'stable' }}>
-          <main className="w-full h-full max-w-7xl mx-auto p-4 pb-28 lg:p-6 lg:pb-28">
+          <main className="w-full h-full p-4 pb-28 lg:px-8 lg:py-6 lg:pb-28">
             {/* Main Content Glassmorphism Container */}
             <div className="w-full lg:bg-white/10 lg:dark:bg-slate-900/10 lg:backdrop-blur-xl lg:rounded-2xl lg:border lg:border-white/20 p-0 lg:p-6 lg:shadow-lg transition-all min-h-[calc(100vh-13rem)] flex flex-col justify-between overflow-x-hidden overflow-y-visible">
               <div className="w-full">
@@ -916,6 +936,7 @@ export function App() {
           </div>
         </footer>
         </div>
+      </div>
       </div>
     </div>
   );

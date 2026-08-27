@@ -99,7 +99,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const appDesc = appConfig?.deskripsiAplikasi || 'Merawat Jejak Pengabdian';
 
   const sidebarContent = (
-    <div className="flex flex-col transition-colors w-64 select-none h-full bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border-r border-white/60 dark:border-slate-700/50 dark:border-slate-800 lg:h-[calc(100vh-2rem)] lg:bg-white/10 lg:dark:bg-slate-900/10 lg:backdrop-blur-lg lg:rounded-3xl lg:border lg:border-white/30 lg:dark:border-slate-700/40 lg:m-4 lg:shadow-[0_12px_40px_rgba(0,0,0,0.12)] lg:dark:shadow-[0_12px_40px_rgba(0,0,0,0.25)] overflow-hidden">
+    <div className="flex flex-col transition-colors w-64 select-none h-full bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border-r border-white/60 dark:border-slate-700/50 dark:border-slate-800 lg:h-[calc(100vh-2rem)] lg:bg-white/10 lg:dark:bg-slate-900/10 lg:backdrop-blur-lg lg:rounded-3xl lg:border lg:border-white/30 lg:dark:border-slate-700/40 lg:my-4 lg:ml-4 lg:shadow-[0_12px_40px_rgba(0,0,0,0.12)] lg:dark:shadow-[0_12px_40px_rgba(0,0,0,0.25)] overflow-hidden">
       {/* Sidebar Header */}
       <div className="p-5 border-b border-white/20 dark:border-slate-700/40 flex items-center justify-between">
         <div className="flex items-center space-x-3 min-w-0">

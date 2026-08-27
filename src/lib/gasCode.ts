@@ -127,7 +127,16 @@ function saveAppDataFull(data) {
     var ss = getSpreadsheet();
     if (!data) return { status: "error", message: "Data kosong" };
 
-    // 1. Data Sekolah
+    // 1. App Config
+    if (data.appConfig) {
+      var ac = data.appConfig;
+      writeSheet(ss, "App Config", 
+        ["Nama Aplikasi", "Deskripsi", "Logo URL", "Background Image", "Background Style", "Background Opacity"],
+        [[ac.namaAplikasi||'', ac.deskripsiAplikasi||'', ac.logoAplikasiUrl||'', ac.customBgImage||'', ac.customBgStyle||'', (ac.customBgOpacity !== undefined ? ac.customBgOpacity : '')]]
+      );
+    }
+
+    // 2. Data Sekolah
     if (data.dataSekolah) {
       var ds = data.dataSekolah;
       writeSheet(ss, "Data Sekolah", 
@@ -273,6 +282,16 @@ function loadAppDataFull() {
 
     // Fallback: Read from individual sheets directly
     var payload = {};
+
+    // 0. App Config
+    var sheetConfig = ss.getSheetByName("App Config");
+    if (sheetConfig && sheetConfig.getLastRow() >= 2) {
+      var c = sheetConfig.getRange(2, 1, 1, 6).getValues()[0];
+      payload.appConfig = {
+        namaAplikasi: String(c[0]||''), deskripsiAplikasi: String(c[1]||''), logoAplikasiUrl: String(c[2]||''),
+        customBgImage: String(c[3]||''), customBgStyle: String(c[4]||''), customBgOpacity: c[5] !== '' ? parseFloat(c[5]) : undefined
+      };
+    }
 
     // 1. Data Sekolah
     var sheetSekolah = ss.getSheetByName("Data Sekolah");

@@ -15,6 +15,7 @@ import {
   Moon,
   Sparkle,
 } from 'lucide-react';
+import { compressImage } from '../lib/imageUtils';
 
 interface AppearanceLayoutProps {
   darkMode?: boolean;
@@ -103,7 +104,7 @@ export const AppearanceLayout: React.FC<AppearanceLayoutProps> = ({
   };
 
   // Handle File Upload
-  const handleFileChange = (file: File) => {
+  const handleFileChange = async (file: File) => {
     if (!file.type.startsWith('image/')) {
       if (onShowToast) onShowToast('Harap pilih file gambar (JPG, PNG, WebP, SVG, dll)', 'error');
       return;
@@ -115,20 +116,14 @@ export const AppearanceLayout: React.FC<AppearanceLayoutProps> = ({
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const result = e.target?.result as string;
-      if (result) {
-        setBgImage(result);
-        try {
-          localStorage.setItem('app_custom_bg_image', result);
-          if (onShowToast) onShowToast('Foto background berhasil diterapkan!', 'success');
-        } catch (err) {
-          if (onShowToast) onShowToast('Gagal menyimpan foto ke memori lokal browser (kuota penuh).', 'error');
-        }
-      }
-    };
-    reader.readAsDataURL(file);
+    try {
+      const compressedDataUrl = await compressImage(file, 1280, 1280, 0.7);
+      setBgImage(compressedDataUrl);
+      localStorage.setItem('app_custom_bg_image', compressedDataUrl);
+      if (onShowToast) onShowToast('Foto background berhasil diterapkan!', 'success');
+    } catch (err) {
+      if (onShowToast) onShowToast('Gagal memproses gambar.', 'error');
+    }
   };
 
   const handleDrop = (e: React.DragEvent) => {
