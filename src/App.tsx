@@ -651,6 +651,8 @@ export function App() {
                     lastSyncedTime={lastSyncedTime}
                     autoSyncEnabled={autoSyncEnabled}
                     onFetchRemoteData={() => handleFetchRemoteData(false)}
+                    darkMode={darkMode}
+                    isDarkMode={darkMode}
                   />
                 )}
 

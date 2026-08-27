@@ -87,12 +87,12 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
             )}
             <div className="min-w-0 flex-1">
-              <span className="text-base sm:text-lg font-black text-white tracking-tight leading-tight block truncate sm:whitespace-normal">
+              <span className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight leading-tight block truncate sm:whitespace-normal">
                 {appConfig?.namaAplikasi ? (
                   appConfig.namaAplikasi
                 ) : (
                   <>
-                    Catatan Seorang <span className="text-white">Guru</span>
+                    Catatan Seorang <span className="text-violet-600 dark:text-violet-400">Guru</span>
                   </>
                 )}
               </span>
@@ -157,10 +157,10 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           )}
           <div className="min-w-0">
-            <h2 className="text-sm sm:text-base font-bold text-white leading-tight truncate">
+            <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white leading-tight truncate">
               {currentSekolah?.namaSekolah || "SMA Negeri 1 Permata Bangsa"}
             </h2>
-            <p className="text-[11px] sm:text-xs text-white font-medium truncate max-w-[140px] xs:max-w-[200px] sm:max-w-md">
+            <p className="text-[11px] sm:text-xs text-slate-600 dark:text-white/70 font-medium truncate max-w-[140px] xs:max-w-[200px] sm:max-w-md">
               {currentSekolah?.alamatLengkap ||
                 "Jl. Merdeka No. 123, Kota Pendidikan"}
             </p>
@@ -266,10 +266,10 @@ export const Header: React.FC<HeaderProps> = ({
             className="flex items-center gap-3 text-right hover:opacity-90 transition-opacity"
           >
             <div className="hidden sm:block">
-              <p className="text-sm font-bold text-white leading-tight">
+              <p className="text-sm font-bold text-slate-900 dark:text-white leading-tight">
                 {currentGuru?.namaGuru || "Drs. Bambang Haryanto"}
               </p>
-              <p className="text-[10px] text-white font-bold uppercase tracking-tight">
+              <p className="text-[10px] text-slate-600 dark:text-white/70 font-bold uppercase tracking-tight">
                 {currentGuru?.nip
                   ? `NIP. ${currentGuru.nip}`
                   : "Guru Mata Pelajaran"}

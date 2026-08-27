@@ -43,6 +43,8 @@ interface DashboardProps {
   lastSyncedTime?: string | null;
   autoSyncEnabled?: boolean;
   onFetchRemoteData?: () => void;
+  isDarkMode?: boolean;
+  darkMode?: boolean;
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({
@@ -58,9 +60,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
   lastSyncedTime,
   autoSyncEnabled = true,
   onFetchRemoteData,
+  isDarkMode,
+  darkMode,
 }) => {
   const [selectedKelasFilter, setSelectedKelasFilter] = useState<string>('Semua');
   const [isMenuExpanded, setIsMenuExpanded] = useState<boolean>(false);
+  const isDark = isDarkMode ?? darkMode ?? (typeof document !== 'undefined' && document.documentElement.classList.contains('dark'));
 
   const goToTab = (tab: ActiveTab) => {
     if (setActiveTab) setActiveTab(tab);
@@ -253,7 +258,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         {/* Card 1: Total Siswa */}
         <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20 shadow-lg flex flex-col justify-between items-stretch overflow-hidden hover:border-violet-300/50 dark:hover:border-violet-700/50 transition-all h-full">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-bold text-white uppercase tracking-widest">
+            <span className="text-xs font-bold text-slate-600 dark:text-white/70 uppercase tracking-widest">
               Total Siswa
             </span>
             <div className="p-2.5 bg-violet-100 dark:bg-violet-950/70 text-violet-600 dark:text-violet-400 rounded-xl">
@@ -262,10 +267,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </div>
           <div className="flex items-end justify-between">
             <div>
-              <h3 className="text-3xl font-extrabold text-white">
+              <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white">
                 {totalSiswa}
               </h3>
-              <p className="text-xs text-white/80 mt-0.5">Siswa terdaftar</p>
+              <p className="text-xs text-slate-600 dark:text-white/70 mt-0.5">Siswa terdaftar</p>
             </div>
             <span className="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold rounded-lg border border-emerald-200/50 dark:border-emerald-800/50">
               Aktif
@@ -276,7 +281,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         {/* Card 2: Jumlah Kelas */}
         <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20 shadow-lg flex flex-col justify-between items-stretch overflow-hidden hover:border-indigo-300/50 dark:hover:border-indigo-800/50 transition-all h-full">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-bold text-white uppercase tracking-widest">
+            <span className="text-xs font-bold text-slate-600 dark:text-white/70 uppercase tracking-widest">
               Jumlah Kelas
             </span>
             <div className="p-2.5 bg-indigo-100 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 rounded-xl">
@@ -285,10 +290,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </div>
           <div className="flex items-end justify-between">
             <div>
-              <h3 className="text-3xl font-extrabold text-white">
+              <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white">
                 {totalKelas}
               </h3>
-              <p className="text-xs text-white/80 mt-0.5">Rombongan belajar</p>
+              <p className="text-xs text-slate-600 dark:text-white/70 mt-0.5">Rombongan belajar</p>
             </div>
             <span className="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold rounded-lg border border-indigo-200/50 dark:border-indigo-800/50">
               {totalKelas > 0 ? 'Tersedia' : 'Belum ada'}
@@ -299,7 +304,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         {/* Card 3: Mata Pelajaran */}
         <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20 shadow-lg flex flex-col justify-between items-stretch overflow-hidden hover:border-emerald-300/50 dark:hover:border-emerald-800/50 transition-all h-full">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-bold text-white uppercase tracking-widest">
+            <span className="text-xs font-bold text-slate-600 dark:text-white/70 uppercase tracking-widest">
               Mata Pelajaran
             </span>
             <div className="p-2.5 bg-emerald-100 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 rounded-xl">
@@ -308,10 +313,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </div>
           <div className="flex items-end justify-between">
             <div>
-              <h3 className="text-3xl font-extrabold text-white">
+              <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white">
                 {totalMapel}
               </h3>
-              <p className="text-xs text-white/80 mt-0.5">Mata pelajaran diampu</p>
+              <p className="text-xs text-slate-600 dark:text-white/70 mt-0.5">Mata pelajaran diampu</p>
             </div>
             <span className="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold rounded-lg border border-emerald-200/50 dark:border-emerald-800/50">
               Terdaftar
@@ -322,7 +327,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         {/* Card 4: Rata-rata Kehadiran */}
         <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20 shadow-lg flex flex-col justify-between items-stretch overflow-hidden hover:border-amber-300/50 dark:hover:border-amber-800/50 transition-all h-full">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-bold text-white uppercase tracking-widest">
+            <span className="text-xs font-bold text-slate-600 dark:text-white/70 uppercase tracking-widest">
               Rata-rata Kehadiran
             </span>
             <div className="p-2.5 bg-amber-100 dark:bg-amber-950/70 text-amber-600 dark:text-amber-400 rounded-xl">
@@ -331,10 +336,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </div>
           <div className="flex items-end justify-between">
             <div>
-              <h3 className="text-3xl font-extrabold text-white">
+              <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white">
                 {avgKehadiran}%
               </h3>
-              <p className="text-xs text-white/80 mt-0.5">Persentase hadir</p>
+              <p className="text-xs text-slate-600 dark:text-white/70 mt-0.5">Persentase hadir</p>
             </div>
             <span className="px-2.5 py-1 bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 text-[10px] font-bold rounded-lg border border-amber-200/50 dark:border-amber-800/50 flex items-center space-x-1">
               <TrendingUp className="w-3 h-3" />
@@ -344,28 +349,23 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
       </section>
 
-        
-        
-
-        
-
       {/* Main Content Grid (Chart + Quick Action Panel) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch w-full">
         {/* Chart Section */}
         <div className="lg:col-span-2 bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-lg flex flex-col justify-between p-6 overflow-hidden h-full">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h4 className="text-sm font-bold text-white">
+              <h4 className="text-sm font-bold text-slate-900 dark:text-white">
                 Statistik Kehadiran Harian
               </h4>
-              <p className="text-xs text-white">
+              <p className="text-xs text-slate-600 dark:text-white/70">
                 Grafik kehadiran siswa dalam pertemuan pembelajaran
               </p>
             </div>
             <select
               value={selectedKelasFilter}
               onChange={(e) => setSelectedKelasFilter(e.target.value)}
-              className="bg-slate-900/60 border border-white/30 rounded-lg px-3 py-1.5 text-xs font-semibold text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
+              className="bg-white/80 dark:bg-slate-900/60 border border-slate-300 dark:border-white/30 rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500 shadow-sm"
             >
               <option value="Semua" className="text-slate-900 bg-white">Semua Kelas</option>
               {kelasList.map((k) => (
@@ -379,19 +379,19 @@ export const Dashboard: React.FC<DashboardProps> = ({
           <div className="h-64 w-full pt-2">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255, 255, 255, 0.2)" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? "rgba(255, 255, 255, 0.15)" : "rgba(0, 0, 0, 0.08)"} />
                 <XAxis 
                   dataKey="label" 
-                  tick={{ fontSize: 11, fill: '#ffffff' }} 
-                  stroke="#ffffff"
-                  tickLine={{ stroke: '#ffffff' }}
+                  tick={{ fontSize: 11, fill: isDark ? '#ffffff' : '#475569' }} 
+                  stroke={isDark ? "#ffffff" : "#64748b"}
+                  tickLine={{ stroke: isDark ? "#ffffff" : "#64748b" }}
                 />
                 <YAxis 
                   domain={[0, 100]} 
-                  tick={{ fontSize: 11, fill: '#ffffff' }} 
+                  tick={{ fontSize: 11, fill: isDark ? '#ffffff' : '#475569' }} 
                   unit="%" 
-                  stroke="#ffffff"
-                  tickLine={{ stroke: '#ffffff' }}
+                  stroke={isDark ? "#ffffff" : "#64748b"}
+                  tickLine={{ stroke: isDark ? "#ffffff" : "#64748b" }}
                 />
                 <Tooltip
                   content={({ active, payload, label }: any) => {
@@ -421,7 +421,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                             <div key={`item-${index}`} className="flex items-center justify-between space-x-4">
                               <span className="flex items-center space-x-1.5">
                                 <span className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
-                                <span className="text-white">{entry.name}:</span>
+                                <span className="text-slate-300">{entry.name}:</span>
                               </span>
                               <span className="font-bold" style={{ color: entry.color }}>
                                 {entry.value}%
@@ -438,23 +438,23 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     <div className="flex flex-wrap items-center justify-center gap-4 pt-3 text-xs">
                       <div className="flex items-center space-x-1.5">
                         <span className="w-3 h-0.5 rounded-full bg-[#10b981] inline-block"></span>
-                        <span className="text-white font-medium">Hadir</span>
+                        <span className="text-slate-700 dark:text-white/80 font-medium">Hadir</span>
                       </div>
                       <div className="flex items-center space-x-1.5">
                         <span className="w-3 h-0.5 rounded-full bg-[#f59e0b] inline-block"></span>
-                        <span className="text-white font-medium">Terlambat</span>
+                        <span className="text-slate-700 dark:text-white/80 font-medium">Terlambat</span>
                       </div>
                       <div className="flex items-center space-x-1.5">
                         <span className="w-3 h-0.5 rounded-full bg-[#3b82f6] inline-block"></span>
-                        <span className="text-white font-medium">Sakit</span>
+                        <span className="text-slate-700 dark:text-white/80 font-medium">Sakit</span>
                       </div>
                       <div className="flex items-center space-x-1.5">
                         <span className="w-3 h-0.5 rounded-full bg-[#a855f7] inline-block"></span>
-                        <span className="text-white font-medium">Izin</span>
+                        <span className="text-slate-700 dark:text-white/80 font-medium">Izin</span>
                       </div>
                       <div className="flex items-center space-x-1.5">
                         <span className="w-3 h-0.5 rounded-full bg-[#f43f5e] inline-block"></span>
-                        <span className="text-white font-medium">Alpha</span>
+                        <span className="text-slate-700 dark:text-white/80 font-medium">Alpha</span>
                       </div>
                     </div>
                   )}
@@ -472,7 +472,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         {/* Action Panel */}
         <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-lg p-6 flex flex-col justify-between overflow-hidden h-full">
           <div>
-            <h4 className="text-sm font-bold text-white mb-4">Aksi Cepat</h4>
+            <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-4">Aksi Cepat</h4>
             <div className="space-y-3">
               <button
                 onClick={() => goToTab('presensi')}
@@ -483,11 +483,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     <ClipboardCheck className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-white">Input Presensi</p>
-                    <p className="text-[10px] text-white/80 uppercase font-bold tracking-tight">Pilih Kelas & Mapel</p>
+                    <p className="text-sm font-bold text-slate-900 dark:text-white">Input Presensi</p>
+                    <p className="text-[10px] text-slate-600 dark:text-white/70 uppercase font-bold tracking-tight">Pilih Kelas & Mapel</p>
                   </div>
                 </div>
-                <ArrowUpRight className="w-5 h-5 text-white/70 group-hover:text-white transition-colors" />
+                <ArrowUpRight className="w-5 h-5 text-slate-400 group-hover:text-slate-700 dark:text-white/70 dark:group-hover:text-white transition-colors" />
               </button>
 
               <button
@@ -499,11 +499,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     <Award className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-white">Input Nilai</p>
-                    <p className="text-[10px] text-white/80 uppercase font-bold tracking-tight">TP, Tugas, & Ulangan</p>
+                    <p className="text-sm font-bold text-slate-900 dark:text-white">Input Nilai</p>
+                    <p className="text-[10px] text-slate-600 dark:text-white/70 uppercase font-bold tracking-tight">TP, Tugas, & Ulangan</p>
                   </div>
                 </div>
-                <ArrowUpRight className="w-5 h-5 text-white/70 group-hover:text-white transition-colors" />
+                <ArrowUpRight className="w-5 h-5 text-slate-400 group-hover:text-slate-700 dark:text-white/70 dark:group-hover:text-white transition-colors" />
               </button>
 
               <button
@@ -515,11 +515,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     <BookMarked className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-white">Jurnal Guru</p>
-                    <p className="text-[10px] text-white/80 uppercase font-bold tracking-tight">Catatan Pembelajaran</p>
+                    <p className="text-sm font-bold text-slate-900 dark:text-white">Jurnal Guru</p>
+                    <p className="text-[10px] text-slate-600 dark:text-white/70 uppercase font-bold tracking-tight">Catatan Pembelajaran</p>
                   </div>
                 </div>
-                <ArrowUpRight className="w-5 h-5 text-white/70 group-hover:text-white transition-colors" />
+                <ArrowUpRight className="w-5 h-5 text-slate-400 group-hover:text-slate-700 dark:text-white/70 dark:group-hover:text-white transition-colors" />
               </button>
             </div>
           </div>
