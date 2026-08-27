@@ -537,30 +537,29 @@ export function App() {
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden relative">
+      <div className="flex-1 overflow-y-auto flex flex-col min-w-0 h-screen relative" style={{ scrollbarGutter: 'stable' }}>
         {/* Header Bar */}
-        <div className="shrink-0 z-40" style={{ scrollbarGutter: 'stable' }}>
-        <Header
-          appConfig={appConfig}
-          dataSekolah={dataSekolah}
-          profilGuru={profilGuru}
-          darkMode={darkMode}
-          onToggleDarkMode={() => setDarkMode(!darkMode)}
-          setActiveTab={setActiveTab}
-          onSyncData={handleSyncData}
-          isSyncing={isSyncing}
-          autoSyncStatus={autoSyncStatus}
-          autoSyncEnabled={autoSyncEnabled}
-          lastSyncedTime={lastSyncedTime}
-          onToggleAutoSync={handleToggleAutoSync}
-          onFetchRemoteData={() => handleFetchRemoteData(false)}
-          isFetchingRemote={isFetchingRemote}
-          onToggleMobileMenu={() => setIsOpenMobile((prev) => !prev)}
-        />
+        <div className="shrink-0 z-40 sticky top-0">
+          <Header
+            appConfig={appConfig}
+            dataSekolah={dataSekolah}
+            profilGuru={profilGuru}
+            darkMode={darkMode}
+            onToggleDarkMode={() => setDarkMode(!darkMode)}
+            setActiveTab={setActiveTab}
+            onSyncData={handleSyncData}
+            isSyncing={isSyncing}
+            autoSyncStatus={autoSyncStatus}
+            autoSyncEnabled={autoSyncEnabled}
+            lastSyncedTime={lastSyncedTime}
+            onToggleAutoSync={handleToggleAutoSync}
+            onFetchRemoteData={() => handleFetchRemoteData(false)}
+            isFetchingRemote={isFetchingRemote}
+            onToggleMobileMenu={() => setIsOpenMobile((prev) => !prev)}
+          />
         </div>
 
         {/* Page Views Routing */}
-        <div className="flex-1 overflow-y-auto" style={{ scrollbarGutter: 'stable' }}>
         <main className="flex-1 p-4 pb-24 sm:p-6 lg:pb-8 lg:p-8 max-w-7xl mx-auto w-full">
           {activeTab === 'dashboard' && (
             <Dashboard
@@ -828,7 +827,6 @@ export function App() {
             <span>Semua sistem berjalan normal</span>
           </div>
         </footer>
-        </div>
       </div>
     </div>
   );
