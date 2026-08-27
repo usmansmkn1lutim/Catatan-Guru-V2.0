@@ -134,7 +134,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
 
       {/* Nav List */}
-      <div className="flex-1 overflow-hidden py-4 px-3 space-y-6">
+      <div className="flex-1 overflow-y-auto py-4 px-3 space-y-6 no-scrollbar">
         {menuGroups.map((group, idx) => (
           <div key={idx} className="space-y-1.5">
             <h3 className="px-4 text-[11px] font-bold text-black dark:text-white/70 uppercase tracking-wider">
