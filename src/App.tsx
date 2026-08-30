@@ -38,7 +38,6 @@ import { Sidebar } from './components/Sidebar';
 import { Dashboard } from './components/Dashboard';
 import { DataSekolahView } from './components/DataSekolah';
 import { ProfilGuruView } from './components/ProfilGuru';
-import { KonfigurasiAppView } from './components/KonfigurasiApp';
 import { DataMapelView } from './components/DataMapel';
 import { DataKelasView } from './components/DataKelas';
 import { DataSiswaView } from './components/DataSiswa';
@@ -688,22 +687,6 @@ export function App() {
                   <ProfilGuruView
                     profilGuru={profilGuru}
                     onSaveProfilGuru={setProfilGuru}
-                    showToast={showToast}
-                  />
-                )}
-
-                {activeTab === 'konfigurasi' && (
-                  <KonfigurasiAppView
-                    appConfig={appConfig}
-                    onSaveAppConfig={(newConfig) => {
-                      const updated = {
-                        ...newConfig,
-                        logoAplikasiUrl: newConfig.logoAplikasiUrl || DEFAULT_APP_LOGO,
-                      };
-                      setAppConfig(updated);
-                      saveToStorage('appConfig', updated);
-                      localStorage.setItem('APP_LOGO_URL', updated.logoAplikasiUrl);
-                    }}
                     showToast={showToast}
                   />
                 )}

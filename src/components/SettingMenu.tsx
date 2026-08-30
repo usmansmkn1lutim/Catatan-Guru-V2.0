@@ -17,14 +17,6 @@ export const SettingMenu: React.FC<SettingMenuProps> = ({ onNavigate }) => {
       badge: 'Glassmorphism',
     },
     {
-      id: 'konfigurasi' as ActiveTab,
-      label: 'Konfigurasi Aplikasi',
-      desc: 'Kustomisasi identitas aplikasi, nama instansi, logo sekolah & preferensi umum',
-      icon: <Sliders className="w-7 h-7 text-violet-600 dark:text-violet-400" />,
-      accentBg: 'bg-violet-500/10 dark:bg-violet-500/20 border-violet-500/20 dark:border-violet-400/30',
-      badge: 'Branding',
-    },
-    {
       id: 'google_sheets' as ActiveTab,
       label: 'Google Sheets API',
       desc: 'Integrasi cloud database dua arah dan live auto-sync dengan Google Spreadsheet',
@@ -53,7 +45,7 @@ export const SettingMenu: React.FC<SettingMenuProps> = ({ onNavigate }) => {
       </div>
 
       {/* Light & Dark Glassmorphism Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
         {menus.map((menu) => (
           <button
             key={menu.id}

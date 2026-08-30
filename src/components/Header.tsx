@@ -73,30 +73,15 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="block lg:hidden bg-transparent px-4 sm:px-6 py-3.5 shrink-0 z-30 max-w-7xl mx-auto w-full">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-0 flex-1">
-            {appConfig?.logoAplikasiUrl ? (
-              <div className="w-8 h-8 flex shrink-0 items-center justify-center overflow-hidden bg-transparent">
+            {appConfig?.logoAplikasiUrl && (
+              <div className="flex shrink-0 items-center justify-start bg-transparent w-1/3">
                 <img
                   src={appConfig.logoAplikasiUrl}
-                  alt={appConfig.namaAplikasi || "Logo Aplikasi"}
-                  className="w-full h-full object-contain"
+                  alt="Logo Aplikasi"
+                  className="w-full max-h-12 object-contain object-left"
                 />
               </div>
-            ) : (
-              <div className="w-8 h-8 bg-violet-600 rounded-xl flex items-center justify-center shadow-lg shadow-violet-500/30 shrink-0">
-                <School className="w-5 h-5 text-white" />
-              </div>
             )}
-            <div className="min-w-0 flex-1">
-              <span className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight leading-tight block truncate sm:whitespace-normal">
-                {appConfig?.namaAplikasi ? (
-                  appConfig.namaAplikasi
-                ) : (
-                  <>
-                    Catatan Seorang <span className="text-violet-600 dark:text-violet-400">Guru</span>
-                  </>
-                )}
-              </span>
-            </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <button

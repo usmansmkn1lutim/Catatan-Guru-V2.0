@@ -82,7 +82,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       title: 'SETTING',
       items: [
         { id: 'tampilan', label: 'Appearance & Layout', icon: Palette },
-        { id: 'konfigurasi', label: 'Konfigurasi Aplikasi', icon: Sliders },
         { id: 'google_sheets', label: 'Google Sheets API', icon: FileSpreadsheet },
       ],
     },
@@ -103,24 +102,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Sidebar Header */}
         <div className="p-5 border-b border-white/20 dark:border-slate-700/40 flex items-center justify-between">
-        <div className="flex items-center space-x-3 min-w-0">
+        <div className="flex items-center justify-center w-full min-w-0">
           {appLogo && (
-            <div className="w-10 h-10 flex items-center justify-center shrink-0 overflow-hidden bg-transparent">
+            <div className="flex items-center justify-center shrink-0 bg-transparent w-full">
               <img
                 src={appLogo}
                 alt="Logo"
-                className="w-full h-full object-contain"
+                className="max-w-full max-h-20 object-contain"
               />
             </div>
           )}
-          <div className="min-w-0 flex-1">
-            <h2 className="text-sm font-bold text-black dark:text-white leading-tight truncate">
-              {appName}
-            </h2>
-            <p className="text-[10px] text-black dark:text-white/70 font-medium uppercase tracking-wider truncate">
-              {appDesc}
-            </p>
-          </div>
         </div>
         {setIsOpenMobile && (
           <button
