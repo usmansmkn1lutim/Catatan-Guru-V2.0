@@ -7,6 +7,15 @@
   --glass-blur: 16px;
   --glass-opacity: 0.65;
   --bg-opacity: 0.85;
+  --bg-solid: #F9FAFC;
+}
+
+html[data-visual-style="solid"] {
+  background-color: #F9FAFC;
+}
+
+html.dark[data-visual-style="solid"] {
+  background-color: #020617;
 }
 
 html {

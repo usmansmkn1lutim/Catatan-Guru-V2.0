@@ -67,10 +67,12 @@ export const PresensiSiswaView: React.FC<PresensiSiswaProps> = ({
     return { hadir, terlambat, sakit, izin, alpha };
   }, [studentPresensiItems]);
 
-  // Tab 2 Riwayat Modals
+  // Tab 2 Riwayat Modals & Filters
   const [selectedViewRecord, setSelectedViewRecord] = useState<PresensiRecord | null>(null);
   const [editingRecord, setEditingRecord] = useState<PresensiRecord | null>(null);
   const [deletingRecord, setDeletingRecord] = useState<PresensiRecord | null>(null);
+  const [riwayatKelasFilter, setRiwayatKelasFilter] = useState<string>('Semua');
+  const [riwayatMapelFilter, setRiwayatMapelFilter] = useState<string>('Semua');
 
   // Tab 3 Rekap Filters
   const [rekapKelasFilter, setRekapKelasFilter] = useState<string>('Semua');
@@ -193,6 +195,18 @@ export const PresensiSiswaView: React.FC<PresensiSiswaProps> = ({
     setEditingRecord(null);
     showToast('Perubahan presensi berhasil disimpan!', 'success');
   };
+
+  // Tab 2 Filtered Riwayat Presensi
+  const filteredRiwayatList = useMemo(() => {
+    return presensiList.filter((rec) => {
+      const matchKelas = riwayatKelasFilter === 'Semua' || rec.kelas === riwayatKelasFilter;
+      const matchMapel =
+        riwayatMapelFilter === 'Semua' ||
+        rec.kodeMapel === riwayatMapelFilter ||
+        rec.namaMapel === riwayatMapelFilter;
+      return matchKelas && matchMapel;
+    });
+  }, [presensiList, riwayatKelasFilter, riwayatMapelFilter]);
 
   // Tab 3 Rekap Data Matrix Calculations
   const rekapMatrixData = useMemo(() => {
@@ -550,8 +564,68 @@ export const PresensiSiswaView: React.FC<PresensiSiswaProps> = ({
       {/* TAB 2: RIWAYAT PRESENSI */}
       {activeSubTab === 'riwayat' && (
         <div className="space-y-4">
+          {/* Toolbar Filter Kelas & Mata Pelajaran */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-3 text-xs flex-1">
+              <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-200 font-bold">
+                <Filter className="w-4 h-4 text-violet-600 dark:text-violet-400" />
+                <span>Filter Riwayat:</span>
+              </div>
+
+              {/* Filter Kelas */}
+              <div className="flex items-center gap-1.5">
+                <label className="font-semibold text-slate-500 dark:text-slate-400">Kelas:</label>
+                <select
+                  value={riwayatKelasFilter}
+                  onChange={(e) => setRiwayatKelasFilter(e.target.value)}
+                  className="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white font-medium text-xs focus:outline-none focus:ring-2 focus:ring-violet-500/20"
+                >
+                  <option value="Semua">Semua Kelas</option>
+                  {kelasList.map((k) => (
+                    <option key={k.id} value={k.namaKelas}>
+                      {k.namaKelas}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Filter Mapel */}
+              <div className="flex items-center gap-1.5">
+                <label className="font-semibold text-slate-500 dark:text-slate-400">Mata Pelajaran:</label>
+                <select
+                  value={riwayatMapelFilter}
+                  onChange={(e) => setRiwayatMapelFilter(e.target.value)}
+                  className="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white font-medium text-xs focus:outline-none focus:ring-2 focus:ring-violet-500/20"
+                >
+                  <option value="Semua">Semua Mapel</option>
+                  {mapelList.map((m) => (
+                    <option key={m.id} value={m.kodeMapel}>
+                      {m.namaMapel}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {(riwayatKelasFilter !== 'Semua' || riwayatMapelFilter !== 'Semua') && (
+                <button
+                  onClick={() => {
+                    setRiwayatKelasFilter('Semua');
+                    setRiwayatMapelFilter('Semua');
+                  }}
+                  className="text-xs text-rose-500 hover:text-rose-600 dark:text-rose-400 font-semibold underline underline-offset-2 ml-1"
+                >
+                  Reset Filter
+                </button>
+              )}
+            </div>
+
+            <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 self-end sm:self-auto">
+              Menampilkan <span className="font-bold text-slate-900 dark:text-white">{filteredRiwayatList.length}</span> dari {presensiList.length} sesi
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {presensiList.map((rec) => (
+            {filteredRiwayatList.map((rec) => (
               <div
                 key={rec.id}
                 className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm space-y-4"
@@ -623,10 +697,25 @@ export const PresensiSiswaView: React.FC<PresensiSiswaProps> = ({
               </div>
             ))}
 
-            {presensiList.length === 0 && (
+            {filteredRiwayatList.length === 0 && (
               <div className="col-span-full p-12 text-center bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
-                <ClipboardCheck className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-                <p className="text-xs text-slate-500">Belum ada riwayat presensi tersimpan.</p>
+                <ClipboardCheck className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                  {presensiList.length === 0
+                    ? 'Belum ada riwayat presensi tersimpan.'
+                    : 'Tidak ada riwayat presensi yang sesuai dengan filter kelas atau mata pelajaran.'}
+                </p>
+                {(riwayatKelasFilter !== 'Semua' || riwayatMapelFilter !== 'Semua') && (
+                  <button
+                    onClick={() => {
+                      setRiwayatKelasFilter('Semua');
+                      setRiwayatMapelFilter('Semua');
+                    }}
+                    className="mt-3 px-3 py-1.5 bg-violet-50 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400 text-xs font-semibold rounded-lg hover:bg-violet-100"
+                  >
+                    Reset Filter
+                  </button>
+                )}
               </div>
             )}
           </div>

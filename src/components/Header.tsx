@@ -1,5 +1,5 @@
 import React from "react";
-import { DataSekolah, ProfilGuru, ActiveTab, AppConfig } from "../types";
+import { DataSekolah, ProfilGuru, ActiveTab, AppConfig, VisualStyle } from "../types";
 import {
   Moon,
   Sun,
@@ -35,6 +35,7 @@ interface HeaderProps {
   onFetchRemoteData?: () => void;
   isFetchingRemote?: boolean;
   onToggleMobileMenu?: () => void;
+  visualStyle?: VisualStyle;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -57,10 +58,12 @@ export const Header: React.FC<HeaderProps> = ({
   onFetchRemoteData,
   isFetchingRemote = false,
   onToggleMobileMenu,
+  visualStyle = "glass",
 }) => {
   const currentSekolah = sekolah || dataSekolah;
   const currentGuru = guru || profilGuru;
   const activeDark = isDarkMode ?? darkMode ?? false;
+  const isSolid = visualStyle === "solid";
 
   const handleToggleDark = () => {
     if (onToggleDarkMode) onToggleDarkMode();
@@ -74,11 +77,11 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-0 flex-1">
             {appConfig?.logoAplikasiUrl && (
-              <div className="flex shrink-0 items-center justify-start bg-transparent w-1/2 sm:w-2/5">
+              <div className="flex shrink-0 items-center justify-start bg-transparent w-1/3 max-w-[33.333%]">
                 <img
                   src={appConfig.logoAplikasiUrl}
                   alt="Logo Aplikasi"
-                  className="w-full max-h-[72px] object-contain object-left"
+                  className="w-full max-h-[96px] sm:max-h-[96px] object-contain object-left scale-125 sm:scale-100 origin-left"
                 />
               </div>
             )}
@@ -116,7 +119,11 @@ export const Header: React.FC<HeaderProps> = ({
 
       
       <header className="hidden lg:flex w-full px-4 sm:px-6 lg:px-8 mt-4">
-        <div className="flex h-20 bg-white/10 dark:bg-slate-900/10 backdrop-blur-lg rounded-3xl border border-white/60 dark:border-white/20 px-8 items-center justify-between shrink-0 z-30 transition-colors shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.25)] w-full">
+        <div className={`flex h-20 px-8 items-center justify-between shrink-0 z-30 transition-colors w-full ${
+          isSolid
+            ? 'bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-800 shadow-sm'
+            : 'bg-white/10 dark:bg-slate-900/10 backdrop-blur-lg rounded-3xl border border-white/60 dark:border-white/20 shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.25)]'
+        }`}>
         {/* School Branding & Mobile Menu Hamburger Button */}
         <div className="flex items-center gap-3 sm:gap-4 min-w-0">
           <button
@@ -145,7 +152,9 @@ export const Header: React.FC<HeaderProps> = ({
             <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white leading-tight truncate">
               {currentSekolah?.namaSekolah || "SMA Negeri 1 Permata Bangsa"}
             </h2>
-            <p className="text-[11px] sm:text-xs text-black dark:text-white/70 font-medium truncate max-w-[140px] xs:max-w-[200px] sm:max-w-md">
+            <p className={`text-[11px] sm:text-xs font-medium truncate max-w-[140px] xs:max-w-[200px] sm:max-w-md ${
+              isSolid ? 'text-slate-600 dark:text-slate-400' : 'text-black dark:text-white/70'
+            }`}>
               {currentSekolah?.alamatLengkap ||
                 "Jl. Merdeka No. 123, Kota Pendidikan"}
             </p>
@@ -155,7 +164,11 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Header Right Actions */}
         <div className="flex items-center gap-2 sm:gap-4">
           {/* Auto Sync Badge & Trigger */}
-          <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-slate-50 dark:bg-slate-800/80 border border-white/50 dark:border-slate-700/80 rounded-xl text-xs">
+          <div className={`hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs ${
+            isSolid
+              ? 'bg-[#F9FAFC] dark:bg-slate-800/80 border border-gray-200 dark:border-slate-700'
+              : 'bg-slate-50 dark:bg-slate-800/80 border border-white/50 dark:border-slate-700/80'
+          }`}>
             {autoSyncStatus === "syncing" && (
               <span className="flex items-center gap-1.5 text-violet-600 dark:text-violet-400 font-bold animate-pulse">
                 <RefreshCw className="w-3.5 h-3.5 animate-spin" />
@@ -233,9 +246,11 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={handleToggleDark}
-            title={activeDark ? "Beralih ke Light Glassmorphism" : "Beralih ke Dark Glassmorphism"}
-            aria-label={activeDark ? "Beralih ke Light Glassmorphism" : "Beralih ke Dark Glassmorphism"}
-            className="p-2 text-slate-500 hover:text-violet-600 dark:text-slate-300 dark:hover:text-amber-400 transition-colors rounded-xl hover:bg-white/40 dark:hover:bg-slate-800/60 flex items-center gap-1.5"
+            title={activeDark ? "Beralih ke Light Mode" : "Beralih ke Dark Mode"}
+            aria-label={activeDark ? "Beralih ke Light Mode" : "Beralih ke Dark Mode"}
+            className={`p-2 text-slate-500 hover:text-violet-600 dark:text-slate-300 dark:hover:text-amber-400 transition-colors rounded-xl flex items-center gap-1.5 ${
+              isSolid ? 'hover:bg-slate-100 dark:hover:bg-slate-800' : 'hover:bg-white/40 dark:hover:bg-slate-800/60'
+            }`}
           >
             {activeDark ? (
               <Sun className="w-5 h-5 text-amber-400 animate-spin-slow" />
@@ -254,7 +269,9 @@ export const Header: React.FC<HeaderProps> = ({
               <p className="text-sm font-bold text-slate-900 dark:text-white leading-tight">
                 {currentGuru?.namaGuru || "Drs. Bambang Haryanto"}
               </p>
-              <p className="text-[10px] text-slate-600 dark:text-white/70 font-bold uppercase tracking-tight">
+              <p className={`text-[10px] font-bold uppercase tracking-tight ${
+                isSolid ? 'text-slate-600 dark:text-slate-400' : 'text-black dark:text-white/70'
+              }`}>
                 {currentGuru?.nip
                   ? `NIP. ${currentGuru.nip}`
                   : "Guru Mata Pelajaran"}

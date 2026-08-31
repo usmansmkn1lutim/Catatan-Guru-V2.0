@@ -9,6 +9,7 @@ import {
   PresensiRecord,
   NilaiRecord,
   JurnalRecord,
+  VisualStyle,
 } from './types';
 import {
   initialAppConfig,
@@ -71,6 +72,9 @@ export function App() {
   });
 
   // Custom Appearance & Background State
+  const [visualStyle, setVisualStyle] = useState<VisualStyle>(() => {
+    return (localStorage.getItem('app_visual_style') as VisualStyle) || 'glass';
+  });
   const [customBgImage, setCustomBgImage] = useState<string>(() => {
     return localStorage.getItem('app_custom_bg_image') || '';
   });
@@ -88,11 +92,13 @@ export function App() {
     const glassBlur = localStorage.getItem('glass_blur') || '16';
     const glassOpacity = localStorage.getItem('glass_opacity') || '0.65';
     const bgOpacity = localStorage.getItem('app_custom_bg_opacity') || '0.85';
+    const currentVisualStyle = (localStorage.getItem('app_visual_style') as VisualStyle) || 'glass';
 
     document.documentElement.style.setProperty('--app-font-size', `${fontSize}px`);
     document.documentElement.style.setProperty('--glass-blur', `${glassBlur}px`);
     document.documentElement.style.setProperty('--glass-opacity', glassOpacity);
     document.documentElement.style.setProperty('--bg-opacity', bgOpacity);
+    document.documentElement.setAttribute('data-visual-style', currentVisualStyle);
 
     const handleAppearanceChange = (e: Event) => {
       const customEvent = e as CustomEvent;
@@ -100,6 +106,7 @@ export function App() {
         if (customEvent.detail.bgImage !== undefined) setCustomBgImage(customEvent.detail.bgImage);
         if (customEvent.detail.bgStyle !== undefined) setCustomBgStyle(customEvent.detail.bgStyle);
         if (customEvent.detail.bgOpacity !== undefined) setCustomBgOpacity(customEvent.detail.bgOpacity);
+        if (customEvent.detail.visualStyle !== undefined) setVisualStyle(customEvent.detail.visualStyle);
       }
     };
 
@@ -572,7 +579,9 @@ export function App() {
   };
 
   return (
-    <div className="h-screen w-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex font-sans antialiased overflow-hidden relative z-0">
+    <div className={`h-screen w-screen text-slate-900 dark:text-slate-100 flex font-sans antialiased overflow-hidden relative z-0 ${
+      visualStyle === 'solid' ? 'bg-[#F9FAFC] dark:bg-slate-950' : 'bg-slate-50 dark:bg-slate-950'
+    }`}>
       {/* Custom Background Image Layer */}
       {customBgImage && (
         <div
@@ -582,11 +591,13 @@ export function App() {
       )}
 
       {/* Glassmorphism Abstract Background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-400/20 dark:bg-blue-600/20 rounded-full blur-[100px]" />
-        <div className="absolute top-[20%] right-[-10%] w-[40%] h-[40%] bg-cyan-400/20 dark:bg-cyan-500/20 rounded-full blur-[100px]" />
-        <div className="absolute bottom-[-10%] left-[20%] w-[60%] h-[60%] bg-violet-400/20 dark:bg-violet-600/20 rounded-full blur-[120px]" />
-      </div>
+      {visualStyle !== 'solid' && (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
+          <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-400/20 dark:bg-blue-600/20 rounded-full blur-[100px]" />
+          <div className="absolute top-[20%] right-[-10%] w-[40%] h-[40%] bg-cyan-400/20 dark:bg-cyan-500/20 rounded-full blur-[100px]" />
+          <div className="absolute bottom-[-10%] left-[20%] w-[60%] h-[60%] bg-violet-400/20 dark:bg-violet-600/20 rounded-full blur-[120px]" />
+        </div>
+      )}
       {/* Toast Notification (Fixed Position) */}
       {toast && (
         <div className="fixed bottom-12 right-8 z-50 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-2xl rounded-2xl p-4 flex items-center gap-4 border-l-4 border-l-violet-600 transition-all animate-in fade-in slide-in-from-bottom-5 duration-300">
@@ -624,6 +635,7 @@ export function App() {
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
         isOpenMobile={isOpenMobile}
         setIsOpenMobile={setIsOpenMobile}
+        visualStyle={visualStyle}
       />
 
       {/* Main Content Area */}
@@ -646,14 +658,19 @@ export function App() {
           onFetchRemoteData={() => handleFetchRemoteData(false)}
           isFetchingRemote={isFetchingRemote}
           onToggleMobileMenu={() => setIsOpenMobile((prev) => !prev)}
+          visualStyle={visualStyle}
         />
         </div>
 
         {/* Page Views Routing */}
         <div className="flex-1 w-full h-full overflow-y-auto no-scrollbar">
           <main className="w-full h-full p-4 pb-28 lg:px-8 lg:py-6 lg:pb-28">
-            {/* Main Content Glassmorphism Container */}
-            <div className="w-full lg:bg-white/10 lg:dark:bg-slate-900/10 lg:backdrop-blur-xl lg:rounded-2xl lg:border lg:border-white/20 p-0 lg:p-6 lg:shadow-lg transition-all min-h-[calc(100vh-13rem)] flex flex-col justify-between overflow-x-hidden overflow-y-visible">
+            {/* Main Content Container */}
+            <div className={`w-full p-0 lg:p-6 transition-all min-h-[calc(100vh-13rem)] flex flex-col justify-between overflow-x-hidden overflow-y-visible ${
+              visualStyle === 'solid'
+                ? 'lg:bg-white lg:dark:bg-slate-900 lg:rounded-2xl lg:border lg:border-gray-200 lg:dark:border-slate-800 lg:shadow-sm'
+                : 'lg:bg-white/10 lg:dark:bg-slate-900/10 lg:backdrop-blur-xl lg:rounded-2xl lg:border lg:border-white/20 lg:shadow-lg'
+            }`}>
               <div className="w-full">
                 {activeTab === 'dashboard' && (
                   <Dashboard
@@ -672,6 +689,7 @@ export function App() {
                     onFetchRemoteData={() => handleFetchRemoteData(false)}
                     darkMode={darkMode}
                     isDarkMode={darkMode}
+                    visualStyle={visualStyle}
                   />
                 )}
 
@@ -905,19 +923,6 @@ export function App() {
           </main>
 
         <BottomTabBar activeTab={activeTab} onSelectTab={setActiveTab} />
-
-        {/* Status Bar / Footer */}
-        <footer className="hidden lg:flex h-10 bg-transparent px-6 sm:px-8 items-center justify-between text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest shrink-0">
-          <div className="flex items-center gap-4">
-            <span>v2.4.0 Stable</span>
-            <div className="w-1 h-1 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
-            <span>Penyimpanan: Local & Apps Script Sync</span>
-          </div>
-          <div className="flex items-center gap-1.5 text-violet-600 dark:text-violet-400">
-            <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>Semua sistem berjalan normal</span>
-          </div>
-        </footer>
         </div>
       </div>
       </div>

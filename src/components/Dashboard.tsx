@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Siswa, Kelas, Mapel, PresensiRecord, ActiveTab } from '../types';
+import { Siswa, Kelas, Mapel, PresensiRecord, ActiveTab, VisualStyle } from '../types';
 import { formatDateString } from '../lib/dateUtils';
 import { Users, GraduationCap, BookOpen, TrendingUp, ClipboardCheck, Award, BookMarked, ArrowUpRight, Sparkles, DoorClosed, School, User, Building, Settings, FileSpreadsheet, MapPin } from 'lucide-react';
 import {
@@ -45,6 +45,7 @@ interface DashboardProps {
   onFetchRemoteData?: () => void;
   isDarkMode?: boolean;
   darkMode?: boolean;
+  visualStyle?: VisualStyle;
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({
@@ -62,10 +63,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
   onFetchRemoteData,
   isDarkMode,
   darkMode,
+  visualStyle = 'glass',
 }) => {
   const [selectedKelasFilter, setSelectedKelasFilter] = useState<string>('Semua');
   const [isMenuExpanded, setIsMenuExpanded] = useState<boolean>(false);
   const isDark = isDarkMode ?? darkMode ?? (typeof document !== 'undefined' && document.documentElement.classList.contains('dark'));
+  const isSolid = visualStyle === 'solid';
 
   const goToTab = (tab: ActiveTab) => {
     if (setActiveTab) setActiveTab(tab);
@@ -195,7 +198,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
       </div>
 
       {/* Mobile Horizontal Categories Menu (visible only on mobile) */}
-      <div className="block lg:hidden w-full bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-lg p-5 overflow-hidden">
+      <div className={`block lg:hidden w-full p-5 overflow-hidden ${
+        isSolid
+          ? 'bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-800 shadow-sm'
+          : 'bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-lg'
+      }`}>
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-bold text-black dark:text-slate-100 text-sm">Menu Utama</h3>
           <button 
@@ -218,7 +225,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
               onClick={() => goToTab(menu.id as ActiveTab)}
               className="flex flex-col items-center gap-2 w-full"
             >
-              <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center ${menu.bg} ${menu.text} shadow-sm border border-white/20`}>
+              <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center ${menu.bg} ${menu.text} shadow-sm ${
+                isSolid ? 'border border-gray-200 dark:border-slate-700' : 'border border-white/20'
+              }`}>
                 <menu.icon className="w-6 h-6" strokeWidth={1.5} />
               </div>
               <span className="text-[11px] font-bold text-black dark:text-slate-300 text-center leading-tight truncate w-full">
@@ -229,7 +238,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
 
         {isMenuExpanded && (
-          <div className="grid grid-cols-4 gap-3 w-full mt-4 pt-4">
+          <div className="grid grid-cols-4 gap-3 w-full mt-4 pt-4 border-t border-gray-100 dark:border-slate-800">
             {[
               { id: 'sekolah', label: 'Data Sekolah', icon: Building, bg: 'bg-indigo-50 dark:bg-indigo-950/40', text: 'text-indigo-500 dark:text-indigo-400' },
               { id: 'mapel', label: 'Data Mapel', icon: BookOpen, bg: 'bg-emerald-50 dark:bg-emerald-950/40', text: 'text-emerald-500 dark:text-emerald-400' },
@@ -241,7 +250,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 onClick={() => goToTab(menu.id as ActiveTab)}
                 className="flex flex-col items-center gap-2 w-full"
               >
-                <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center ${menu.bg} ${menu.text} shadow-sm border border-white/20`}>
+                <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center ${menu.bg} ${menu.text} shadow-sm ${
+                  isSolid ? 'border border-gray-200 dark:border-slate-700' : 'border border-white/20'
+                }`}>
                   <menu.icon className="w-6 h-6" strokeWidth={1.5} />
                 </div>
                 <span className="text-[11px] font-bold text-black dark:text-slate-300 text-center leading-tight truncate w-full">
@@ -256,7 +267,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
       {/* 4 Stat Cards */}
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 items-stretch w-full">
         {/* Card 1: Total Siswa */}
-        <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl p-3.5 sm:p-6 rounded-2xl border border-white/20 shadow-lg flex flex-col justify-between items-stretch overflow-hidden hover:border-violet-300/50 dark:hover:border-violet-700/50 transition-all h-full">
+        <div className={`p-3.5 sm:p-6 rounded-2xl flex flex-col justify-between items-stretch overflow-hidden transition-all h-full ${
+          isSolid
+            ? 'bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 shadow-sm hover:border-violet-400'
+            : 'bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl border border-white/20 shadow-lg hover:border-violet-300/50 dark:hover:border-violet-700/50'
+        }`}>
           <div className="flex items-center justify-between mb-3 sm:mb-4 gap-2">
             <span className="text-[9px] sm:text-xs font-bold text-black dark:text-white/70 uppercase tracking-wider sm:tracking-widest truncate">
               Total Siswa
@@ -279,7 +294,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
 
         {/* Card 2: Jumlah Kelas */}
-        <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl p-3.5 sm:p-6 rounded-2xl border border-white/20 shadow-lg flex flex-col justify-between items-stretch overflow-hidden hover:border-indigo-300/50 dark:hover:border-indigo-800/50 transition-all h-full">
+        <div className={`p-3.5 sm:p-6 rounded-2xl flex flex-col justify-between items-stretch overflow-hidden transition-all h-full ${
+          isSolid
+            ? 'bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 shadow-sm hover:border-indigo-400'
+            : 'bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl border border-white/20 shadow-lg hover:border-indigo-300/50 dark:hover:border-indigo-800/50'
+        }`}>
           <div className="flex items-center justify-between mb-3 sm:mb-4 gap-2">
             <span className="text-[9px] sm:text-xs font-bold text-black dark:text-white/70 uppercase tracking-wider sm:tracking-widest truncate">
               Jumlah Kelas
@@ -302,7 +321,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
 
         {/* Card 3: Mata Pelajaran */}
-        <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl p-3.5 sm:p-6 rounded-2xl border border-white/20 shadow-lg flex flex-col justify-between items-stretch overflow-hidden hover:border-emerald-300/50 dark:hover:border-emerald-800/50 transition-all h-full">
+        <div className={`p-3.5 sm:p-6 rounded-2xl flex flex-col justify-between items-stretch overflow-hidden transition-all h-full ${
+          isSolid
+            ? 'bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 shadow-sm hover:border-emerald-400'
+            : 'bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl border border-white/20 shadow-lg hover:border-emerald-300/50 dark:hover:border-emerald-800/50'
+        }`}>
           <div className="flex items-center justify-between mb-3 sm:mb-4 gap-2">
             <span className="text-[9px] sm:text-xs font-bold text-black dark:text-white/70 uppercase tracking-wider sm:tracking-widest truncate">
               Mata Pelajaran
@@ -325,7 +348,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
 
         {/* Card 4: Rata-rata Kehadiran */}
-        <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl p-3.5 sm:p-6 rounded-2xl border border-white/20 shadow-lg flex flex-col justify-between items-stretch overflow-hidden hover:border-amber-300/50 dark:hover:border-amber-800/50 transition-all h-full">
+        <div className={`p-3.5 sm:p-6 rounded-2xl flex flex-col justify-between items-stretch overflow-hidden transition-all h-full ${
+          isSolid
+            ? 'bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 shadow-sm hover:border-amber-400'
+            : 'bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl border border-white/20 shadow-lg hover:border-amber-300/50 dark:hover:border-amber-800/50'
+        }`}>
           <div className="flex items-center justify-between mb-3 sm:mb-4 gap-2">
             <span className="text-[9px] sm:text-xs font-bold text-black dark:text-white/70 uppercase tracking-wider sm:tracking-widest truncate">
               Rata-rata Kehadiran
@@ -352,7 +379,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
       {/* Main Content Grid (Chart + Quick Action Panel) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch w-full">
         {/* Chart Section */}
-        <div className="lg:col-span-2 bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-lg flex flex-col justify-between p-6 overflow-hidden h-full">
+        <div className={`lg:col-span-2 rounded-2xl flex flex-col justify-between p-6 overflow-hidden h-full ${
+          isSolid
+            ? 'bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 shadow-sm'
+            : 'bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl border border-white/20 shadow-lg'
+        }`}>
           <div className="flex items-center justify-between mb-6">
             <div>
               <h4 className="text-sm font-bold text-black dark:text-white">
@@ -470,13 +501,21 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
 
         {/* Action Panel */}
-        <div className="bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-lg p-6 flex flex-col justify-between overflow-hidden h-full">
+        <div className={`rounded-2xl p-6 flex flex-col justify-between overflow-hidden h-full ${
+          isSolid
+            ? 'bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 shadow-sm'
+            : 'bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl border border-white/20 shadow-lg'
+        }`}>
           <div>
             <h4 className="text-sm font-bold text-black dark:text-white mb-4">Aksi Cepat</h4>
             <div className="space-y-3">
               <button
                 onClick={() => goToTab('presensi')}
-                className="w-full flex items-center justify-between p-4 bg-white/10 hover:bg-white/20 dark:bg-white/5 dark:hover:bg-white/10 rounded-2xl transition-all border border-white/20 group text-left shadow-sm overflow-hidden"
+                className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all group text-left shadow-sm overflow-hidden ${
+                  isSolid
+                    ? 'bg-[#F9FAFC] hover:bg-slate-100 dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-gray-200 dark:border-slate-700'
+                    : 'bg-white/10 hover:bg-white/20 dark:bg-white/5 dark:hover:bg-white/10 border border-white/20'
+                }`}
               >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-violet-600 rounded-xl flex items-center justify-center text-white shadow-md shrink-0">
@@ -492,7 +531,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
               <button
                 onClick={() => goToTab('nilai')}
-                className="w-full flex items-center justify-between p-4 bg-white/10 hover:bg-white/20 dark:bg-white/5 dark:hover:bg-white/10 rounded-2xl transition-all border border-white/20 group text-left shadow-sm overflow-hidden"
+                className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all group text-left shadow-sm overflow-hidden ${
+                  isSolid
+                    ? 'bg-[#F9FAFC] hover:bg-slate-100 dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-gray-200 dark:border-slate-700'
+                    : 'bg-white/10 hover:bg-white/20 dark:bg-white/5 dark:hover:bg-white/10 border border-white/20'
+                }`}
               >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-amber-600 rounded-xl flex items-center justify-center text-white shadow-md shrink-0">
@@ -508,7 +551,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
               <button
                 onClick={() => goToTab('jurnal')}
-                className="w-full flex items-center justify-between p-4 bg-white/10 hover:bg-white/20 dark:bg-white/5 dark:hover:bg-white/10 rounded-2xl transition-all border border-white/20 group text-left shadow-sm overflow-hidden"
+                className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all group text-left shadow-sm overflow-hidden ${
+                  isSolid
+                    ? 'bg-[#F9FAFC] hover:bg-slate-100 dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-gray-200 dark:border-slate-700'
+                    : 'bg-white/10 hover:bg-white/20 dark:bg-white/5 dark:hover:bg-white/10 border border-white/20'
+                }`}
               >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-teal-600 rounded-xl flex items-center justify-center text-white shadow-md shrink-0">

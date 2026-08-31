@@ -1,5 +1,5 @@
 import React from 'react';
-import { ActiveTab, DataSekolah, AppConfig } from '../types';
+import { ActiveTab, DataSekolah, AppConfig, VisualStyle } from '../types';
 import { DEFAULT_APP_LOGO } from '../data/initialData';
 import {
   LayoutDashboard,
@@ -30,6 +30,7 @@ interface SidebarProps {
   setIsOpenMobile?: (open: boolean) => void;
   collapsed?: boolean;
   onToggleCollapse?: () => void;
+  visualStyle?: VisualStyle;
 }
 
 interface MenuItem {
@@ -53,7 +54,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   setIsOpenMobile,
   collapsed = false,
   onToggleCollapse,
+  visualStyle = 'glass',
 }) => {
+  const isSolid = visualStyle === 'solid';
 
   const menuGroups: MenuGroup[] = [
     {
@@ -98,10 +101,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const appDesc = appConfig?.deskripsiAplikasi || 'Merawat Jejak Pengabdian';
 
   const sidebarContent = (
-    <div className="flex flex-col justify-between transition-colors w-64 select-none h-full bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border-r border-white/60 dark:border-slate-700/50 dark:border-slate-800 lg:h-[calc(100vh-2rem)] lg:bg-white/10 lg:dark:bg-slate-900/10 lg:backdrop-blur-lg lg:rounded-3xl lg:border lg:border-white/30 lg:dark:border-slate-700/40 lg:my-4 lg:ml-4 lg:shadow-[0_12px_40px_rgba(0,0,0,0.12)] lg:dark:shadow-[0_12px_40px_rgba(0,0,0,0.25)] overflow-hidden">
+    <div className={`flex flex-col justify-between transition-colors w-64 select-none h-full overflow-hidden ${
+      isSolid
+        ? 'bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 lg:h-[calc(100vh-2rem)] lg:bg-white lg:dark:bg-slate-900 lg:rounded-2xl lg:border lg:border-gray-200 lg:dark:border-slate-800 lg:my-4 lg:ml-4 lg:shadow-sm'
+        : 'bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border-r border-white/60 dark:border-slate-700/50 dark:border-slate-800 lg:h-[calc(100vh-2rem)] lg:bg-white/10 lg:dark:bg-slate-900/10 lg:backdrop-blur-lg lg:rounded-3xl lg:border lg:border-white/30 lg:dark:border-slate-700/40 lg:my-4 lg:ml-4 lg:shadow-[0_12px_40px_rgba(0,0,0,0.12)] lg:dark:shadow-[0_12px_40px_rgba(0,0,0,0.25)]'
+    }`}>
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Sidebar Header */}
-        <div className="p-5 border-b border-white/20 dark:border-slate-700/40 flex items-center justify-between">
+        <div className={`p-5 flex items-center justify-between ${
+          isSolid
+            ? 'border-b border-gray-200 dark:border-slate-800'
+            : 'border-b border-white/20 dark:border-slate-700/40'
+        }`}>
         <div className="flex items-center justify-center w-full min-w-0">
           {appLogo && (
             <div className="flex items-center justify-center shrink-0 bg-transparent w-full">
@@ -123,12 +134,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
         )}
       </div>
 
-
       {/* Nav List */}
       <div className="flex-1 overflow-y-auto py-4 px-3 space-y-6 no-scrollbar">
         {menuGroups.map((group, idx) => (
           <div key={idx} className="space-y-1.5">
-            <h3 className="px-4 text-[11px] font-bold text-black dark:text-white/70 uppercase tracking-wider">
+            <h3 className={`px-4 text-[11px] font-bold uppercase tracking-wider ${
+              isSolid ? 'text-slate-500 dark:text-slate-400' : 'text-black dark:text-white/70'
+            }`}>
               {group.title}
             </h3>
             <div className="space-y-1">
@@ -141,12 +153,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     onClick={() => handleSelect(item.id)}
                     className={`w-full flex items-center space-x-3 px-4 py-2.5 transition-all text-sm font-medium ${
                       isActive
-                        ? 'bg-violet-600 text-white rounded-full shadow-md shadow-violet-500/20 translate-x-1'
-                        : 'text-black hover:text-black hover:bg-black/5 dark:text-white/80 dark:hover:text-white dark:hover:bg-white/10 rounded-full'
+                        ? isSolid
+                          ? 'bg-violet-600 text-white rounded-xl shadow-sm font-semibold'
+                          : 'bg-violet-600 text-white rounded-full shadow-md shadow-violet-500/20 translate-x-1'
+                        : isSolid
+                          ? 'text-slate-700 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800 rounded-xl'
+                          : 'text-black hover:text-black hover:bg-black/5 dark:text-white/80 dark:hover:text-white dark:hover:bg-white/10 rounded-full'
                     }`}
                   >
-                    <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-black dark:text-white/70'}`} />
-                    <span className={`truncate font-medium ${isActive ? 'text-white' : 'text-black dark:text-white/80'}`}>{item.label}</span>
+                    <Icon className={`w-4 h-4 ${
+                      isActive
+                        ? 'text-white'
+                        : isSolid
+                          ? 'text-slate-500 dark:text-slate-400'
+                          : 'text-black dark:text-white/70'
+                    }`} />
+                    <span className={`truncate font-medium ${
+                      isActive
+                        ? 'text-white'
+                        : isSolid
+                          ? 'text-slate-700 dark:text-slate-200'
+                          : 'text-black dark:text-white/80'
+                    }`}>{item.label}</span>
                   </button>
                 );
               })}
@@ -157,10 +185,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Sidebar Footer info */}
-      <div className="shrink-0 p-4 border-t border-white/20 dark:border-slate-700/40 bg-slate-50/30 lg:bg-transparent dark:bg-slate-800/20">
-        <div className="flex items-center space-x-2 text-xs text-black dark:text-white/70">
-          <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
-          <span className="text-black dark:text-white/70">Google Sheets Synchronized</span>
+      <div className={`shrink-0 p-4 ${
+        isSolid
+          ? 'border-t border-gray-200 dark:border-slate-800 bg-[#F9FAFC] dark:bg-slate-800/40'
+          : 'border-t border-white/20 dark:border-slate-700/40 bg-slate-50/30 lg:bg-transparent dark:bg-slate-800/20'
+      }`}>
+        <div className={`flex items-center space-x-2 text-xs ${
+          isSolid ? 'text-slate-600 dark:text-slate-400' : 'text-black dark:text-white/70'
+        }`}>
+          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+          <span>Google Sheets Synchronized</span>
         </div>
       </div>
     </div>

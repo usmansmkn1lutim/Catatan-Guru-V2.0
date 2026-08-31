@@ -16,6 +16,8 @@ export type ActiveTab =
   | 'setting_menu'
   | 'tampilan';
 
+export type VisualStyle = 'solid' | 'glass';
+
 export interface AppConfig {
   namaAplikasi: string;
   deskripsiAplikasi: string;
