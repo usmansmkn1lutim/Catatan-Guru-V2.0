@@ -1,4 +1,4 @@
-import { AppConfig, DataSekolah, ProfilGuru, Mapel, Kelas, Siswa, PresensiRecord, NilaiRecord, JurnalRecord } from '../types';
+import { AppConfig, DataSekolah, ProfilGuru, Mapel, Kelas, Siswa, PresensiRecord, NilaiRecord, JurnalRecord, JadwalRecord, ScheduleConfig } from '../types';
 
 export const DEFAULT_APP_LOGO = '/logo.png?v=' + Date.now();
 
@@ -354,7 +354,26 @@ export const initialJurnalRecords: JurnalRecord[] = [
   },
 ];
 
+export const initialScheduleConfig: ScheduleConfig = {
+  systemType: 'BLOK',
+  academicYear: '2026/2027',
+  semester: 'Ganjil',
+  anchorDate: '2026-07-13',
+  cyclePattern: 'A_FIRST',
+  activeDays: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'],
+};
+
+export const initialScheduleList: JadwalRecord[] = [
+  { id: 'sched-1', cycle: 'A', day: 'Senin', period: '1 - 2', start: '07:15', end: '08:45', subject: 'Bahasa Inggris', kodeMapel: 'BING-X', class: 'X IPA 1', room: 'Ruang 3', jpm: 2 },
+  { id: 'sched-2', cycle: 'A', day: 'Senin', period: '3 - 4', start: '10:00', end: '11:30', subject: 'Informatika & Koding X', kodeMapel: 'INFOR-X', class: 'X IPA 2', room: 'Lab Komputer', jpm: 2 },
+  { id: 'sched-3', cycle: 'A', day: 'Selasa', period: '1 - 2', start: '07:15', end: '08:45', subject: 'Bahasa Inggris', kodeMapel: 'BING-X', class: 'XI IPA 1', room: 'Ruang 2', jpm: 2 },
+  { id: 'sched-4', cycle: 'B', day: 'Senin', period: '1 - 2', start: '07:15', end: '08:45', subject: 'Bahasa Inggris', kodeMapel: 'BING-X', class: 'XII IPA 1', room: 'Ruang 5', jpm: 2 },
+  { id: 'sched-5', cycle: 'B', day: 'Rabu', period: '3 - 4', start: '10:00', end: '11:30', subject: 'Informatika & Koding X', kodeMapel: 'INFOR-X', class: 'X IPA 1', room: 'Lab Komputer', jpm: 2 },
+  { id: 'sched-6', cycle: 'Reguler', day: 'Jumat', period: '1 - 2', start: '07:30', end: '09:00', subject: 'Bahasa Inggris Lanjut', kodeMapel: 'BING-X', class: 'XII IPA 1', room: 'Lab Bahasa', jpm: 2 }
+];
+
 // Aliases
 export const initialPresensiList = initialPresensiRecords;
 export const initialNilaiList = initialNilaiRecords;
 export const initialJurnalList = initialJurnalRecords;
+export const initialJadwalList = initialScheduleList;

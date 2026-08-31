@@ -6,6 +6,7 @@ export type ActiveTab =
   | 'mapel'
   | 'kelas'
   | 'siswa'
+  | 'jadwal'
   | 'presensi'
   | 'nilai'
   | 'jurnal'
@@ -180,4 +181,32 @@ export interface JurnalRecord {
   catatanKendala: string;
   jumlahHadir: number;
   jumlahTidakHadir: number;
+}
+
+export type ScheduleCycle = 'Reguler' | 'A' | 'B';
+export type ScheduleSystemType = 'REGULER' | 'BLOK';
+export type ScheduleDay = 'Senin' | 'Selasa' | 'Rabu' | 'Kamis' | 'Jumat' | 'Sabtu';
+
+export interface JadwalRecord {
+  id: string;
+  cycle: ScheduleCycle;
+  day: ScheduleDay;
+  period: string; // e.g. "1 - 2"
+  start: string; // "07:15"
+  end: string; // "08:45"
+  subject: string; // "Bahasa Inggris"
+  kodeMapel?: string;
+  class: string; // "X TKR 1"
+  room?: string; // "Ruang 3"
+  jpm: number; // 2
+  catatan?: string;
+}
+
+export interface ScheduleConfig {
+  systemType: ScheduleSystemType;
+  academicYear: string;
+  semester: 'Ganjil' | 'Genap';
+  anchorDate: string; // '2026-07-13'
+  cyclePattern: 'A_FIRST' | 'B_FIRST';
+  activeDays: string[];
 }

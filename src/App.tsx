@@ -9,6 +9,8 @@ import {
   PresensiRecord,
   NilaiRecord,
   JurnalRecord,
+  JadwalRecord,
+  ScheduleConfig,
   VisualStyle,
 } from './types';
 import {
@@ -21,6 +23,8 @@ import {
   initialPresensiList,
   initialNilaiList,
   initialJurnalList,
+  initialScheduleList,
+  initialScheduleConfig,
   DEFAULT_APP_LOGO,
 } from './data/initialData';
 import {
@@ -43,6 +47,7 @@ import { DataMapelView } from './components/DataMapel';
 import { DataKelasView } from './components/DataKelas';
 import { DataSiswaView } from './components/DataSiswa';
 import { PresensiSiswaView } from './components/PresensiSiswa';
+import { JadwalMengajarView } from './components/JadwalMengajar';
 import { NilaiSiswaView } from './components/NilaiSiswa';
 import { JurnalGuruView } from './components/JurnalGuru';
 import { GoogleSheetsView } from './components/GoogleSheetsView';
@@ -197,6 +202,12 @@ export function App() {
   const [presensiList, setPresensiList] = useState<PresensiRecord[]>(() =>
     sanitizePresensiList(loadFromStorage('presensiList', initialPresensiList))
   );
+  const [scheduleList, setScheduleList] = useState<JadwalRecord[]>(() =>
+    loadFromStorage('scheduleList', initialScheduleList)
+  );
+  const [scheduleConfig, setScheduleConfig] = useState<ScheduleConfig>(() =>
+    loadFromStorage('scheduleConfig', initialScheduleConfig)
+  );
   const [nilaiList, setNilaiList] = useState<NilaiRecord[]>(() =>
     loadFromStorage('nilaiList', initialNilaiList).map((n: NilaiRecord) => ({ ...n, tanggal: formatDateString(n.tanggal) }))
   );
@@ -280,6 +291,14 @@ export function App() {
   useEffect(() => {
     saveToStorage('presensiList', presensiList);
   }, [presensiList]);
+
+  useEffect(() => {
+    saveToStorage('scheduleList', scheduleList);
+  }, [scheduleList]);
+
+  useEffect(() => {
+    saveToStorage('scheduleConfig', scheduleConfig);
+  }, [scheduleConfig]);
 
   useEffect(() => {
     saveToStorage('nilaiList', nilaiList);
@@ -680,6 +699,8 @@ export function App() {
                     kelasList={kelasList}
                     mapelList={mapelList}
                     presensiList={presensiList}
+                    scheduleList={scheduleList}
+                    scheduleConfig={scheduleConfig}
                     nilaiList={nilaiList}
                     jurnalList={jurnalList}
                     onNavigate={(tab) => setActiveTab(tab)}
@@ -735,6 +756,27 @@ export function App() {
                     nilaiList={nilaiList}
                     onSaveSiswaList={setSiswaList}
                     showToast={showToast}
+                  />
+                )}
+
+                {activeTab === 'jadwal' && (
+                  <JadwalMengajarView
+                    scheduleList={scheduleList}
+                    scheduleConfig={scheduleConfig}
+                    siswaList={siswaList}
+                    kelasList={kelasList}
+                    mapelList={mapelList}
+                    presensiList={presensiList}
+                    jurnalList={jurnalList}
+                    onSaveScheduleList={setScheduleList}
+                    onSaveScheduleConfig={setScheduleConfig}
+                    onSavePresensiList={setPresensiList}
+                    onSaveJurnalList={setJurnalList}
+                    showToast={showToast}
+                    visualStyle={visualStyle}
+                    namaGuru={profilGuru.namaGuru}
+                    nipGuru={profilGuru.nip}
+                    namaSekolah={dataSekolah.namaSekolah}
                   />
                 )}
 

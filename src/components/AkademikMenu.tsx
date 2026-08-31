@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActiveTab } from '../types';
-import { ClipboardCheck, Award, BookMarked, Sparkles, ArrowRight } from 'lucide-react';
+import { CalendarDays, ClipboardCheck, Award, BookMarked, Sparkles, ArrowRight } from 'lucide-react';
 
 interface AkademikMenuProps {
   onNavigate: (tab: ActiveTab) => void;
@@ -8,6 +8,14 @@ interface AkademikMenuProps {
 
 export const AkademikMenu: React.FC<AkademikMenuProps> = ({ onNavigate }) => {
   const menus = [
+    {
+      id: 'jadwal' as ActiveTab,
+      label: 'Jadwal Mengajar',
+      desc: 'Pengaturan jadwal presisi dengan dual-sistem Reguler & Blok 2-Mingguan (Minggu A & B)',
+      icon: <CalendarDays className="w-7 h-7 text-violet-600 dark:text-violet-400" />,
+      accentBg: 'bg-violet-500/10 dark:bg-violet-500/20 border-violet-500/20 dark:border-violet-400/30',
+      badge: 'Penjadwalan',
+    },
     {
       id: 'presensi' as ActiveTab,
       label: 'Presensi Siswa',
@@ -47,13 +55,13 @@ export const AkademikMenu: React.FC<AkademikMenuProps> = ({ onNavigate }) => {
             Menu Akademik
           </h2>
           <p className="text-xs sm:text-sm text-black dark:text-slate-400 font-medium">
-            Akses cepat fitur pencatatan presensi kehadiran, penginputan asesmen nilai, dan agenda jurnal kelas.
+            Akses cepat fitur penjadwalan KBM, pencatatan presensi kehadiran, penginputan asesmen nilai, dan agenda jurnal kelas.
           </p>
         </div>
       </div>
 
       {/* Light & Dark Glassmorphism Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
         {menus.map((menu) => (
           <button
             key={menu.id}

@@ -40,7 +40,7 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({ activeTab, onSelectT
         <button
           onClick={() => onSelectTab('akademik_menu')}
           className={getTabStyle(
-            ['presensi', 'nilai', 'jurnal', 'akademik_menu'].includes(activeTab)
+            ['jadwal', 'presensi', 'nilai', 'jurnal', 'akademik_menu'].includes(activeTab)
           )}
         >
           <GraduationCap className="w-6 h-6" />

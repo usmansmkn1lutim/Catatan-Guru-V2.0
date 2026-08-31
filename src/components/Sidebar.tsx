@@ -8,6 +8,7 @@ import {
   BookOpen,
   GraduationCap,
   Users,
+  CalendarDays,
   ClipboardCheck,
   Award,
   BookMarked,
@@ -76,6 +77,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     {
       title: 'AKADEMIK',
       items: [
+        { id: 'jadwal', label: 'Jadwal Mengajar', icon: CalendarDays },
         { id: 'presensi', label: 'Presensi', icon: ClipboardCheck },
         { id: 'nilai', label: 'Nilai', icon: Award },
         { id: 'jurnal', label: 'Jurnal', icon: BookMarked },

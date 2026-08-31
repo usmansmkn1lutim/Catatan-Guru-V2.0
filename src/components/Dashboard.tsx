@@ -1,7 +1,30 @@
 import React, { useState, useMemo } from 'react';
-import { Siswa, Kelas, Mapel, PresensiRecord, ActiveTab, VisualStyle } from '../types';
+import { Siswa, Kelas, Mapel, PresensiRecord, JadwalRecord, ScheduleConfig, ScheduleDay, ScheduleCycle, ActiveTab, VisualStyle } from '../types';
 import { formatDateString } from '../lib/dateUtils';
-import { Users, GraduationCap, BookOpen, TrendingUp, ClipboardCheck, Award, BookMarked, ArrowUpRight, Sparkles, DoorClosed, School, User, Building, Settings, FileSpreadsheet, MapPin } from 'lucide-react';
+import {
+  Users,
+  GraduationCap,
+  BookOpen,
+  TrendingUp,
+  ClipboardCheck,
+  Award,
+  BookMarked,
+  ArrowUpRight,
+  Sparkles,
+  DoorClosed,
+  School,
+  User,
+  Building,
+  Settings,
+  FileSpreadsheet,
+  MapPin,
+  CalendarDays,
+  Clock,
+  CheckCircle2,
+  Calendar,
+  RotateCw,
+  ArrowRight,
+} from 'lucide-react';
 import {
   ResponsiveContainer,
   LineChart,
@@ -33,6 +56,8 @@ interface DashboardProps {
   kelasList: Kelas[];
   mapelList: Mapel[];
   presensiList: PresensiRecord[];
+  scheduleList?: JadwalRecord[];
+  scheduleConfig?: ScheduleConfig;
   setActiveTab?: (tab: ActiveTab) => void;
   onNavigate?: (tab: ActiveTab) => void;
   dataSekolah?: any;
@@ -53,6 +78,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
   kelasList,
   mapelList,
   presensiList,
+  scheduleList = [],
+  scheduleConfig,
   setActiveTab,
   onNavigate,
   dataSekolah,
@@ -77,6 +104,63 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
   const namaGuru = profilGuru?.namaGuru || 'Guru';
   const namaSekolah = dataSekolah?.namaSekolah || '';
+
+  // Today Date & Cycle Calculation for Jadwal Hari Ini
+  const todayDateStr = useMemo(() => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }, []);
+
+  const todayDayName = useMemo(() => {
+    const days: ScheduleDay[] = ['Minggu' as any, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const d = new Date();
+    return days[d.getDay()] || 'Senin';
+  }, []);
+
+  const formattedTodayDate = useMemo(() => {
+    const d = new Date();
+    const day = d.getDate();
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
+    return `${todayDayName}, ${day} ${months[d.getMonth()]} ${d.getFullYear()}`;
+  }, [todayDayName]);
+
+  const todayCycleDetails = useMemo(() => {
+    if (!scheduleConfig || scheduleConfig.systemType === 'REGULER') {
+      return { cycle: 'Reguler' as ScheduleCycle, label: 'Reguler' };
+    }
+    const anchor = new Date(scheduleConfig.anchorDate || '2026-07-13');
+    const target = new Date(todayDateStr);
+    const diffMs = target.getTime() - anchor.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    let weekNumber = Math.floor(diffDays / 7) + 1;
+    if (isNaN(weekNumber) || weekNumber < 1) weekNumber = 1;
+    const isOddWeek = weekNumber % 2 !== 0;
+    let cycle: 'A' | 'B' = 'A';
+    if (scheduleConfig.cyclePattern === 'A_FIRST') {
+      cycle = isOddWeek ? 'A' : 'B';
+    } else {
+      cycle = isOddWeek ? 'B' : 'A';
+    }
+    return {
+      cycle,
+      label: `Minggu ${cycle}`,
+    };
+  }, [scheduleConfig, todayDateStr]);
+
+  // Schedules active for today
+  const todaySchedules = useMemo(() => {
+    if (!scheduleList || scheduleList.length === 0) return [];
+    return scheduleList
+      .filter((s) => {
+        if (s.day !== todayDayName) return false;
+        if (!scheduleConfig || scheduleConfig.systemType === 'REGULER') return true;
+        return s.cycle === 'Reguler' || s.cycle === todayCycleDetails.cycle;
+      })
+      .sort((a, b) => (a.start || '').localeCompare(b.start || ''));
+  }, [scheduleList, todayDayName, scheduleConfig, todayCycleDetails.cycle]);
 
   // Compute stats
   const totalSiswa = siswaList.length;
@@ -376,7 +460,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
       </section>
 
-      {/* Main Content Grid (Chart + Quick Action Panel) */}
+      {/* Main Content Grid (Chart + Jadwal Hari Ini Panel) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch w-full">
         {/* Chart Section */}
         <div className={`lg:col-span-2 rounded-2xl flex flex-col justify-between p-6 overflow-hidden h-full ${
@@ -384,7 +468,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
             ? 'bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 shadow-sm'
             : 'bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl border border-white/20 shadow-lg'
         }`}>
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-4">
             <div>
               <h4 className="text-sm font-bold text-black dark:text-white">
                 Statistik Kehadiran Harian
@@ -407,7 +491,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
             </select>
           </div>
 
-          <div className="h-96 w-full pt-2">
+          <div className="h-64 sm:h-72 w-full pt-1">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? "rgba(255, 255, 255, 0.15)" : "rgba(0, 0, 0, 0.15)"} />
@@ -500,115 +584,133 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </div>
         </div>
 
-        {/* Action Panel */}
+        {/* Jadwal Hari Ini Panel */}
         <div className={`rounded-2xl p-6 flex flex-col justify-between overflow-hidden h-full ${
           isSolid
             ? 'bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 shadow-sm'
             : 'bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl border border-white/20 shadow-lg'
         }`}>
-          <div>
-            <h4 className="text-sm font-bold text-black dark:text-white mb-4">Aksi Cepat</h4>
-            <div className="space-y-3">
-              <button
-                onClick={() => goToTab('presensi')}
-                className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all group text-left shadow-sm overflow-hidden ${
-                  isSolid
-                    ? 'bg-[#F9FAFC] hover:bg-slate-100 dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-gray-200 dark:border-slate-700'
-                    : 'bg-white/10 hover:bg-white/20 dark:bg-white/5 dark:hover:bg-white/10 border border-white/20'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-violet-600 rounded-xl flex items-center justify-center text-white shadow-md shrink-0">
-                    <ClipboardCheck className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-black dark:text-white">Input Presensi</p>
-                    <p className="text-[10px] text-black dark:text-white/70 uppercase font-bold tracking-tight">Pilih Kelas & Mapel</p>
-                  </div>
+          <div className="flex flex-col h-full">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-violet-100 dark:bg-violet-950/70 text-violet-600 dark:text-violet-400 flex items-center justify-center shrink-0">
+                  <CalendarDays className="w-4 h-4" />
                 </div>
-                <ArrowUpRight className="w-5 h-5 text-slate-400 group-hover:text-black dark:text-white/70 dark:group-hover:text-white transition-colors" />
-              </button>
+                <div>
+                  <h4 className="text-sm font-bold text-black dark:text-white leading-tight">Jadwal Hari Ini</h4>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">{formattedTodayDate}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5">
+                {scheduleConfig?.systemType === 'BLOK' ? (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-violet-100 dark:bg-violet-950 text-violet-700 dark:text-violet-300 font-mono">
+                    Minggu {todayCycleDetails.cycle}
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                    Reguler
+                  </span>
+                )}
+              </div>
+            </div>
 
-              <button
-                onClick={() => goToTab('nilai')}
-                className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all group text-left shadow-sm overflow-hidden ${
-                  isSolid
-                    ? 'bg-[#F9FAFC] hover:bg-slate-100 dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-gray-200 dark:border-slate-700'
-                    : 'bg-white/10 hover:bg-white/20 dark:bg-white/5 dark:hover:bg-white/10 border border-white/20'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-amber-600 rounded-xl flex items-center justify-center text-white shadow-md shrink-0">
-                    <Award className="w-5 h-5" />
+            {/* Vertical Schedule Cards */}
+            <div className="flex-1 overflow-y-auto max-h-[300px] space-y-2.5 custom-scrollbar pr-0.5">
+              {todaySchedules.length === 0 ? (
+                <div className="h-full flex flex-col items-center justify-center text-center p-5 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-dashed border-slate-200 dark:border-slate-700 space-y-2 my-auto">
+                  <div className="w-9 h-9 rounded-xl bg-violet-50 dark:bg-violet-950/50 text-violet-600 dark:text-violet-400 flex items-center justify-center">
+                    <CalendarDays className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-black dark:text-white">Input Nilai</p>
-                    <p className="text-[10px] text-black dark:text-white/70 uppercase font-bold tracking-tight">TP, Tugas, & Ulangan</p>
+                    <p className="text-xs font-bold text-slate-800 dark:text-slate-200">Tidak ada jadwal hari ini</p>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
+                      Tidak ada jam tatap muka untuk hari {todayDayName}.
+                    </p>
                   </div>
                 </div>
-                <ArrowUpRight className="w-5 h-5 text-slate-400 group-hover:text-black dark:text-white/70 dark:group-hover:text-white transition-colors" />
-              </button>
+              ) : (
+                todaySchedules.map((s) => {
+                  const isDone = presensiList.some(
+                    (p) =>
+                      p.tanggal === todayDateStr &&
+                      p.kelas === s.class &&
+                      (p.namaMapel === s.subject || p.kodeMapel === s.kodeMapel)
+                  );
 
+                  return (
+                    <div
+                      key={s.id}
+                      className={`p-3 rounded-xl border transition-all flex flex-col gap-2 ${
+                        isSolid
+                          ? 'bg-[#F9FAFC] dark:bg-slate-800/80 border-gray-200 dark:border-slate-700 hover:border-violet-300 dark:hover:border-violet-600 shadow-sm'
+                          : 'bg-white/40 dark:bg-slate-900/40 backdrop-blur-md border-white/40 dark:border-slate-800 hover:border-violet-300'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="px-2 py-0.5 rounded-md bg-violet-100 dark:bg-violet-950 text-violet-700 dark:text-violet-300 text-[10px] font-bold font-mono">
+                            Jam {s.period}
+                          </span>
+                          <span className="text-[10px] font-semibold text-slate-600 dark:text-slate-300 font-mono flex items-center gap-1">
+                            <Clock className="w-3 h-3 text-slate-400" />
+                            {s.start} - {s.end}
+                          </span>
+                        </div>
+                        <span className="px-2 py-0.5 text-[10px] font-bold rounded-md bg-violet-50 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300 border border-violet-200/60 dark:border-violet-800/60">
+                          {s.class}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="min-w-0 pr-1">
+                          <div className="font-semibold text-slate-900 dark:text-white text-xs truncate">
+                            {s.subject}
+                          </div>
+                          <div className="flex items-center gap-1.5 text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
+                            <span className="flex items-center gap-0.5">
+                              <MapPin className="w-2.5 h-2.5" />
+                              {s.room || 'Kelas'}
+                            </span>
+                            <span>• {s.jpm} JPM</span>
+                          </div>
+                        </div>
+
+                        <div className="shrink-0">
+                          {isDone ? (
+                            <span className="px-2 py-1 rounded-lg text-[10px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                              <span>Presensi OK</span>
+                            </span>
+                          ) : (
+                            <button
+                              onClick={() => goToTab('presensi')}
+                              className="px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-violet-600 hover:bg-violet-700 text-white shadow-sm transition flex items-center gap-1 active:scale-95"
+                              title="Buka presensi kelas ini"
+                            >
+                              <ClipboardCheck className="w-3 h-3" />
+                              <span>Presensi</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            {/* Footer action */}
+            <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800">
               <button
-                onClick={() => goToTab('jurnal')}
-                className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all group text-left shadow-sm overflow-hidden ${
-                  isSolid
-                    ? 'bg-[#F9FAFC] hover:bg-slate-100 dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-gray-200 dark:border-slate-700'
-                    : 'bg-white/10 hover:bg-white/20 dark:bg-white/5 dark:hover:bg-white/10 border border-white/20'
-                }`}
+                onClick={() => goToTab('jadwal')}
+                className="w-full py-2 px-3 rounded-xl bg-violet-50 dark:bg-violet-950/50 hover:bg-violet-100 dark:hover:bg-violet-900/60 text-violet-700 dark:text-violet-300 font-semibold text-xs transition flex items-center justify-center gap-1.5"
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-teal-600 rounded-xl flex items-center justify-center text-white shadow-md shrink-0">
-                    <BookMarked className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-black dark:text-white">Jurnal Guru</p>
-                    <p className="text-[10px] text-black dark:text-white/70 uppercase font-bold tracking-tight">Catatan Pembelajaran</p>
-                  </div>
-                </div>
-                <ArrowUpRight className="w-5 h-5 text-slate-400 group-hover:text-black dark:text-white/70 dark:group-hover:text-white transition-colors" />
+                <Calendar className="w-3.5 h-3.5" />
+                <span>Lihat Jadwal Selengkapnya</span>
+                <ArrowRight className="w-3.5 h-3.5 ml-0.5" />
               </button>
             </div>
-          </div>
-
-          <div
-            onClick={() => goToTab('google_sheets')}
-            className="mt-6 p-5 bg-slate-900/90 text-white rounded-2xl cursor-pointer hover:bg-slate-800 transition-colors border border-white/20 overflow-hidden shadow-sm"
-          >
-            <div className="flex items-center justify-between">
-              <p className="text-xs font-bold">Sinkron Otomatis Google Sheets</p>
-              {autoSyncStatus === 'synced' && (
-                <span className="text-[10px] font-bold text-emerald-400 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-ping"></span>
-                  LIVE SYNC
-                </span>
-              )}
-              {autoSyncStatus === 'syncing' && (
-                <span className="text-[10px] font-bold text-violet-400 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce"></span>
-                  MENYIMPAN...
-                </span>
-              )}
-              {autoSyncStatus === 'unconfigured' && (
-                <span className="text-[10px] font-bold text-amber-400">
-                  SETUP URL SHEET
-                </span>
-              )}
-              {autoSyncStatus === 'error' && (
-                <span className="text-[10px] font-bold text-rose-400">
-                  KENDALA SYNC
-                </span>
-              )}
-            </div>
-            <p className="text-[10px] text-slate-400 mt-1">
-              {autoSyncStatus === 'synced'
-                ? `Terakhir disinkronkan otomatis ${lastSyncedTime ? `pukul ${lastSyncedTime}` : 'baru saja'}. Data dapat diakses real-time dari perangkat mana saja.`
-                : autoSyncStatus === 'syncing'
-                ? 'Sedang mengirim perubahan data ke Google Spreadsheet...'
-                : autoSyncStatus === 'unconfigured'
-                ? 'Klik untuk memasukkan URL Web App Google Apps Script agar data otomatis tersimpan di Cloud.'
-                : 'Klik untuk memeriksa pengaturan koneksi Google Apps Script.'}
-            </p>
           </div>
         </div>
       </div>
