@@ -371,6 +371,12 @@ export function App() {
         if (remoteData.presensiList && Array.isArray(remoteData.presensiList)) {
           setPresensiList(sanitizePresensiList(remoteData.presensiList));
         }
+        if (remoteData.scheduleList && Array.isArray(remoteData.scheduleList)) {
+          setScheduleList(remoteData.scheduleList);
+        }
+        if (remoteData.scheduleConfig) {
+          setScheduleConfig(remoteData.scheduleConfig);
+        }
         if (remoteData.nilaiList && Array.isArray(remoteData.nilaiList)) {
           setNilaiList(remoteData.nilaiList.map((n: NilaiRecord) => ({ ...n, tanggal: formatDateString(n.tanggal) })));
         }
@@ -469,6 +475,8 @@ export function App() {
         kelasList,
         siswaList,
         presensiList,
+        scheduleList,
+        scheduleConfig,
         nilaiList,
         jurnalList,
         appConfig: {
@@ -538,6 +546,8 @@ export function App() {
       kelasList,
       siswaList,
       presensiList,
+      scheduleList,
+      scheduleConfig,
       nilaiList,
       jurnalList,
     };
@@ -828,6 +838,8 @@ export function App() {
                       if (data.mapelList && data.mapelList.length > 0) setMapelList(data.mapelList);
                       if (data.kelasList && data.kelasList.length > 0) setKelasList(data.kelasList);
                       if (data.siswaList && data.siswaList.length > 0) setSiswaList(data.siswaList);
+                      if (data.scheduleList && data.scheduleList.length > 0) setScheduleList(data.scheduleList);
+                      if (data.scheduleConfig) setScheduleConfig(data.scheduleConfig);
                     }}
                     showToast={showToast}
                     autoSyncEnabled={autoSyncEnabled}

@@ -112,7 +112,7 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
     start: string;
     end: string;
     room: string;
-    jpm: number;
+    jpm: number | string;
     catatan: string;
   }>({
     day: 'Senin',
@@ -1408,11 +1408,8 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
                     <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
                       Mata Pelajaran
                     </label>
-                    <input
-                      type="text"
-                      list="mapel-options"
+                    <select
                       required
-                      placeholder="Contoh: Bahasa Inggris"
                       value={scheduleForm.subject}
                       onChange={(e) => {
                         const val = e.target.value;
@@ -1424,32 +1421,33 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
                         });
                       }}
                       className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-white rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-violet-500"
-                    />
-                    <datalist id="mapel-options">
+                    >
+                      <option value="" disabled>Pilih Mata Pelajaran</option>
                       {mapelList.map((m) => (
-                        <option key={m.id} value={m.namaMapel} />
+                        <option key={m.id} value={m.namaMapel}>
+                          {m.namaMapel}
+                        </option>
                       ))}
-                    </datalist>
+                    </select>
                   </div>
 
                   <div>
                     <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
                       Kelas
                     </label>
-                    <input
-                      type="text"
-                      list="kelas-options"
+                    <select
                       required
-                      placeholder="Contoh: X TKR 1"
                       value={scheduleForm.class}
                       onChange={(e) => setScheduleForm({ ...scheduleForm, class: e.target.value })}
                       className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-white rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-violet-500"
-                    />
-                    <datalist id="kelas-options">
+                    >
+                      <option value="" disabled>Pilih Kelas</option>
                       {kelasList.map((k) => (
-                        <option key={k.id} value={k.namaKelas} />
+                        <option key={k.id} value={k.namaKelas}>
+                          {k.namaKelas}
+                        </option>
                       ))}
-                    </datalist>
+                    </select>
                   </div>
                 </div>
 
@@ -1519,9 +1517,10 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
                       max={12}
                       required
                       value={scheduleForm.jpm}
-                      onChange={(e) =>
-                        setScheduleForm({ ...scheduleForm, jpm: parseInt(e.target.value, 10) || 2 })
-                      }
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setScheduleForm({ ...scheduleForm, jpm: val === '' ? '' : parseInt(val, 10) });
+                      }}
                       className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-white rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-violet-500"
                     />
                   </div>

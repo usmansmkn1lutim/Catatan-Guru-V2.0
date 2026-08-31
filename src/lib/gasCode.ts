@@ -202,6 +202,32 @@ function saveAppDataFull(data) {
       writeSheet(ss, "Jurnal Guru", ["ID", "Tanggal", "Kode Mapel", "Nama Mapel", "Kelas", "Jam Ke", "Pertemuan", "Materi Pembelajaran", "Tujuan Pembelajaran", "Proses Pembelajaran", "Catatan / Kendala", "Hadir", "Absen"], jurnalRows);
     }
 
+    // 9. Jadwal Settings
+    if (data.scheduleConfig) {
+      var sc = data.scheduleConfig;
+      var guruName = (data.profilGuru && data.profilGuru.namaGuru) ? data.profilGuru.namaGuru : "";
+      var status = "Aktif";
+      writeSheet(ss, "Jadwal_Settings", 
+        ["Nama Guru", "TahunAjaran", "Semester", "Sistem", "TanggalMulai", "Status"],
+        [[guruName, sc.academicYear||'', sc.semester||'', sc.systemType||'', sc.anchorDate||'', status]]
+      );
+    }
+
+    // 10. Jadwal Mengajar
+    if (data.scheduleList && Array.isArray(data.scheduleList)) {
+      var guruName = (data.profilGuru && data.profilGuru.namaGuru) ? data.profilGuru.namaGuru : "";
+      var sysType = data.scheduleConfig ? data.scheduleConfig.systemType : "REGULER";
+      var scheduleRows = data.scheduleList.map(function(s) {
+        return [
+          guruName, sysType, s.cycle||'Reguler', s.day||'', s.start||'', s.end||'', s.class||'', s.subject||'', s.room||''
+        ];
+      });
+      writeSheet(ss, "Jadwal_Mengajar", 
+        ["Nama Guru", "Sistem", "Siklus", "Hari", "JamMulai", "JamSelesai", "Kelas", "Mapel", "Ruang"], 
+        scheduleRows
+      );
+    }
+
     // Safe Backup to Config Sheet without cell length crashes
     try {
       var configSheet = ss.getSheetByName("Config");
@@ -374,6 +400,30 @@ function loadAppDataFull() {
       payload.jurnalList = jData.map(function(r) {
         return { id: String(r[0]), tanggal: cleanGasDate(r[1]), kodeMapel: String(r[2]), namaMapel: String(r[3]), kelas: String(r[4]), jamKe: String(r[5]), pertemuanKe: Number(r[6]||1), materiPembelajaran: String(r[7]), tujuanPembelajaran: String(r[8]), prosesPembelajaran: String(r[9]), catatanKendala: String(r[10]), jumlahHadir: Number(r[11]||0), jumlahTidakHadir: Number(r[12]||0) };
       });
+    }
+
+    // 9. Jadwal Settings
+    var sheetJadwalConfig = ss.getSheetByName("Jadwal_Settings");
+    if (sheetJadwalConfig && sheetJadwalConfig.getLastRow() >= 2) {
+      var jc = sheetJadwalConfig.getRange(2, 1, 1, 6).getValues()[0];
+      payload.scheduleConfig = {
+        academicYear: String(jc[1]||''), semester: String(jc[2]||''), systemType: String(jc[3]||'REGULER'), anchorDate: cleanGasDate(jc[4])
+      };
+    }
+
+    // 10. Jadwal Mengajar
+    var sheetJadwalList = ss.getSheetByName("Jadwal_Mengajar");
+    if (sheetJadwalList && sheetJadwalList.getLastRow() >= 2) {
+      var jlData = sheetJadwalList.getDataRange().getValues();
+      var scheduleList = [];
+      for (var i = 1; i < jlData.length; i++) {
+        var row = jlData[i];
+        if (!row[0] && !row[4]) continue;
+        scheduleList.push({
+          id: "gas_" + i, cycle: String(row[2]||'Reguler'), day: String(row[3]||''), start: String(row[4]||''), end: String(row[5]||''), class: String(row[6]||''), subject: String(row[7]||''), room: String(row[8]||'')
+        });
+      }
+      payload.scheduleList = scheduleList;
     }
 
     return payload;
