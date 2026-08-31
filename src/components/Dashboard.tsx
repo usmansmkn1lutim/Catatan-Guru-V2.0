@@ -407,7 +407,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
             </select>
           </div>
 
-          <div className="h-64 w-full pt-2">
+          <div className="h-96 w-full pt-2">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? "rgba(255, 255, 255, 0.15)" : "rgba(0, 0, 0, 0.15)"} />
