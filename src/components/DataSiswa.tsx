@@ -682,7 +682,7 @@ export const DataSiswaView: React.FC<DataSiswaProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Pie Chart */}
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-xl">
-                  <h4 className="text-xs font-bold text-violet-600 dark:text-violet-400 uppercase tracking-wider mb-2">
+                  <h4 className="text-xs font-bold text-black dark:text-violet-400 uppercase tracking-wider mb-2">
                     B. Statistik Kehadiran ({studentAttendanceStats?.percentage}% Hadir)
                   </h4>
                   <div className="h-48 w-full">
@@ -696,18 +696,21 @@ export const DataSiswaView: React.FC<DataSiswaProps> = ({
                             cx="50%"
                             cy="50%"
                             outerRadius={60}
-                            label
+                            label={{ fill: '#000000', fontSize: 11, fontWeight: 700 }}
                           >
                             {studentAttendanceStats.pieData.map((entry, index) => (
                               <Cell key={`cell-${index}`} fill={entry.color} />
                             ))}
                           </Pie>
                           <Tooltip />
-                          <Legend wrapperStyle={{ fontSize: '11px' }} />
+                          <Legend 
+                            wrapperStyle={{ fontSize: '11px' }}
+                            formatter={(value) => <span className="text-black dark:text-white font-medium">{value}</span>}
+                          />
                         </PieChart>
                       </ResponsiveContainer>
                     ) : (
-                      <div className="h-full flex items-center justify-center text-xs text-slate-400">
+                      <div className="h-full flex items-center justify-center text-xs text-black dark:text-slate-400">
                         Belum ada data presensi tercatat
                       </div>
                     )}
@@ -715,23 +718,23 @@ export const DataSiswaView: React.FC<DataSiswaProps> = ({
 
                   {/* Attendance status breakdown badges */}
                   <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-center gap-2">
-                    <span className="px-2.5 py-1 bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 rounded-full font-bold text-xs flex items-center space-x-1">
+                    <span className="px-2.5 py-1 bg-emerald-100 text-black dark:bg-emerald-950 dark:text-emerald-300 rounded-full font-bold text-xs flex items-center space-x-1 border border-emerald-300 dark:border-emerald-800">
                       <span>Hadir:</span>
                       <span>{studentAttendanceStats?.hadir || 0}</span>
                     </span>
-                    <span className="px-2.5 py-1 bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300 rounded-full font-bold text-xs flex items-center space-x-1">
+                    <span className="px-2.5 py-1 bg-amber-100 text-black dark:bg-amber-950 dark:text-amber-300 rounded-full font-bold text-xs flex items-center space-x-1 border border-amber-300 dark:border-amber-800">
                       <span>Terlambat:</span>
                       <span>{studentAttendanceStats?.terlambat || 0}</span>
                     </span>
-                    <span className="px-2.5 py-1 bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 rounded-full font-bold text-xs flex items-center space-x-1">
+                    <span className="px-2.5 py-1 bg-blue-100 text-black dark:bg-blue-950 dark:text-blue-300 rounded-full font-bold text-xs flex items-center space-x-1 border border-blue-300 dark:border-blue-800">
                       <span>Sakit:</span>
                       <span>{studentAttendanceStats?.sakit || 0}</span>
                     </span>
-                    <span className="px-2.5 py-1 bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300 rounded-full font-bold text-xs flex items-center space-x-1">
+                    <span className="px-2.5 py-1 bg-purple-100 text-black dark:bg-purple-950 dark:text-purple-300 rounded-full font-bold text-xs flex items-center space-x-1 border border-purple-300 dark:border-purple-800">
                       <span>Izin:</span>
                       <span>{studentAttendanceStats?.izin || 0}</span>
                     </span>
-                    <span className="px-2.5 py-1 bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 rounded-full font-bold text-xs flex items-center space-x-1">
+                    <span className="px-2.5 py-1 bg-rose-100 text-black dark:bg-rose-950 dark:text-rose-300 rounded-full font-bold text-xs flex items-center space-x-1 border border-rose-300 dark:border-rose-800">
                       <span>Alpha:</span>
                       <span>{studentAttendanceStats?.alpha || 0}</span>
                     </span>
@@ -740,7 +743,7 @@ export const DataSiswaView: React.FC<DataSiswaProps> = ({
 
                 {/* Section D: History List */}
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-xl space-y-3">
-                  <h4 className="text-xs font-bold text-violet-600 dark:text-violet-400 uppercase tracking-wider">
+                  <h4 className="text-xs font-bold text-black dark:text-violet-400 uppercase tracking-wider">
                     D. Riwayat Presensi Terbaru
                   </h4>
                   <div className="max-h-48 overflow-y-auto space-y-2 text-xs custom-scrollbar">

@@ -894,10 +894,10 @@ export function App() {
 
               {/* Footer Text */}
               <div className="mt-12 pt-6 border-t border-white/20 dark:border-white/10 flex flex-col items-center justify-center text-center space-y-1">
-                <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                  © 2026 Catatan Seorang Guru. Dibuat dengan ❤️ untuk Pendidik Indonesia
+                <p className="text-xs font-semibold text-black dark:text-white">
+                  © 2026 Teacheers. Dari guru untuk guru
                 </p>
-                <p className="text-[11px] font-medium text-slate-400 dark:text-slate-500">
+                <p className="text-[11px] font-medium text-black/70 dark:text-white/70">
                   Developed by Usman Abdullah
                 </p>
               </div>

@@ -74,11 +74,11 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-0 flex-1">
             {appConfig?.logoAplikasiUrl && (
-              <div className="flex shrink-0 items-center justify-start bg-transparent w-1/3">
+              <div className="flex shrink-0 items-center justify-start bg-transparent w-1/2 sm:w-2/5">
                 <img
                   src={appConfig.logoAplikasiUrl}
                   alt="Logo Aplikasi"
-                  className="w-full max-h-12 object-contain object-left"
+                  className="w-full max-h-[72px] object-contain object-left"
                 />
               </div>
             )}

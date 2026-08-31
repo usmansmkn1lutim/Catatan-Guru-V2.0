@@ -9,6 +9,7 @@ import {
 } from 'firebase/auth';
 import firebaseConfig from '../../firebase-applet-config.json';
 import {
+  AppConfig,
   DataSekolah,
   ProfilGuru,
   Mapel,

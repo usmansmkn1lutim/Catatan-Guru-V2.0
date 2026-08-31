@@ -59,10 +59,10 @@ export const AdministrasiMenu: React.FC<AdministrasiMenuProps> = ({ onNavigate }
             <Sparkles className="w-3.5 h-3.5" />
             <span>Master Data Pendidikan</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-black text-black dark:text-white tracking-tight">
             Menu Administrasi
           </h2>
-          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
+          <p className="text-xs sm:text-sm text-black dark:text-slate-400 font-medium">
             Kelola data pokok sekolah, profil pengampu, mata pelajaran, rombongan belajar, dan data siswa.
           </p>
         </div>
@@ -81,14 +81,14 @@ export const AdministrasiMenu: React.FC<AdministrasiMenuProps> = ({ onNavigate }
                 <div className={`p-3.5 rounded-2xl border ${menu.accentBg} shadow-sm group-hover:scale-110 transition-transform duration-300`}>
                   {menu.icon}
                 </div>
-                <span className="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                <span className="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-slate-100 dark:bg-slate-800 text-black dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                   {menu.badge}
                 </span>
               </div>
-              <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
+              <h3 className="text-base sm:text-lg font-bold text-black dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
                 {menu.label}
               </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-400 font-medium mt-2 leading-relaxed">
+              <p className="text-xs text-black dark:text-slate-400 font-medium mt-2 leading-relaxed">
                 {menu.desc}
               </p>
             </div>
