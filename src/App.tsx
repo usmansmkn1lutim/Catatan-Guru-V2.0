@@ -32,7 +32,13 @@ import {
   saveToStorage,
   saveAllAppDataToGas,
 } from './lib/storage';
-import { getStoredGasUrl, saveAppDataToGasUrl, loadAppDataFromGasUrl } from './lib/gasApi';
+import {
+  getStoredGasUrl,
+  saveAppDataToGasUrl,
+  loadAppDataFromGasUrl,
+  getJadwalMengajarFromGasUrl,
+  saveJadwalMengajarToGasUrl,
+} from './lib/gasApi';
 import { getAccessToken, exportToGoogleSheets, importFromGoogleSheets } from './lib/googleSheets';
 import { sanitizePresensiList, formatDateString } from './lib/dateUtils';
 import { CODE_GS_TEMPLATE, INDEX_HTML_TEMPLATE } from './lib/gasCode';
@@ -422,15 +428,64 @@ export function App() {
     }
   };
 
+  // Synchronize Jadwal Mengajar specifically via GAS Web App
+  const fetchJadwalMengajarFromGas = async (silent = true) => {
+    const gasUrl = getStoredGasUrl();
+    if (!gasUrl) return;
+
+    try {
+      const fetchedData = await getJadwalMengajarFromGasUrl(gasUrl);
+      if (fetchedData && Array.isArray(fetchedData)) {
+        setScheduleList(fetchedData);
+        saveToStorage('scheduleList', fetchedData);
+        if (!silent) {
+          showToast('Data Jadwal Mengajar berhasil diambil dari Google Sheets!', 'success');
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch Jadwal Mengajar from GAS:', err);
+      if (!silent) {
+        showToast('Gagal mengambil data Jadwal Mengajar dari Google Sheets.', 'error');
+      }
+    }
+  };
+
+  const handleSaveScheduleList = async (newList: JadwalRecord[]) => {
+    // 1. Optimistic UI update
+    setScheduleList(newList);
+
+    // 2. Save state to localStorage
+    saveToStorage('scheduleList', newList);
+
+    // 3. Send POST request to GAS Web App URL
+    const gasUrl = getStoredGasUrl();
+    if (gasUrl) {
+      try {
+        const res = await saveJadwalMengajarToGasUrl(gasUrl, newList);
+        if (res && res.status === 'success') {
+          const timeStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+          setAutoSyncStatus('synced');
+          setLastSyncedTime(timeStr);
+          localStorage.setItem('catatan_guru_last_synced_time', timeStr);
+        }
+      } catch (err: any) {
+        console.error('Error auto-syncing Jadwal Mengajar to GAS:', err);
+        showToast('Gagal menyinkronkan Jadwal Mengajar ke Google Sheets: ' + (err?.message || 'Error'), 'error');
+      }
+    }
+  };
+
   // Initial Boot & Window Focus Remote Sync
   useEffect(() => {
     handleFetchRemoteData(true);
+    fetchJadwalMengajarFromGas(true);
 
     const onFocus = () => {
       const gasUrl = getStoredGasUrl();
       const activeSheetId = localStorage.getItem('catatan_guru_active_sheet_id');
       if (gasUrl || activeSheetId) {
         handleFetchRemoteData(true);
+        fetchJadwalMengajarFromGas(true);
       }
     };
 
@@ -439,6 +494,13 @@ export function App() {
       window.removeEventListener('focus', onFocus);
     };
   }, []);
+
+  // Fetch Jadwal Mengajar when switching to 'jadwal' menu tab
+  useEffect(() => {
+    if (activeTab === 'jadwal') {
+      fetchJadwalMengajarFromGas(true);
+    }
+  }, [activeTab]);
 
   // Debounced Auto-Sync on state changes
   useEffect(() => {
@@ -550,21 +612,48 @@ export function App() {
       scheduleConfig,
       nilaiList,
       jurnalList,
+      appConfig: {
+        ...appConfig,
+        customBgImage,
+        customBgStyle,
+        customBgOpacity
+      },
     };
 
     try {
-      const res = await saveAllAppDataToGas(allPayload);
-      if (res.success) {
+      const gasUrl = getStoredGasUrl();
+      const activeSheetId = localStorage.getItem('catatan_guru_active_sheet_id');
+      const token = getAccessToken();
+
+      let success = false;
+      let msg = '';
+
+      if (gasUrl) {
+        const result = await saveAppDataToGasUrl(gasUrl, allPayload);
+        success = result.status === 'success';
+        msg = result.message || 'Berhasil disinkronkan ke Google Sheets via Apps Script';
+      } else if (activeSheetId && token) {
+        await exportToGoogleSheets(activeSheetId, token, allPayload);
+        success = true;
+        msg = 'Berhasil disinkronkan via OAuth';
+      } else {
+        const res = await saveAllAppDataToGas(allPayload);
+        success = res.success;
+        msg = res.message;
+      }
+
+      if (success) {
         const timeStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
         setAutoSyncStatus('synced');
         setLastSyncedTime(timeStr);
         localStorage.setItem('catatan_guru_last_synced_time', timeStr);
-        showToast(res.message, 'success');
+        showToast(msg, 'success');
       } else {
         showToast(`Sinkronisasi disimpan di penyimpanan lokal browser`, 'success');
       }
-    } catch (err) {
-      showToast('Terjadi kesalahan saat sinkronisasi', 'error');
+    } catch (err: any) {
+      console.error('Manual sync error:', err);
+      showToast(err.message || 'Terjadi kesalahan saat sinkronisasi', 'error');
     } finally {
       setIsSyncing(false);
     }
@@ -778,7 +867,7 @@ export function App() {
                     mapelList={mapelList}
                     presensiList={presensiList}
                     jurnalList={jurnalList}
-                    onSaveScheduleList={setScheduleList}
+                    onSaveScheduleList={handleSaveScheduleList}
                     onSaveScheduleConfig={setScheduleConfig}
                     onSavePresensiList={setPresensiList}
                     onSaveJurnalList={setJurnalList}

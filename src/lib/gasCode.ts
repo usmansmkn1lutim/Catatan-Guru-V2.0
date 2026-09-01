@@ -13,14 +13,19 @@ const CONFIG = {
 };
 
 function doGet(e) {
-  // If request contains REST action parameter (e.g. ?action=load or ?action=ping)
+  // If request contains REST action parameter (e.g. ?action=load or ?action=ping or ?action=getJadwalMengajar)
   if (e && e.parameter && e.parameter.action) {
-    if (e.parameter.action === 'ping') {
+    var act = e.parameter.action;
+    if (act === 'ping') {
       return responseJson({ status: 'success', message: 'Google Apps Script Web App Terhubung!' });
     }
-    if (e.parameter.action === 'load') {
+    if (act === 'load') {
       var data = loadAppDataFull();
       return responseJson({ status: 'success', data: data });
+    }
+    if (act === 'getJadwalMengajar') {
+      var scheduleData = getJadwalMengajar();
+      return responseJson({ status: 'success', data: scheduleData });
     }
   }
 
@@ -55,6 +60,17 @@ function doPost(e) {
       return responseJson({ status: "success", data: data });
     }
 
+    if (action === "getJadwalMengajar") {
+      var scheduleData = getJadwalMengajar();
+      return responseJson({ status: "success", data: scheduleData });
+    }
+
+    if (action === "saveJadwalMengajar") {
+      var scheduleList = contents.payload || contents.data || [];
+      var saveRes = saveJadwalMengajar(scheduleList, contents.guruName);
+      return responseJson(saveRes);
+    }
+
     return responseJson({ status: "error", message: "Aksi tidak dikenal: " + action });
   } catch (err) {
     return responseJson({ status: "error", message: err.toString() });
@@ -86,9 +102,11 @@ function writeSheet(ss, sheetName, headers, rowsData) {
       sheet.clearContents();
     }
 
+    var numCols = (headers && headers.length > 0) ? headers.length : (rowsData && rowsData[0] ? rowsData[0].length : 1);
+
     // Write Headers
     if (headers && headers.length > 0) {
-      sheet.getRange(1, 1, 1, headers.length).setValues([headers]).setFontWeight("bold").setBackground("#f1f5f9");
+      sheet.getRange(1, 1, 1, numCols).setValues([headers]).setFontWeight("bold").setBackground("#f1f5f9");
       sheet.setFrozenRows(1);
     }
 
@@ -96,8 +114,9 @@ function writeSheet(ss, sheetName, headers, rowsData) {
     if (rowsData && rowsData.length > 0) {
       // Clean rowsData: handle undefined/objects and strictly cap cell text length at 45000 chars (Google Sheets limit is 50000)
       var safeRows = rowsData.map(function(row) {
-        return row.map(function(val) {
-          if (val === undefined || val === null) return "";
+        var safeRow = [];
+        for (var c = 0; c < numCols; c++) {
+          var val = (row && row[c] !== undefined && row[c] !== null) ? row[c] : "";
           var str = "";
           if (typeof val === "object") {
             try { str = JSON.stringify(val); } catch (e) { str = String(val); }
@@ -107,13 +126,15 @@ function writeSheet(ss, sheetName, headers, rowsData) {
           if (str.length > 45000) {
             str = str.substring(0, 45000);
           }
-          return str;
-        });
+          safeRow.push(str);
+        }
+        return safeRow;
       });
-      sheet.getRange(2, 1, safeRows.length, headers.length).setValues(safeRows);
+      sheet.getRange(2, 1, safeRows.length, numCols).setValues(safeRows);
     }
   } catch (err) {
     console.error("Error writing sheet " + sheetName + ": " + err.toString());
+    throw new Error("Gagal menulis sheet '" + sheetName + "': " + err.toString());
   }
 }
 
@@ -203,30 +224,17 @@ function saveAppDataFull(data) {
     }
 
     // 9. Jadwal Settings
-    if (data.scheduleConfig) {
-      var sc = data.scheduleConfig;
-      var guruName = (data.profilGuru && data.profilGuru.namaGuru) ? data.profilGuru.namaGuru : "";
-      var status = "Aktif";
-      writeSheet(ss, "Jadwal_Settings", 
-        ["Nama Guru", "TahunAjaran", "Semester", "Sistem", "TanggalMulai", "Status"],
-        [[guruName, sc.academicYear||'', sc.semester||'', sc.systemType||'', sc.anchorDate||'', status]]
-      );
-    }
+    var sc = data.scheduleConfig || {};
+    var guruName = (data.profilGuru && data.profilGuru.namaGuru) ? data.profilGuru.namaGuru : "";
+    var status = "Aktif";
+    writeSheet(ss, "Jadwal_Settings", 
+      ["Nama Guru", "TahunAjaran", "Semester", "Sistem", "TanggalMulai", "Status"],
+      [[guruName, sc.academicYear||'', sc.semester||'', sc.systemType||'', sc.anchorDate||'', status]]
+    );
 
     // 10. Jadwal Mengajar
-    if (data.scheduleList && Array.isArray(data.scheduleList)) {
-      var guruName = (data.profilGuru && data.profilGuru.namaGuru) ? data.profilGuru.namaGuru : "";
-      var sysType = data.scheduleConfig ? data.scheduleConfig.systemType : "REGULER";
-      var scheduleRows = data.scheduleList.map(function(s) {
-        return [
-          guruName, sysType, s.cycle||'Reguler', s.day||'', s.start||'', s.end||'', s.class||'', s.subject||'', s.room||''
-        ];
-      });
-      writeSheet(ss, "Jadwal_Mengajar", 
-        ["Nama Guru", "Sistem", "Siklus", "Hari", "JamMulai", "JamSelesai", "Kelas", "Mapel", "Ruang"], 
-        scheduleRows
-      );
-    }
+    var scheduleListToSave = (data.scheduleList && Array.isArray(data.scheduleList)) ? data.scheduleList : [];
+    saveJadwalMengajar(scheduleListToSave, guruName);
 
     // Safe Backup to Config Sheet without cell length crashes
     try {
@@ -412,24 +420,113 @@ function loadAppDataFull() {
     }
 
     // 10. Jadwal Mengajar
-    var sheetJadwalList = ss.getSheetByName("Jadwal_Mengajar");
-    if (sheetJadwalList && sheetJadwalList.getLastRow() >= 2) {
-      var jlData = sheetJadwalList.getDataRange().getValues();
-      var scheduleList = [];
-      for (var i = 1; i < jlData.length; i++) {
-        var row = jlData[i];
-        if (!row[0] && !row[4]) continue;
-        scheduleList.push({
-          id: "gas_" + i, cycle: String(row[2]||'Reguler'), day: String(row[3]||''), start: String(row[4]||''), end: String(row[5]||''), class: String(row[6]||''), subject: String(row[7]||''), room: String(row[8]||'')
-        });
-      }
-      payload.scheduleList = scheduleList;
-    }
+    payload.scheduleList = getJadwalMengajar();
 
     return payload;
   } catch (err) {
     console.error("Error loading app data full: " + err.toString());
     return null;
+  }
+}
+
+function getJadwalMengajar() {
+  try {
+    var ss = getSpreadsheet();
+    var sheet = ss.getSheetByName("Jadwal_Mengajar");
+    if (!sheet || sheet.getLastRow() < 2) {
+      return [];
+    }
+    var rows = sheet.getDataRange().getValues();
+    var scheduleList = [];
+    var headerRow = rows[0] || [];
+    var isNewFormat = String(headerRow[0] || '').toUpperCase() === "ID";
+
+    for (var i = 1; i < rows.length; i++) {
+      var r = rows[i];
+      if (!r || r.length === 0) continue;
+      var hasVal = false;
+      for (var col = 0; col < r.length; col++) {
+        if (r[col] !== undefined && r[col] !== null && String(r[col]).trim() !== '') {
+          hasVal = true;
+          break;
+        }
+      }
+      if (!hasVal) continue;
+
+      if (isNewFormat || r.length >= 10) {
+        scheduleList.push({
+          id: String(r[0] || ("gas_" + i)),
+          cycle: String(r[3] || 'Reguler'),
+          day: String(r[4] || ''),
+          period: String(r[5] || ''),
+          start: String(r[6] || ''),
+          end: String(r[7] || ''),
+          class: String(r[8] || ''),
+          kodeMapel: String(r[9] || ''),
+          subject: String(r[10] || ''),
+          room: String(r[11] || ''),
+          jpm: Number(r[12] || 2),
+          catatan: String(r[13] || '')
+        });
+      } else {
+        // Legacy 9 columns format
+        scheduleList.push({
+          id: "gas_" + i,
+          cycle: String(r[2] || 'Reguler'),
+          day: String(r[3] || ''),
+          period: "1 - 2",
+          start: String(r[4] || ''),
+          end: String(r[5] || ''),
+          class: String(r[6] || ''),
+          subject: String(r[7] || ''),
+          room: String(r[8] || ''),
+          jpm: 2,
+          catatan: ''
+        });
+      }
+    }
+    return scheduleList;
+  } catch (err) {
+    console.error("Error getJadwalMengajar: " + err.toString());
+    return [];
+  }
+}
+
+function saveJadwalMengajar(scheduleList, guruName) {
+  var lock = LockService.getScriptLock();
+  try { lock.tryLock(10000); } catch (lErr) {}
+  try {
+    var ss = getSpreadsheet();
+    var gName = guruName || "";
+    if (!gName) {
+      var sheetGuru = ss.getSheetByName("Profil_Guru") || ss.getSheetByName("Profil Guru");
+      if (sheetGuru && sheetGuru.getLastRow() >= 2) {
+        gName = String(sheetGuru.getRange(2, 2).getValue() || '');
+      }
+    }
+    var headers = ["ID", "Nama Guru", "Sistem", "Siklus", "Hari", "Jam Ke", "Jam Mulai", "Jam Selesai", "Kelas", "Kode Mapel", "Nama Mapel", "Ruang", "JPM", "Catatan"];
+    var scheduleRows = (scheduleList || []).map(function(s) {
+      return [
+        s.id || '',
+        gName,
+        'REGULER',
+        s.cycle || 'Reguler',
+        s.day || '',
+        s.period || '',
+        s.start || '',
+        s.end || '',
+        s.class || '',
+        s.kodeMapel || '',
+        s.subject || '',
+        s.room || '',
+        s.jpm !== undefined && s.jpm !== null ? s.jpm : 2,
+        s.catatan || ''
+      ];
+    });
+    writeSheet(ss, "Jadwal_Mengajar", headers, scheduleRows);
+    return { status: "success", message: "Jadwal Mengajar berhasil disimpan di Google Sheets!" };
+  } catch (err) {
+    return { status: "error", message: err.toString() };
   }
 }
 

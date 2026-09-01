@@ -137,6 +137,8 @@ export async function createSpreadsheet(accessToken: string, title: string): Pro
         { properties: { title: 'Data_Presensi' } },
         { properties: { title: 'Data_Nilai' } },
         { properties: { title: 'Data_Jurnal' } },
+        { properties: { title: 'Jadwal_Settings' } },
+        { properties: { title: 'Jadwal_Mengajar' } },
       ],
     };
 
@@ -177,11 +179,32 @@ export async function exportToGoogleSheets(
     kelasList: Kelas[];
     siswaList: Siswa[];
     presensiList: PresensiRecord[];
+    scheduleList?: any[];
+    scheduleConfig?: any;
     nilaiList: NilaiRecord[];
     jurnalList: JurnalRecord[];
   }
 ) {
   try {
+    // 0. Ensure all required sheets exist
+    const requiredSheets = ['Data_Sekolah', 'Profil_Guru', 'Data_Mapel', 'Data_Kelas', 'Data_Siswa', 'Data_Presensi', 'Data_Nilai', 'Data_Jurnal', 'Jadwal_Settings', 'Jadwal_Mengajar'];
+    const metaRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}`, {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+    if (metaRes.ok) {
+      const metaData = await metaRes.json();
+      const existingTitles = metaData.sheets.map((s: any) => s.properties.title);
+      const missingSheets = requiredSheets.filter(title => !existingTitles.includes(title));
+      if (missingSheets.length > 0) {
+        const addSheetRequests = missingSheets.map(title => ({ addSheet: { properties: { title } } }));
+        await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}:batchUpdate`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ requests: addSheetRequests })
+        });
+      }
+    }
+
     // 1. Prepare sheet data rows
     const dataSekolahRows = [
       ['KEY', 'VALUE'],
@@ -298,6 +321,33 @@ export async function exportToGoogleSheets(
       ]),
     ];
 
+    const jadwalSettingsRows = [
+      ['Nama Guru', 'TahunAjaran', 'Semester', 'Sistem', 'TanggalMulai', 'Status'],
+      [
+        data.profilGuru.namaGuru,
+        data.scheduleConfig?.academicYear || '',
+        data.scheduleConfig?.semester || '',
+        data.scheduleConfig?.systemType || '',
+        data.scheduleConfig?.anchorDate || '',
+        'Aktif',
+      ],
+    ];
+
+    const jadwalMengajarRows = [
+      ['Nama Guru', 'Sistem', 'Siklus', 'Hari', 'JamMulai', 'JamSelesai', 'Kelas', 'Mapel', 'Ruang'],
+      ...(data.scheduleList || []).map((s) => [
+        data.profilGuru.namaGuru,
+        data.scheduleConfig?.systemType || 'REGULER',
+        s.cycle || 'Reguler',
+        s.day || '',
+        s.start || '',
+        s.end || '',
+        s.class || '',
+        s.subject || '',
+        s.room || '',
+      ]),
+    ];
+
     const payload = {
       valueInputOption: 'USER_ENTERED',
       data: [
@@ -309,6 +359,8 @@ export async function exportToGoogleSheets(
         { range: 'Data_Presensi!A1', values: presensiRows },
         { range: 'Data_Nilai!A1', values: nilaiRows },
         { range: 'Data_Jurnal!A1', values: jurnalRows },
+        { range: 'Jadwal_Settings!A1', values: jadwalSettingsRows },
+        { range: 'Jadwal_Mengajar!A1', values: jadwalMengajarRows },
       ],
     };
 
@@ -345,6 +397,8 @@ export async function importFromGoogleSheets(spreadsheetId: string, accessToken:
       'Data_Mapel!A2:H100',
       'Data_Kelas!A2:D100',
       'Data_Siswa!A2:K500',
+      'Jadwal_Settings!A2:F2',
+      'Jadwal_Mengajar!A2:I1000',
     ];
 
     const rangesQuery = ranges.map((r) => `ranges=${encodeURIComponent(r)}`).join('&');
@@ -414,6 +468,32 @@ export async function importFromGoogleSheets(spreadsheetId: string, accessToken:
       kontakOrangTua: r[10] || '',
     }));
 
+    // Parse Jadwal Settings
+    const scheduleConfigValues = valueRanges[5]?.values || [];
+    let scheduleConfig: any = null;
+    if (scheduleConfigValues.length > 0) {
+      const r = scheduleConfigValues[0];
+      scheduleConfig = {
+        academicYear: r[1] || '',
+        semester: r[2] || 'Ganjil',
+        systemType: r[3] || 'REGULER',
+        anchorDate: r[4] || '',
+      };
+    }
+
+    // Parse Jadwal Mengajar
+    const scheduleListValues = valueRanges[6]?.values || [];
+    const scheduleList: any[] = scheduleListValues.map((r: string[], idx: number) => ({
+      id: `gas_${idx}`,
+      cycle: r[2] || 'Reguler',
+      day: r[3] || '',
+      start: r[4] || '',
+      end: r[5] || '',
+      class: r[6] || '',
+      subject: r[7] || '',
+      room: r[8] || '',
+    })).filter(s => s.subject && s.class);
+
     return {
       dataSekolah: Object.keys(dsObj).length > 0 ? {
         npsn: dsObj['NPSN'] || '',
@@ -453,6 +533,8 @@ export async function importFromGoogleSheets(spreadsheetId: string, accessToken:
       mapelList: mapelList.filter((m) => m.namaMapel),
       kelasList: kelasList.filter((k) => k.namaKelas),
       siswaList: siswaList.filter((s) => s.namaLengkap),
+      scheduleList: scheduleList.length > 0 ? scheduleList : null,
+      scheduleConfig: scheduleConfig,
     };
   } catch (err: any) {
     console.error('Error importFromGoogleSheets:', err);

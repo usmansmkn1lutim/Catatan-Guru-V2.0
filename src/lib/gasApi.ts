@@ -165,3 +165,49 @@ export async function loadAppDataFromGasUrl(url: string): Promise<GasSyncPayload
   }
   return null;
 }
+
+/**
+ * Membaca data Jadwal Mengajar khusus dari Google Spreadsheet via GAS Web App
+ */
+export async function getJadwalMengajarFromGasUrl(url: string): Promise<any[] | null> {
+  const trimmedUrl = url ? url.trim() : '';
+  if (!trimmedUrl) return null;
+
+  // 1. Coba request via GET dengan parameter ?action=getJadwalMengajar
+  try {
+    const fetchUrl = trimmedUrl + (trimmedUrl.includes('?') ? '&' : '?') + 'action=getJadwalMengajar';
+    const res = await fetch(fetchUrl, { method: 'GET', redirect: 'follow' });
+    if (res.ok) {
+      const text = await res.text();
+      const json = JSON.parse(text);
+      if (json && json.status === 'success' && Array.isArray(json.data)) {
+        return json.data;
+      }
+    }
+  } catch (e) {
+    console.warn('GET getJadwalMengajar failed, attempting POST:', e);
+  }
+
+  // 2. Fallback via POST callGasEndpoint
+  try {
+    const result = await callGasEndpoint(trimmedUrl, { action: 'getJadwalMengajar' });
+    if (result && result.status === 'success' && Array.isArray(result.data)) {
+      return result.data;
+    }
+  } catch (e) {
+    console.error('POST getJadwalMengajar failed:', e);
+  }
+
+  return null;
+}
+
+/**
+ * Menyimpan data Jadwal Mengajar ke Google Spreadsheet via GAS Web App
+ */
+export async function saveJadwalMengajarToGasUrl(url: string, payload: any[]): Promise<any> {
+  return await callGasEndpoint(url, {
+    action: 'saveJadwalMengajar',
+    payload: payload,
+  });
+}
+
