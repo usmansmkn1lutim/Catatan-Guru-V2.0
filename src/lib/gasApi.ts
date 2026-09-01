@@ -12,6 +12,8 @@ export interface GasSyncPayload {
   presensiList?: any[];
   nilaiList?: any[];
   jurnalList?: any[];
+  scheduleList?: any[];
+  scheduleConfig?: any;
   appConfig?: any;
 }
 
@@ -179,23 +181,33 @@ export async function getJadwalMengajarFromGasUrl(url: string): Promise<any[] | 
     const res = await fetch(fetchUrl, { method: 'GET', redirect: 'follow' });
     if (res.ok) {
       const text = await res.text();
-      const json = JSON.parse(text);
+      let json: any;
+      try { json = JSON.parse(text); } catch (e) {}
       if (json && json.status === 'success' && Array.isArray(json.data)) {
         return json.data;
       }
     }
   } catch (e) {
-    console.warn('GET getJadwalMengajar failed, attempting POST:', e);
+    // Silent fallback
   }
 
-  // 2. Fallback via POST callGasEndpoint
+  // 2. Coba via POST action getJadwalMengajar
   try {
     const result = await callGasEndpoint(trimmedUrl, { action: 'getJadwalMengajar' });
     if (result && result.status === 'success' && Array.isArray(result.data)) {
       return result.data;
     }
-  } catch (e) {
-    console.error('POST getJadwalMengajar failed:', e);
+  } catch (e: any) {
+    // 3. Graceful Fallback: Jika script GAS di deployment lama belum memiliki action 'getJadwalMengajar',
+    // gunakan action 'load' standar yang sudah didukung versi lama.
+    try {
+      const fullData = await loadAppDataFromGasUrl(trimmedUrl);
+      if (fullData && Array.isArray((fullData as any).scheduleList)) {
+        return (fullData as any).scheduleList;
+      }
+    } catch (fallbackErr) {
+      console.warn('Fallback loadAppDataFromGasUrl for Jadwal Mengajar failed:', fallbackErr);
+    }
   }
 
   return null;
@@ -205,9 +217,18 @@ export async function getJadwalMengajarFromGasUrl(url: string): Promise<any[] | 
  * Menyimpan data Jadwal Mengajar ke Google Spreadsheet via GAS Web App
  */
 export async function saveJadwalMengajarToGasUrl(url: string, payload: any[]): Promise<any> {
-  return await callGasEndpoint(url, {
-    action: 'saveJadwalMengajar',
-    payload: payload,
-  });
+  try {
+    return await callGasEndpoint(url, {
+      action: 'saveJadwalMengajar',
+      payload: payload,
+    });
+  } catch (err: any) {
+    const msg = String(err?.message || err);
+    // Jika deployment versi lama belum mendukung action saveJadwalMengajar, fallback ke action 'save'
+    if (msg.includes('Aksi tidak dikenal')) {
+      return await saveAppDataToGasUrl(url, { scheduleList: payload });
+    }
+    throw err;
+  }
 }
 

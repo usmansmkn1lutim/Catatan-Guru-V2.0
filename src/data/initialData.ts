@@ -363,6 +363,22 @@ export const initialScheduleConfig: ScheduleConfig = {
   activeDays: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'],
 };
 
+export function sanitizeScheduleConfig(config?: any): ScheduleConfig {
+  if (!config || typeof config !== 'object') {
+    return { ...initialScheduleConfig };
+  }
+  return {
+    systemType: config.systemType === 'REGULER' ? 'REGULER' : 'BLOK',
+    academicYear: config.academicYear || '2026/2027',
+    semester: config.semester === 'Genap' ? 'Genap' : 'Ganjil',
+    anchorDate: config.anchorDate || '2026-07-13',
+    cyclePattern: config.cyclePattern === 'B_FIRST' ? 'B_FIRST' : 'A_FIRST',
+    activeDays: Array.isArray(config.activeDays) && config.activeDays.length > 0
+      ? config.activeDays
+      : ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'],
+  };
+}
+
 export const initialScheduleList: JadwalRecord[] = [
   { id: 'sched-1', cycle: 'A', day: 'Senin', period: '1 - 2', start: '07:15', end: '08:45', subject: 'Bahasa Inggris', kodeMapel: 'BING-X', class: 'X IPA 1', room: 'Ruang 3', jpm: 2 },
   { id: 'sched-2', cycle: 'A', day: 'Senin', period: '3 - 4', start: '10:00', end: '11:30', subject: 'Informatika & Koding X', kodeMapel: 'INFOR-X', class: 'X IPA 2', room: 'Lab Komputer', jpm: 2 },

@@ -41,6 +41,7 @@ import {
   Check,
 } from 'lucide-react';
 import { formatDateString } from '../lib/dateUtils';
+import { sanitizeScheduleConfig } from '../data/initialData';
 
 interface JadwalMengajarProps {
   scheduleList: JadwalRecord[];
@@ -97,7 +98,7 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
   // Modals state
   const [isWizardOpen, setIsWizardOpen] = useState<boolean>(false);
   const [wizardStep, setWizardStep] = useState<number>(1);
-  const [tempConfig, setTempConfig] = useState<ScheduleConfig>({ ...scheduleConfig });
+  const [tempConfig, setTempConfig] = useState<ScheduleConfig>(() => sanitizeScheduleConfig(scheduleConfig));
 
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState<boolean>(false);
   const [editingSchedule, setEditingSchedule] = useState<JadwalRecord | null>(null);
@@ -396,13 +397,14 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
 
   // Wizard handlers
   const openWizard = () => {
-    setTempConfig({ ...scheduleConfig });
+    setTempConfig(sanitizeScheduleConfig(scheduleConfig));
     setWizardStep(1);
     setIsWizardOpen(true);
   };
 
   const finishWizardSetup = () => {
-    onSaveScheduleConfig(tempConfig);
+    const sanitized = sanitizeScheduleConfig(tempConfig);
+    onSaveScheduleConfig(sanitized);
     setIsWizardOpen(false);
     showToast('Konfigurasi sistem jadwal mengajar berhasil diperbarui!', 'success');
   };
@@ -705,7 +707,7 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
 
             {/* Timeline Cards Container */}
             <div className="space-y-4">
-              {currentDayName === ('Minggu' as any) || (currentDayName === 'Sabtu' && !scheduleConfig.activeDays.includes('Sabtu')) ? (
+              {currentDayName === ('Minggu' as any) || (currentDayName === 'Sabtu' && !(scheduleConfig?.activeDays || ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat']).includes('Sabtu')) ? (
                 <div className="p-12 text-center bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 font-medium space-y-2">
                   <Clock className="w-10 h-10 text-slate-400 dark:text-slate-500 mx-auto" />
                   <p className="font-bold text-sm text-slate-800 dark:text-slate-200">
@@ -895,7 +897,7 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
                 <thead>
                   <tr className="text-xs font-semibold text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-700">
                     {(['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'] as ScheduleDay[])
-                      .filter((d) => d !== 'Sabtu' || scheduleConfig.activeDays.includes('Sabtu'))
+                      .filter((d) => d !== 'Sabtu' || (scheduleConfig?.activeDays || ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat']).includes('Sabtu'))
                       .map((d) => (
                         <th key={d} className="py-3 px-3 text-center border-r last:border-r-0 border-slate-200 dark:border-slate-700">
                           {d}
@@ -906,7 +908,7 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
                   <tr className="align-top divide-x divide-slate-200 dark:divide-slate-700">
                     {(['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'] as ScheduleDay[])
-                      .filter((d) => d !== 'Sabtu' || scheduleConfig.activeDays.includes('Sabtu'))
+                      .filter((d) => d !== 'Sabtu' || (scheduleConfig?.activeDays || ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat']).includes('Sabtu'))
                       .map((day) => {
                         const targetCycle =
                           scheduleConfig.systemType === 'REGULER' ? 'Reguler' : activeWeeklyBlockTab;
@@ -1102,16 +1104,16 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
             className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 sm:p-6 overflow-y-auto"
             style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh' }}
           >
-            <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800 relative overflow-hidden my-auto">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full p-5 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800 relative overflow-y-auto max-h-[92vh] my-auto">
               <button
                 onClick={() => setIsWizardOpen(false)}
-                className="absolute top-5 right-5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1"
+                className="absolute top-5 right-5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
               >
                 <X className="w-5 h-5" />
               </button>
 
-              <div className="text-center space-y-1 mb-6">
-                <h3 className="text-xl font-black text-slate-900 dark:text-white">
+              <div className="text-center space-y-1 mb-6 pr-6">
+                <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white">
                   SETUP SISTEM JADWAL MENGAJAR
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -1138,13 +1140,14 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
                 <div className="space-y-5">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Option REGULER */}
-                    <div
+                    <button
+                      type="button"
                       onClick={() => {
-                        setTempConfig({ ...tempConfig, systemType: 'REGULER' });
+                        setTempConfig(prev => sanitizeScheduleConfig({ ...prev, systemType: 'REGULER' }));
                         setWizardStep(2);
                       }}
-                      className={`border-2 rounded-2xl p-5 cursor-pointer transition flex flex-col justify-between space-y-3 group ${
-                        tempConfig.systemType === 'REGULER'
+                      className={`text-left border-2 rounded-2xl p-4 sm:p-5 cursor-pointer transition flex flex-col justify-between space-y-3 group ${
+                        (tempConfig?.systemType || 'REGULER') === 'REGULER'
                           ? 'border-violet-600 bg-violet-50/50 dark:bg-violet-950/30'
                           : 'border-slate-200 dark:border-slate-700 hover:border-violet-400 bg-white dark:bg-slate-800'
                       }`}
@@ -1164,16 +1167,17 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
                         <span>Pilih Reguler</span>
                         <ArrowRight className="w-3.5 h-3.5" />
                       </span>
-                    </div>
+                    </button>
 
                     {/* Option BLOK */}
-                    <div
+                    <button
+                      type="button"
                       onClick={() => {
-                        setTempConfig({ ...tempConfig, systemType: 'BLOK' });
+                        setTempConfig(prev => sanitizeScheduleConfig({ ...prev, systemType: 'BLOK' }));
                         setWizardStep(2);
                       }}
-                      className={`border-2 rounded-2xl p-5 cursor-pointer transition flex flex-col justify-between space-y-3 group ${
-                        tempConfig.systemType === 'BLOK'
+                      className={`text-left border-2 rounded-2xl p-4 sm:p-5 cursor-pointer transition flex flex-col justify-between space-y-3 group ${
+                        tempConfig?.systemType === 'BLOK'
                           ? 'border-violet-600 bg-violet-50/50 dark:bg-violet-950/30'
                           : 'border-slate-200 dark:border-slate-700 hover:border-violet-400 bg-white dark:bg-slate-800'
                       }`}
@@ -1193,7 +1197,7 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
                         <span>Pilih Sistem Blok</span>
                         <ArrowRight className="w-3.5 h-3.5" />
                       </span>
-                    </div>
+                    </button>
                   </div>
 
                   <div className="p-3.5 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-200/80 dark:border-amber-800/60 text-[11px] text-amber-800 dark:text-amber-300 flex items-center space-x-2">
@@ -1214,8 +1218,8 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
                         Tahun Ajaran
                       </label>
                       <select
-                        value={tempConfig.academicYear}
-                        onChange={(e) => setTempConfig({ ...tempConfig, academicYear: e.target.value })}
+                        value={tempConfig?.academicYear || '2026/2027'}
+                        onChange={(e) => setTempConfig(prev => ({ ...sanitizeScheduleConfig(prev), academicYear: e.target.value }))}
                         className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 dark:text-white"
                       >
                         <option value="2025/2026">2025/2026</option>
@@ -1228,9 +1232,9 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
                         Semester
                       </label>
                       <select
-                        value={tempConfig.semester}
+                        value={tempConfig?.semester || 'Ganjil'}
                         onChange={(e) =>
-                          setTempConfig({ ...tempConfig, semester: e.target.value as 'Ganjil' | 'Genap' })
+                          setTempConfig(prev => ({ ...sanitizeScheduleConfig(prev), semester: e.target.value as 'Ganjil' | 'Genap' }))
                         }
                         className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 dark:text-white"
                       >
@@ -1241,7 +1245,7 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
                   </div>
 
                   {/* Fields for BLOK SYSTEM */}
-                  {tempConfig.systemType === 'BLOK' && (
+                  {tempConfig?.systemType === 'BLOK' && (
                     <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-800">
                       <div>
                         <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
@@ -1249,8 +1253,8 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
                         </label>
                         <input
                           type="date"
-                          value={tempConfig.anchorDate}
-                          onChange={(e) => setTempConfig({ ...tempConfig, anchorDate: e.target.value })}
+                          value={tempConfig?.anchorDate || '2026-07-13'}
+                          onChange={(e) => setTempConfig(prev => ({ ...sanitizeScheduleConfig(prev), anchorDate: e.target.value }))}
                           className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 dark:text-white"
                         />
                         <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
@@ -1263,12 +1267,12 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
                           Pola Awal Rotasi
                         </label>
                         <select
-                          value={tempConfig.cyclePattern}
+                          value={tempConfig?.cyclePattern || 'A_FIRST'}
                           onChange={(e) =>
-                            setTempConfig({
-                              ...tempConfig,
+                            setTempConfig(prev => ({
+                              ...sanitizeScheduleConfig(prev),
                               cyclePattern: e.target.value as 'A_FIRST' | 'B_FIRST',
-                            })
+                            }))
                           }
                           className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 dark:text-white"
                         >
@@ -1297,18 +1301,19 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
                       <label className="flex items-center space-x-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-3 py-1.5 rounded-xl cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700">
                         <input
                           type="checkbox"
-                          checked={tempConfig.activeDays.includes('Sabtu')}
+                          checked={(tempConfig?.activeDays || ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat']).includes('Sabtu')}
                           onChange={(e) => {
+                            const currentActiveDays = tempConfig?.activeDays || ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
                             if (e.target.checked) {
-                              setTempConfig({
-                                ...tempConfig,
-                                activeDays: [...tempConfig.activeDays, 'Sabtu'],
-                              });
+                              setTempConfig(prev => ({
+                                ...sanitizeScheduleConfig(prev),
+                                activeDays: currentActiveDays.includes('Sabtu') ? currentActiveDays : [...currentActiveDays, 'Sabtu'],
+                              }));
                             } else {
-                              setTempConfig({
-                                ...tempConfig,
-                                activeDays: tempConfig.activeDays.filter((d) => d !== 'Sabtu'),
-                              });
+                              setTempConfig(prev => ({
+                                ...sanitizeScheduleConfig(prev),
+                                activeDays: currentActiveDays.filter((d) => d !== 'Sabtu'),
+                              }));
                             }
                           }}
                           className="rounded text-violet-600"

@@ -25,6 +25,7 @@ import {
   initialJurnalList,
   initialScheduleList,
   initialScheduleConfig,
+  sanitizeScheduleConfig,
   DEFAULT_APP_LOGO,
 } from './data/initialData';
 import {
@@ -212,7 +213,7 @@ export function App() {
     loadFromStorage('scheduleList', initialScheduleList)
   );
   const [scheduleConfig, setScheduleConfig] = useState<ScheduleConfig>(() =>
-    loadFromStorage('scheduleConfig', initialScheduleConfig)
+    sanitizeScheduleConfig(loadFromStorage('scheduleConfig', initialScheduleConfig))
   );
   const [nilaiList, setNilaiList] = useState<NilaiRecord[]>(() =>
     loadFromStorage('nilaiList', initialNilaiList).map((n: NilaiRecord) => ({ ...n, tanggal: formatDateString(n.tanggal) }))
@@ -381,7 +382,7 @@ export function App() {
           setScheduleList(remoteData.scheduleList);
         }
         if (remoteData.scheduleConfig) {
-          setScheduleConfig(remoteData.scheduleConfig);
+          setScheduleConfig(sanitizeScheduleConfig(remoteData.scheduleConfig));
         }
         if (remoteData.nilaiList && Array.isArray(remoteData.nilaiList)) {
           setNilaiList(remoteData.nilaiList.map((n: NilaiRecord) => ({ ...n, tanggal: formatDateString(n.tanggal) })));
@@ -928,7 +929,7 @@ export function App() {
                       if (data.kelasList && data.kelasList.length > 0) setKelasList(data.kelasList);
                       if (data.siswaList && data.siswaList.length > 0) setSiswaList(data.siswaList);
                       if (data.scheduleList && data.scheduleList.length > 0) setScheduleList(data.scheduleList);
-                      if (data.scheduleConfig) setScheduleConfig(data.scheduleConfig);
+                      if (data.scheduleConfig) setScheduleConfig(sanitizeScheduleConfig(data.scheduleConfig));
                     }}
                     showToast={showToast}
                     autoSyncEnabled={autoSyncEnabled}
