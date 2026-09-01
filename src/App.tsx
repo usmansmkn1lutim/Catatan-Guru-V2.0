@@ -41,7 +41,7 @@ import {
   saveJadwalMengajarToGasUrl,
 } from './lib/gasApi';
 import { getAccessToken, exportToGoogleSheets, importFromGoogleSheets } from './lib/googleSheets';
-import { sanitizePresensiList, formatDateString } from './lib/dateUtils';
+import { sanitizePresensiList, sanitizeScheduleList, formatDateString } from './lib/dateUtils';
 import { CODE_GS_TEMPLATE, INDEX_HTML_TEMPLATE } from './lib/gasCode';
 import { updateDynamicFavicons } from './lib/faviconUtils';
 
@@ -210,7 +210,7 @@ export function App() {
     sanitizePresensiList(loadFromStorage('presensiList', initialPresensiList))
   );
   const [scheduleList, setScheduleList] = useState<JadwalRecord[]>(() =>
-    loadFromStorage('scheduleList', initialScheduleList)
+    sanitizeScheduleList(loadFromStorage('scheduleList', initialScheduleList))
   );
   const [scheduleConfig, setScheduleConfig] = useState<ScheduleConfig>(() =>
     sanitizeScheduleConfig(loadFromStorage('scheduleConfig', initialScheduleConfig))
@@ -379,7 +379,7 @@ export function App() {
           setPresensiList(sanitizePresensiList(remoteData.presensiList));
         }
         if (remoteData.scheduleList && Array.isArray(remoteData.scheduleList)) {
-          setScheduleList(remoteData.scheduleList);
+          setScheduleList(sanitizeScheduleList(remoteData.scheduleList));
         }
         if (remoteData.scheduleConfig) {
           setScheduleConfig(sanitizeScheduleConfig(remoteData.scheduleConfig));
@@ -928,7 +928,7 @@ export function App() {
                       if (data.mapelList && data.mapelList.length > 0) setMapelList(data.mapelList);
                       if (data.kelasList && data.kelasList.length > 0) setKelasList(data.kelasList);
                       if (data.siswaList && data.siswaList.length > 0) setSiswaList(data.siswaList);
-                      if (data.scheduleList && data.scheduleList.length > 0) setScheduleList(data.scheduleList);
+                      if (data.scheduleList && data.scheduleList.length > 0) setScheduleList(sanitizeScheduleList(data.scheduleList));
                       if (data.scheduleConfig) setScheduleConfig(sanitizeScheduleConfig(data.scheduleConfig));
                     }}
                     showToast={showToast}

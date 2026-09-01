@@ -40,7 +40,7 @@ import {
   ArrowRight,
   Check,
 } from 'lucide-react';
-import { formatDateString } from '../lib/dateUtils';
+import { formatDateString, formatTimeString } from '../lib/dateUtils';
 import { sanitizeScheduleConfig } from '../data/initialData';
 
 interface JadwalMengajarProps {
@@ -478,7 +478,7 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
       kodeMapel: schedule.kodeMapel || schedule.subject,
       namaMapel: schedule.subject,
       kelas: schedule.class,
-      jamKe: `Jam ${schedule.period} (${schedule.start} - ${schedule.end})`,
+      jamKe: `Jam ${schedule.period} (${formatTimeString(schedule.start)} - ${formatTimeString(schedule.end)})`,
       pertemuanKe: 1,
       materiPembelajaran: quickJournalTopic || `KBM ${schedule.subject}`,
       tujuanPembelajaran: 'Penguasaan materi & capaian kompetensi dasar',
@@ -748,7 +748,7 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
                             Jam {sched.period}
                           </div>
                           <div className="text-xs font-bold text-slate-800 dark:text-slate-200 mt-0.5 font-mono">
-                            {sched.start} - {sched.end}
+                            {formatTimeString(sched.start)} - {formatTimeString(sched.end)}
                           </div>
                           <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400 mt-0.5">
                             {sched.jpm} JPM
@@ -937,7 +937,7 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
                                       Jam {s.period}
                                     </span>
                                     <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 font-mono">
-                                      {s.start} - {s.end}
+                                      {formatTimeString(s.start)} - {formatTimeString(s.end)}
                                     </span>
                                   </div>
                                   <div className="font-semibold text-slate-900 dark:text-white text-xs leading-snug">
@@ -1042,7 +1042,7 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
                       <tr key={s.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
                         <td className="py-3 px-4 font-semibold text-slate-900 dark:text-white">{s.day}</td>
                         <td className="py-3 px-4 text-slate-600 dark:text-slate-300 font-medium font-mono">
-                          Jam {s.period} ({s.start} - {s.end})
+                          Jam {s.period} ({formatTimeString(s.start)} - {formatTimeString(s.end)})
                         </td>
                         <td className="py-3 px-4">
                           <span
@@ -1671,7 +1671,7 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
                     {formatDateString(presensiModalData.date)} • Jam{' '}
-                    {presensiModalData.schedule.start} – {presensiModalData.schedule.end} (
+                    {formatTimeString(presensiModalData.schedule.start)} – {formatTimeString(presensiModalData.schedule.end)} (
                     {presensiModalData.schedule.room || 'Kelas'})
                   </p>
                 </div>

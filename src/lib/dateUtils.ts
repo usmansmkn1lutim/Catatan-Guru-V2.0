@@ -42,20 +42,56 @@ export function formatTimeString(input?: any): string {
   const str = String(input).trim();
   if (!str) return '';
 
-  // Already HH:mm (e.g. "07:30")
+  // Standard clean HH:mm format
   if (/^\d{2}:\d{2}$/.test(str)) {
     return str;
   }
 
-  // Look for HH:mm pattern in string (e.g., "11:05:00" or "Sat Dec 30 1899 11:05:00 GMT...")
-  const timeMatch = str.match(/(\d{1,2}):(\d{2})/);
-  if (timeMatch) {
-    const hours = timeMatch[1].padStart(2, '0');
-    const minutes = timeMatch[2];
+  // Find all time patterns (HH:mm) in the input string
+  const timeMatches = Array.from(str.matchAll(/(\d{1,2}):(\d{2})/g));
+  if (timeMatches.length === 1) {
+    const hours = timeMatches[0][1].padStart(2, '0');
+    const minutes = timeMatches[0][2];
     return `${hours}:${minutes}`;
+  } else if (timeMatches.length >= 2) {
+    // If input contains multiple times e.g. "Sat Dec 30 1899 08:05:00 ... - Sat Dec 30 1899 09:15:00 ..."
+    const t1 = `${timeMatches[0][1].padStart(2, '0')}:${timeMatches[0][2]}`;
+    const t2 = `${timeMatches[1][1].padStart(2, '0')}:${timeMatches[1][2]}`;
+    return `${t1} - ${t2}`;
   }
 
   return str;
+}
+
+/**
+ * Sanitizes all date and time fields in schedule records.
+ */
+export function sanitizeScheduleRecord(record: any): any {
+  if (!record || typeof record !== 'object') return record;
+  let start = formatTimeString(record.start || record.waktuMulai || '');
+  let end = formatTimeString(record.end || record.waktuSelesai || '');
+
+  if (start.includes(' - ')) {
+    const parts = start.split(' - ');
+    start = parts[0];
+    if (!end || end === record.start) {
+      end = parts[1];
+    }
+  }
+
+  return {
+    ...record,
+    start: start || '07:00',
+    end: end || '08:30',
+  };
+}
+
+/**
+ * Sanitizes an array of schedule records.
+ */
+export function sanitizeScheduleList(list: any[]): any[] {
+  if (!Array.isArray(list)) return [];
+  return list.map(sanitizeScheduleRecord);
 }
 
 /**

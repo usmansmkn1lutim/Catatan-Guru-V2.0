@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Siswa, Kelas, Mapel, PresensiRecord, JadwalRecord, ScheduleConfig, ScheduleDay, ScheduleCycle, ActiveTab, VisualStyle } from '../types';
-import { formatDateString } from '../lib/dateUtils';
+import { formatDateString, formatTimeString } from '../lib/dateUtils';
 import {
   Users,
   GraduationCap,
@@ -654,7 +654,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                           </span>
                           <span className="text-[10px] font-semibold text-slate-600 dark:text-slate-300 font-mono flex items-center gap-1">
                             <Clock className="w-3 h-3 text-slate-400" />
-                            {s.start} - {s.end}
+                            {formatTimeString(s.start)} - {formatTimeString(s.end)}
                           </span>
                         </div>
                         <span className="px-2 py-0.5 text-[10px] font-bold rounded-md bg-violet-50 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300 border border-violet-200/60 dark:border-violet-800/60">
