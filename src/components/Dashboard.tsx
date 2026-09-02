@@ -387,14 +387,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
               return (
                 <div
                   key={s.id}
-                  className={`p-3.5 sm:p-4 rounded-xl border transition-all flex items-center justify-between gap-3 ${
+                  className={`p-3.5 sm:p-4 rounded-xl border transition-all flex flex-col gap-2.5 ${
                     isSolid
                       ? 'bg-[#F9FAFC] dark:bg-slate-800/80 border-gray-200 dark:border-slate-700 hover:border-violet-300 dark:hover:border-violet-600 shadow-sm'
                       : 'bg-white/40 dark:bg-slate-900/40 backdrop-blur-md border-white/40 dark:border-slate-800 hover:border-violet-300'
                   }`}
                 >
-                  {/* Left Section: 3 Baris Info */}
-                  <div className="flex-1 min-w-0 space-y-1">
+                  {/* Top Section: 3 Baris Info */}
+                  <div className="w-full space-y-1">
                     {/* Baris 1: (Jam 1 - 3) (icon jam 07:30 - 09:15) */}
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-xs font-bold text-violet-700 dark:text-violet-300 tracking-wide">
@@ -428,8 +428,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     </div>
                   </div>
 
-                  {/* Right Section: Tombol Presensi */}
-                  <div className="shrink-0 flex items-center justify-end">
+                  {/* Bottom-left Section: Tombol Presensi */}
+                  <div className="flex items-center justify-start pt-1">
                     {isDone ? (
                       <span className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1.5 shadow-sm">
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
@@ -438,7 +438,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     ) : (
                       <button
                         onClick={() => goToTab('presensi')}
-                        className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-violet-600 hover:bg-violet-700 text-white shadow-sm transition flex items-center gap-1.5 active:scale-95"
+                        className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-violet-600 hover:bg-violet-700 text-white shadow-sm transition flex items-center gap-1.5 active:scale-95"
                         title="Buka presensi kelas ini"
                       >
                         <ClipboardCheck className="w-3.5 h-3.5" />
