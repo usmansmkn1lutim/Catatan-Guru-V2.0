@@ -362,7 +362,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
 
         {/* Vertical Schedule Cards */}
-        <div className={`space-y-2.5 custom-scrollbar pr-0.5 ${isMobileView ? 'max-h-[320px] overflow-y-auto' : 'flex-1 overflow-y-auto max-h-[300px]'}`}>
+        <div className={`space-y-3 custom-scrollbar pr-0.5 ${isMobileView ? 'max-h-[380px] overflow-y-auto' : 'flex-1 overflow-y-auto max-h-[360px]'}`}>
           {todaySchedules.length === 0 ? (
             <div className="flex flex-col items-center justify-center text-center p-5 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-dashed border-slate-200 dark:border-slate-700 space-y-2 my-auto">
               <div className="w-9 h-9 rounded-xl bg-violet-50 dark:bg-violet-950/50 text-violet-600 dark:text-violet-400 flex items-center justify-center">
@@ -387,51 +387,57 @@ export const Dashboard: React.FC<DashboardProps> = ({
               return (
                 <div
                   key={s.id}
-                  className={`p-3 rounded-xl border transition-all flex flex-col gap-2 ${
+                  className={`p-3.5 sm:p-4 rounded-xl border transition-all flex items-center justify-between gap-3 ${
                     isSolid
                       ? 'bg-[#F9FAFC] dark:bg-slate-800/80 border-gray-200 dark:border-slate-700 hover:border-violet-300 dark:hover:border-violet-600 shadow-sm'
                       : 'bg-white/40 dark:bg-slate-900/40 backdrop-blur-md border-white/40 dark:border-slate-800 hover:border-violet-300'
                   }`}
                 >
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 rounded-md bg-violet-100 dark:bg-violet-950 text-violet-700 dark:text-violet-300 text-[10px] font-bold font-mono">
-                        Jam {s.period}
-                      </span>
-                      <span className="text-[10px] font-semibold text-slate-600 dark:text-slate-300 font-mono flex items-center gap-1">
-                        <Clock className="w-3 h-3 text-slate-400" />
-                        {formatTimeString(s.start)} - {formatTimeString(s.end)}
-                      </span>
+                  {/* Left Column: 3 Baris Info (Jam, Waktu, Ruangan & JP) */}
+                  <div className="flex-1 min-w-0 space-y-1.5 text-left">
+                    {/* Baris 1: Info Jam */}
+                    <div className="text-xs font-bold text-violet-700 dark:text-violet-300 tracking-wide">
+                      Jam {s.period}
                     </div>
-                    <span className="px-2 py-0.5 text-[10px] font-bold rounded-md bg-violet-50 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300 border border-violet-200/60 dark:border-violet-800/60">
-                      {s.class}
-                    </span>
+
+                    {/* Baris 2: Waktu (icon jam 07:30 - 09:15) */}
+                    <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 font-mono">
+                      <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <span>{formatTimeString(s.start)} - {formatTimeString(s.end)}</span>
+                    </div>
+
+                    {/* Baris 3: Ruangan (Icon pin lokasi Ruang D3 - Jumlah JP (3 JP)) */}
+                    <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+                      <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <span className="truncate">{s.room || 'Ruang Kelas'}</span>
+                      <span>-</span>
+                      <span className="shrink-0">{s.jpm} JP</span>
+                    </div>
                   </div>
 
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="min-w-0 pr-1">
-                      <div className="font-semibold text-slate-900 dark:text-white text-xs truncate">
-                        {s.subject}
-                      </div>
-                      <div className="flex items-center gap-1.5 text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
-                        <span className="flex items-center gap-0.5">
-                          <MapPin className="w-2.5 h-2.5" />
-                          {s.room || 'Kelas'}
-                        </span>
-                        <span>• {s.jpm} JP</span>
-                      </div>
+                  {/* Right Column: 3 Baris Info Simetris Rata Kanan (Kelas, Mapel, Presensi) */}
+                  <div className="flex-1 min-w-0 flex flex-col items-end text-right space-y-1.5 shrink-0">
+                    {/* Baris 1: Tulisan Kelas warna ungu tanpa badge */}
+                    <div className="font-bold text-xs sm:text-sm text-violet-600 dark:text-violet-400 tracking-tight truncate max-w-[170px]">
+                      {s.class}
                     </div>
 
-                    <div className="shrink-0">
+                    {/* Baris 2: Mata Pelajaran */}
+                    <div className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm truncate max-w-[170px] leading-snug">
+                      {s.subject}
+                    </div>
+
+                    {/* Baris 3: Tombol Presensi / Status Presensi */}
+                    <div className="flex justify-end">
                       {isDone ? (
-                        <span className="px-2 py-1 rounded-lg text-[10px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
+                        <span className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
                           <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                           <span>Presensi OK</span>
                         </span>
                       ) : (
                         <button
                           onClick={() => goToTab('presensi')}
-                          className="px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-violet-600 hover:bg-violet-700 text-white shadow-sm transition flex items-center gap-1 active:scale-95"
+                          className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-violet-600 hover:bg-violet-700 text-white shadow-sm transition flex items-center gap-1.5 active:scale-95"
                           title="Buka presensi kelas ini"
                         >
                           <ClipboardCheck className="w-3 h-3" />
