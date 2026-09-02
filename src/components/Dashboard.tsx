@@ -387,65 +387,77 @@ export const Dashboard: React.FC<DashboardProps> = ({
               return (
                 <div
                   key={s.id}
-                  className={`p-3.5 sm:p-4 rounded-xl border transition-all flex flex-col gap-2.5 ${
+                  className={`p-3.5 sm:p-4 rounded-xl border transition-all flex items-stretch gap-3.5 ${
                     isSolid
                       ? 'bg-[#F9FAFC] dark:bg-slate-800/80 border-gray-200 dark:border-slate-700 hover:border-violet-300 dark:hover:border-violet-600 shadow-sm'
                       : 'bg-white/40 dark:bg-slate-900/40 backdrop-blur-md border-white/40 dark:border-slate-800 hover:border-violet-300'
                   }`}
                 >
-                  {/* Top Section: 3 Baris Info */}
-                  <div className="w-full space-y-1">
-                    {/* Baris 1: Waktu (icon jam 07:30 - 09:15) & Jumlah JP */}
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 font-mono">
-                        <Clock className="w-3.5 h-3.5 text-violet-500 dark:text-violet-400 shrink-0" />
-                        <span>{formatTimeString(s.start)} - {formatTimeString(s.end)}</span>
-                      </span>
-                      <span className="text-slate-300 dark:text-slate-600">•</span>
-                      <span className="px-2 py-0.5 rounded-md bg-violet-50 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300 text-[11px] font-bold border border-violet-200/60 dark:border-violet-800/60">
-                        {s.jpm} JP
-                      </span>
-                    </div>
-
-                    {/* Baris 2: (Mapel) */}
-                    <div className="font-bold text-slate-900 dark:text-white text-sm sm:text-base leading-snug truncate">
-                      {s.subject}
-                    </div>
-
-                    {/* Baris 3: (Kelas diperbesar) & Ruangan */}
-                    <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
-                      <span className="font-bold text-sm sm:text-base text-violet-600 dark:text-violet-400 tracking-tight">
-                        {s.class}
-                      </span>
-                      {s.room && (
+                  {/* Kolom 1 (Kiri): Info Kelas dengan garis pembatas di sebelah kanan */}
+                  <div className="flex flex-col items-center justify-center text-center pr-3.5 border-r border-slate-200 dark:border-slate-700/80 min-w-[82px] sm:min-w-[96px] shrink-0">
+                    <div className="font-black text-violet-700 dark:text-violet-300 leading-tight tracking-tight w-full flex flex-col items-center justify-center">
+                      {s.class.includes(' ') ? (
                         <>
-                          <span className="text-slate-300 dark:text-slate-600">•</span>
-                          <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1 truncate text-xs">
-                            <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                            <span className="truncate">{s.room}</span>
-                          </span>
+                          <div className="text-xl sm:text-2xl font-black tracking-tight truncate w-full">
+                            {s.class.split(' ')[0]}
+                          </div>
+                          <div className="text-xs sm:text-sm font-extrabold text-violet-600 dark:text-violet-400 tracking-wide uppercase truncate w-full mt-0.5">
+                            {s.class.split(' ').slice(1).join(' ')}
+                          </div>
                         </>
+                      ) : (
+                        <span className="text-xl sm:text-2xl font-black tracking-tight">{s.class}</span>
                       )}
                     </div>
                   </div>
 
-                  {/* Bottom-left Section: Tombol Presensi */}
-                  <div className="flex items-center justify-start pt-1">
-                    {isDone ? (
-                      <span className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1.5 shadow-sm">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                        <span>Presensi OK</span>
-                      </span>
-                    ) : (
-                      <button
-                        onClick={() => goToTab('presensi')}
-                        className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-violet-600 hover:bg-violet-700 text-white shadow-sm transition flex items-center gap-1.5 active:scale-95"
-                        title="Buka presensi kelas ini"
-                      >
-                        <ClipboardCheck className="w-3.5 h-3.5" />
-                        <span>Presensi</span>
-                      </button>
-                    )}
+                  {/* Kolom 2 (Kanan): 3 Baris Info & Tombol Presensi */}
+                  <div className="flex-1 min-w-0 flex flex-col justify-between space-y-1.5">
+                    <div className="space-y-1">
+                      {/* Baris 1: Info Jam Mulai dan Jam Selesai */}
+                      <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 font-mono">
+                        <Clock className="w-3.5 h-3.5 text-violet-500 dark:text-violet-400 shrink-0" />
+                        <span>{formatTimeString(s.start)} - {formatTimeString(s.end)}</span>
+                      </div>
+
+                      {/* Baris 2: Mata Pelajaran */}
+                      <div className="font-bold text-slate-900 dark:text-white text-sm sm:text-base leading-snug truncate">
+                        {s.subject}
+                      </div>
+
+                      {/* Baris 3: Info Ruangan dengan icon lokasi - Info 2 JP & Tombol Presensi di Kanan */}
+                      <div className="flex items-center justify-between gap-2 pt-0.5">
+                        <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 flex-wrap min-w-0">
+                          <span className="flex items-center gap-1 truncate text-slate-600 dark:text-slate-300 font-medium">
+                            <MapPin className="w-3.5 h-3.5 text-violet-500 dark:text-violet-400 shrink-0" />
+                            <span className="truncate max-w-[90px] sm:max-w-[120px]">{s.room || 'Ruang Kelas'}</span>
+                          </span>
+                          <span className="text-slate-300 dark:text-slate-600">-</span>
+                          <span className="px-1.5 py-0.5 rounded bg-violet-50 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300 text-[11px] font-bold border border-violet-200/60 dark:border-violet-800/60 shrink-0">
+                            {s.jpm} JP
+                          </span>
+                        </div>
+
+                        {/* Tombol Presensi / Status Presensi (Kanan Bawah) */}
+                        <div className="shrink-0 flex items-center justify-end">
+                          {isDone ? (
+                            <span className="px-2 py-1 rounded-lg text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1 shadow-sm">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                              <span>Presensi OK</span>
+                            </span>
+                          ) : (
+                            <button
+                              onClick={() => goToTab('presensi')}
+                              className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-violet-600 hover:bg-violet-700 text-white shadow-sm transition flex items-center gap-1 active:scale-95"
+                              title="Buka presensi kelas ini"
+                            >
+                              <ClipboardCheck className="w-3 h-3" />
+                              <span>Presensi</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               );
