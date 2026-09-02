@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActiveTab } from '../types';
-import { School, UserCheck, BookOpen, GraduationCap, Users, Sparkles, ArrowRight } from 'lucide-react';
+import { School, Calendar, BookOpen, GraduationCap, Users, Sparkles, ArrowRight } from 'lucide-react';
 
 interface AdministrasiMenuProps {
   onNavigate: (tab: ActiveTab) => void;
@@ -17,12 +17,12 @@ export const AdministrasiMenu: React.FC<AdministrasiMenuProps> = ({ onNavigate }
       badge: 'Sekolah',
     },
     {
-      id: 'profil' as ActiveTab,
-      label: 'Profil Guru',
-      desc: 'Informasi guru pengampu, NIP, kontak & foto profil pendidik',
-      icon: <UserCheck className="w-7 h-7 text-blue-600 dark:text-blue-400" />,
+      id: 'jadwal' as ActiveTab,
+      label: 'Jadwal',
+      desc: 'Pengaturan jadwal presisi dengan dual-sistem Reguler & Blok 2-Mingguan (Minggu A & B)',
+      icon: <Calendar className="w-7 h-7 text-blue-600 dark:text-blue-400" />,
       accentBg: 'bg-blue-500/10 dark:bg-blue-500/20 border-blue-500/20 dark:border-blue-400/30',
-      badge: 'Pendidik',
+      badge: 'Penjadwalan',
     },
     {
       id: 'mapel' as ActiveTab,
@@ -81,9 +81,6 @@ export const AdministrasiMenu: React.FC<AdministrasiMenuProps> = ({ onNavigate }
                 <div className={`p-3.5 rounded-2xl border ${menu.accentBg} shadow-sm group-hover:scale-110 transition-transform duration-300`}>
                   {menu.icon}
                 </div>
-                <span className="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-slate-100 dark:bg-slate-800 text-black dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-                  {menu.badge}
-                </span>
               </div>
               <h3 className="text-base sm:text-lg font-bold text-black dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
                 {menu.label}

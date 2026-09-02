@@ -73,9 +73,6 @@ export const AkademikMenu: React.FC<AkademikMenuProps> = ({ onNavigate }) => {
                 <div className={`p-3.5 rounded-2xl border ${menu.accentBg} shadow-sm group-hover:scale-110 transition-transform duration-300`}>
                   {menu.icon}
                 </div>
-                <span className="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-slate-100 dark:bg-slate-800 text-black dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-                  {menu.badge}
-                </span>
               </div>
               <h3 className="text-base sm:text-lg font-bold text-black dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                 {menu.label}

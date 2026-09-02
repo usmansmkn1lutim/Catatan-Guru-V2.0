@@ -302,7 +302,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
             { id: 'presensi', label: 'Presensi', icon: ClipboardCheck, bg: 'bg-rose-50 dark:bg-rose-950/40', text: 'text-rose-500 dark:text-rose-400' },
             { id: 'nilai', label: 'Nilai', icon: Award, bg: 'bg-amber-50 dark:bg-amber-950/40', text: 'text-amber-500 dark:text-amber-400' },
             { id: 'jurnal', label: 'Jurnal', icon: BookMarked, bg: 'bg-teal-50 dark:bg-teal-950/40', text: 'text-teal-500 dark:text-teal-400' },
-            { id: 'profil', label: 'Profil Guru', icon: User, bg: 'bg-blue-50 dark:bg-blue-950/40', text: 'text-blue-500 dark:text-blue-400' },
+            { id: 'jadwal', label: 'Jadwal', icon: Calendar, bg: 'bg-blue-50 dark:bg-blue-950/40', text: 'text-blue-500 dark:text-blue-400' },
           ].map((menu) => (
             <button
               key={menu.id}
