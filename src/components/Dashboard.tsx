@@ -840,8 +840,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
             {renderSlideItem(0, true)}
           </div>
 
-          {/* Slider Pagination Dots & Navigation Buttons */}
-          <div className="flex items-center justify-between px-1.5 pt-0.5">
+          {/* Slider Pagination Dots */}
+          <div className="flex items-center justify-start px-1.5 pt-1">
             <div className="flex items-center gap-1.5">
               {[0, 1, 2, 3, 4].map((idx) => (
                 <button
@@ -855,28 +855,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   aria-label={`Slide ${idx + 1}`}
                 />
               ))}
-            </div>
-
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 font-mono">
-                {activeSlide + 1} / 5
-              </span>
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={prevSlide}
-                  className="p-1 rounded-lg bg-white/80 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-95 transition shadow-sm"
-                  title="Card Sebelumnya"
-                >
-                  <ChevronLeft className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  onClick={nextSlide}
-                  className="p-1 rounded-lg bg-white/80 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-95 transition shadow-sm"
-                  title="Card Selanjutnya"
-                >
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
             </div>
           </div>
         </div>
