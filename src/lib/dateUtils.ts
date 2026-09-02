@@ -37,6 +37,16 @@ export function formatDateString(input?: any): string {
   return str;
 }
 
+export function formatDateDMY(input?: any): string {
+  if (!input) return '';
+  const ymd = formatDateString(input);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(ymd)) {
+    const [year, month, day] = ymd.split('-');
+    return `${day}-${month}-${year}`;
+  }
+  return String(input);
+}
+
 export function formatTimeString(input?: any): string {
   if (!input) return '';
   const str = String(input).trim();

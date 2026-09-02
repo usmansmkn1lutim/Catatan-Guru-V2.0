@@ -115,10 +115,28 @@ export function App() {
     const handleAppearanceChange = (e: Event) => {
       const customEvent = e as CustomEvent;
       if (customEvent.detail) {
-        if (customEvent.detail.bgImage !== undefined) setCustomBgImage(customEvent.detail.bgImage);
-        if (customEvent.detail.bgStyle !== undefined) setCustomBgStyle(customEvent.detail.bgStyle);
-        if (customEvent.detail.bgOpacity !== undefined) setCustomBgOpacity(customEvent.detail.bgOpacity);
-        if (customEvent.detail.visualStyle !== undefined) setVisualStyle(customEvent.detail.visualStyle);
+        if (customEvent.detail.bgImage !== undefined) {
+          setCustomBgImage(customEvent.detail.bgImage);
+          if (customEvent.detail.bgImage) {
+            localStorage.setItem('app_custom_bg_image', customEvent.detail.bgImage);
+          } else {
+            localStorage.removeItem('app_custom_bg_image');
+          }
+        }
+        if (customEvent.detail.bgStyle !== undefined) {
+          setCustomBgStyle(customEvent.detail.bgStyle);
+          localStorage.setItem('app_custom_bg_style', customEvent.detail.bgStyle);
+        }
+        if (customEvent.detail.bgOpacity !== undefined) {
+          setCustomBgOpacity(customEvent.detail.bgOpacity);
+          localStorage.setItem('app_custom_bg_opacity', customEvent.detail.bgOpacity.toString());
+          document.documentElement.style.setProperty('--bg-opacity', customEvent.detail.bgOpacity.toString());
+        }
+        if (customEvent.detail.visualStyle !== undefined) {
+          setVisualStyle(customEvent.detail.visualStyle);
+          localStorage.setItem('app_visual_style', customEvent.detail.visualStyle);
+          document.documentElement.setAttribute('data-visual-style', customEvent.detail.visualStyle);
+        }
       }
     };
 
@@ -398,15 +416,20 @@ export function App() {
           
           if (remoteData.appConfig.customBgImage !== undefined) {
             setCustomBgImage(remoteData.appConfig.customBgImage);
-            localStorage.setItem('app_custom_bg_image', remoteData.appConfig.customBgImage);
+            if (remoteData.appConfig.customBgImage) {
+              localStorage.setItem('app_custom_bg_image', remoteData.appConfig.customBgImage);
+            } else {
+              localStorage.removeItem('app_custom_bg_image');
+            }
           }
           if (remoteData.appConfig.customBgStyle) {
             setCustomBgStyle(remoteData.appConfig.customBgStyle as any);
             localStorage.setItem('app_custom_bg_style', remoteData.appConfig.customBgStyle);
           }
-          if (remoteData.appConfig.customBgOpacity !== undefined) {
+          if (remoteData.appConfig.customBgOpacity !== undefined && !isNaN(remoteData.appConfig.customBgOpacity)) {
             setCustomBgOpacity(remoteData.appConfig.customBgOpacity);
             localStorage.setItem('app_custom_bg_opacity', remoteData.appConfig.customBgOpacity.toString());
+            document.documentElement.style.setProperty('--bg-opacity', remoteData.appConfig.customBgOpacity.toString());
           }
         }
 
@@ -593,9 +616,14 @@ export function App() {
     kelasList,
     siswaList,
     presensiList,
+    scheduleList,
+    scheduleConfig,
     nilaiList,
     jurnalList,
     appConfig,
+    customBgImage,
+    customBgStyle,
+    customBgOpacity,
     autoSyncEnabled,
   ]);
 

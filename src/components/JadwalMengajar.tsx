@@ -40,7 +40,7 @@ import {
   ArrowRight,
   Check,
 } from 'lucide-react';
-import { formatDateString, formatTimeString } from '../lib/dateUtils';
+import { formatDateString, formatDateDMY, formatTimeString } from '../lib/dateUtils';
 import { sanitizeScheduleConfig } from '../data/initialData';
 
 interface JadwalMengajarProps {
@@ -505,7 +505,7 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
           <div>
             <h2 className="text-lg font-bold text-slate-900 dark:text-white">Jadwal Mengajar</h2>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Kelola waktu KBM secara presisi dengan dukungan sistem Reguler dan Blok 2-Mingguan (Minggu A & B)
+              Kelola waktu KBM dengan sistem Reguler dan Blok 2-Mingguan (Minggu A & B)
             </p>
           </div>
         </div>
@@ -540,24 +540,14 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
       {/* Active System Status Card */}
       <div className="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="space-y-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-violet-50 dark:bg-violet-950/50 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-800">
-              {scheduleConfig.systemType === 'REGULER' ? 'SISTEM REGULER' : 'SISTEM BLOK 2 MINGGU'}
-            </span>
-            {scheduleConfig.systemType === 'BLOK' && (
-              <span className="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                Minggu {currentCycleDetails.cycle} Aktif
-              </span>
-            )}
-          </div>
           <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
             {scheduleConfig.systemType === 'REGULER'
-              ? 'Jadwal Mengajar — Sistem Reguler Pekanan'
-              : `Jadwal Mengajar — MINGGU ${currentCycleDetails.cycle} (${currentCycleDetails.cycle === 'A' ? 'Ganjil' : 'Genap'})`}
+              ? 'Jadwal Mengajar - Sistem Reguler Mingguan'
+              : 'Jadwal Mengajar - Sistem Blok 2-Mingguan'}
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400">
             Tahun Ajaran {scheduleConfig.academicYear} • Semester {scheduleConfig.semester}{' '}
-            {scheduleConfig.systemType === 'BLOK' && `• Tanggal Acuan: ${scheduleConfig.anchorDate}`}
+            {scheduleConfig.systemType === 'BLOK' && `• Tanggal Acuan: ${formatDateDMY(scheduleConfig.anchorDate)}`}
           </p>
         </div>
 
@@ -687,7 +677,7 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
                   Agenda Pembelajaran Aktif
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white mt-0.5">
-                  {formatDateString(selectedDate)}
+                  {formatDateDMY(selectedDate)}
                 </h3>
               </div>
               <div className="flex items-center space-x-2">
@@ -743,7 +733,7 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
                       }`}
                     >
                       <div className="flex items-start space-x-4">
-                        <div className="p-3 bg-violet-50 dark:bg-violet-950/60 border border-violet-100 dark:border-violet-900/60 rounded-xl text-center min-w-[95px] shrink-0">
+                        <div className="p-3 bg-violet-50 dark:bg-violet-950/60 border border-violet-100 dark:border-violet-900/60 rounded-xl text-left min-w-[95px] shrink-0">
                           <div className="text-[10px] font-semibold uppercase text-violet-600 dark:text-violet-400">
                             Jam {sched.period}
                           </div>
@@ -751,29 +741,19 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
                             {formatTimeString(sched.start)} - {formatTimeString(sched.end)}
                           </div>
                           <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400 mt-0.5">
-                            {sched.jpm} JPM
+                            {sched.jpm} JP
                           </div>
                         </div>
 
-                        <div className="space-y-1.5">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span className="text-sm font-bold text-slate-900 dark:text-white">
-                              {sched.subject}
-                            </span>
-                            <span className="px-2.5 py-0.5 text-[10px] font-semibold rounded-md bg-violet-100 dark:bg-violet-950/80 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-800">
-                              {sched.class}
-                            </span>
+                        <div className="space-y-0.5 text-left">
+                          <div className="text-sm font-bold text-slate-900 dark:text-white">
+                            {sched.subject}
                           </div>
-                          <div className="text-xs text-slate-600 dark:text-slate-400 flex flex-wrap items-center gap-3">
-                            <span className="flex items-center gap-1">
-                              <MapPin className="w-3.5 h-3.5 text-rose-500" />
-                              <span>{sched.room || 'Kelas Utama'}</span>
-                            </span>
-                            {scheduleConfig.systemType === 'BLOK' && (
-                              <span className="text-violet-600 dark:text-violet-400 font-medium">
-                                • Siklus: Minggu {sched.cycle}
-                              </span>
-                            )}
+                          <div className="text-sm font-bold text-violet-600 dark:text-violet-400">
+                            {sched.class}
+                          </div>
+                          <div className="text-xs text-slate-600 dark:text-slate-400 flex flex-wrap items-center gap-2 pt-0.5">
+                            <span>{sched.room || 'Kelas Utama'}</span>
                             {sched.catatan && (
                               <span className="text-slate-500 dark:text-slate-400 italic">
                                 ({sched.catatan})
@@ -1670,7 +1650,7 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
                     Kelas {presensiModalData.schedule.class} • {presensiModalData.schedule.subject}
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    {formatDateString(presensiModalData.date)} • Jam{' '}
+                    {formatDateDMY(presensiModalData.date)} • Jam{' '}
                     {formatTimeString(presensiModalData.schedule.start)} – {formatTimeString(presensiModalData.schedule.end)} (
                     {presensiModalData.schedule.room || 'Kelas'})
                   </p>

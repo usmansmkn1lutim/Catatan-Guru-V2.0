@@ -10,7 +10,7 @@ export const AkademikMenu: React.FC<AkademikMenuProps> = ({ onNavigate }) => {
   const menus = [
     {
       id: 'jadwal' as ActiveTab,
-      label: 'Jadwal Mengajar',
+      label: 'Jadwal',
       desc: 'Pengaturan jadwal presisi dengan dual-sistem Reguler & Blok 2-Mingguan (Minggu A & B)',
       icon: <CalendarDays className="w-7 h-7 text-violet-600 dark:text-violet-400" />,
       accentBg: 'bg-violet-500/10 dark:bg-violet-500/20 border-violet-500/20 dark:border-violet-400/30',

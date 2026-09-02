@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActiveTab } from '../types';
-import { School, Calendar, BookOpen, GraduationCap, Users, Sparkles, ArrowRight } from 'lucide-react';
+import { School, BookOpen, GraduationCap, Users, Sparkles, ArrowRight } from 'lucide-react';
 
 interface AdministrasiMenuProps {
   onNavigate: (tab: ActiveTab) => void;
@@ -15,14 +15,6 @@ export const AdministrasiMenu: React.FC<AdministrasiMenuProps> = ({ onNavigate }
       icon: <School className="w-7 h-7 text-violet-600 dark:text-violet-400" />,
       accentBg: 'bg-violet-500/10 dark:bg-violet-500/20 border-violet-500/20 dark:border-violet-400/30',
       badge: 'Sekolah',
-    },
-    {
-      id: 'jadwal' as ActiveTab,
-      label: 'Jadwal',
-      desc: 'Pengaturan jadwal presisi dengan dual-sistem Reguler & Blok 2-Mingguan (Minggu A & B)',
-      icon: <Calendar className="w-7 h-7 text-blue-600 dark:text-blue-400" />,
-      accentBg: 'bg-blue-500/10 dark:bg-blue-500/20 border-blue-500/20 dark:border-blue-400/30',
-      badge: 'Penjadwalan',
     },
     {
       id: 'mapel' as ActiveTab,

@@ -93,6 +93,11 @@ export const AppearanceLayout: React.FC<AppearanceLayoutProps> = ({
     localStorage.setItem('glass_opacity', glassOpacity.toString());
     localStorage.setItem('app_custom_bg_opacity', bgOpacity.toString());
     localStorage.setItem('app_custom_bg_style', bgStyle);
+    if (bgImage) {
+      localStorage.setItem('app_custom_bg_image', bgImage);
+    } else {
+      localStorage.removeItem('app_custom_bg_image');
+    }
 
     // Dispatch a custom event so App.tsx can update seamlessly
     window.dispatchEvent(

@@ -68,7 +68,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       title: 'ADMINISTRASI',
       items: [
         { id: 'sekolah', label: 'Data Sekolah', icon: Building2 },
-        { id: 'jadwal', label: 'Jadwal', icon: Calendar },
         { id: 'mapel', label: 'Data Mapel', icon: BookOpen },
         { id: 'kelas', label: 'Data Kelas', icon: GraduationCap },
         { id: 'siswa', label: 'Data Siswa', icon: Users },
@@ -77,7 +76,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     {
       title: 'AKADEMIK',
       items: [
-        { id: 'jadwal', label: 'Jadwal Mengajar', icon: CalendarDays },
+        { id: 'jadwal', label: 'Jadwal', icon: CalendarDays },
         { id: 'presensi', label: 'Presensi', icon: ClipboardCheck },
         { id: 'nilai', label: 'Nilai', icon: Award },
         { id: 'jurnal', label: 'Jurnal', icon: BookMarked },
