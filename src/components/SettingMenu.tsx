@@ -31,7 +31,7 @@ export const SettingMenu: React.FC<SettingMenuProps> = ({ onNavigate }) => {
       {/* Header Title with Badge */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-white/40 dark:border-white/10">
         <div className="space-y-1">
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-500/10 dark:bg-blue-500/20 border border-blue-500/20 dark:border-blue-400/30 text-blue-600 dark:text-blue-300 text-xs font-semibold">
+          <div className="hidden lg:inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-500/10 dark:bg-blue-500/20 border border-blue-500/20 dark:border-blue-400/30 text-blue-600 dark:text-blue-300 text-xs font-semibold">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Pengaturan & Personalisasi</span>
           </div>

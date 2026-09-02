@@ -55,7 +55,7 @@ export const AdministrasiMenu: React.FC<AdministrasiMenuProps> = ({ onNavigate }
       {/* Header Title with Badge */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-white/40 dark:border-white/10">
         <div className="space-y-1">
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-violet-500/10 dark:bg-violet-500/20 border border-violet-500/20 dark:border-violet-400/30 text-violet-600 dark:text-violet-300 text-xs font-semibold">
+          <div className="hidden lg:inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-violet-500/10 dark:bg-violet-500/20 border border-violet-500/20 dark:border-violet-400/30 text-violet-600 dark:text-violet-300 text-xs font-semibold">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Master Data Pendidikan</span>
           </div>
