@@ -395,14 +395,15 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 >
                   {/* Top Section: 3 Baris Info */}
                   <div className="w-full space-y-1">
-                    {/* Baris 1: (Jam 1 - 3) (icon jam 07:30 - 09:15) */}
+                    {/* Baris 1: Waktu (icon jam 07:30 - 09:15) & Jumlah JP */}
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-xs font-bold text-violet-700 dark:text-violet-300 tracking-wide">
-                        Jam {s.period}
-                      </span>
-                      <span className="flex items-center gap-1 text-xs font-semibold text-slate-500 dark:text-slate-400 font-mono">
-                        <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <span className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 font-mono">
+                        <Clock className="w-3.5 h-3.5 text-violet-500 dark:text-violet-400 shrink-0" />
                         <span>{formatTimeString(s.start)} - {formatTimeString(s.end)}</span>
+                      </span>
+                      <span className="text-slate-300 dark:text-slate-600">•</span>
+                      <span className="px-2 py-0.5 rounded-md bg-violet-50 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300 text-[11px] font-bold border border-violet-200/60 dark:border-violet-800/60">
+                        {s.jpm} JP
                       </span>
                     </div>
 
@@ -411,16 +412,16 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       {s.subject}
                     </div>
 
-                    {/* Baris 3: (Kelas) (Jumlah JP) */}
-                    <div className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-300">
-                      <span className="font-bold text-violet-600 dark:text-violet-400">{s.class}</span>
-                      <span className="text-slate-300 dark:text-slate-600">•</span>
-                      <span className="font-medium text-slate-500 dark:text-slate-400">{s.jpm} JP</span>
+                    {/* Baris 3: (Kelas diperbesar) & Ruangan */}
+                    <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
+                      <span className="font-bold text-sm sm:text-base text-violet-600 dark:text-violet-400 tracking-tight">
+                        {s.class}
+                      </span>
                       {s.room && (
                         <>
                           <span className="text-slate-300 dark:text-slate-600">•</span>
-                          <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1 truncate">
-                            <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
+                          <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1 truncate text-xs">
+                            <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                             <span className="truncate">{s.room}</span>
                           </span>
                         </>
