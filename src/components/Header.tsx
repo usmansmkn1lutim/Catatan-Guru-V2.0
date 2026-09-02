@@ -58,7 +58,7 @@ export const Header: React.FC<HeaderProps> = ({
   onFetchRemoteData,
   isFetchingRemote = false,
   onToggleMobileMenu,
-  visualStyle = "glass",
+  visualStyle = "solid",
 }) => {
   const currentSekolah = sekolah || dataSekolah;
   const currentGuru = guru || profilGuru;

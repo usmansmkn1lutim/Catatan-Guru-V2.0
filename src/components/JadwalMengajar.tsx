@@ -75,7 +75,7 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
   onSavePresensiList,
   onSaveJurnalList,
   showToast,
-  visualStyle = 'glass',
+  visualStyle = 'solid',
   namaGuru = 'Guru Mata Pelajaran',
   nipGuru = '-',
   namaSekolah = 'SMK / SMA Negeri 1',

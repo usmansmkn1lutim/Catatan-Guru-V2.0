@@ -55,7 +55,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   setIsOpenMobile,
   collapsed = false,
   onToggleCollapse,
-  visualStyle = 'glass',
+  visualStyle = 'solid',
 }) => {
   const isSolid = visualStyle === 'solid';
 

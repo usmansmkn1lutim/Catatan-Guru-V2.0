@@ -38,15 +38,15 @@ export const AppearanceLayout: React.FC<AppearanceLayoutProps> = ({
   // State for Visual Style: 'solid' | 'glass'
   const [visualStyle, setVisualStyle] = useState<VisualStyle>(() => {
     const saved = localStorage.getItem('app_visual_style');
-    return (saved as VisualStyle) || 'glass';
+    return (saved as VisualStyle) || 'solid';
   });
 
   // State for Appearance & Layout
   const [fontSize, setFontSize] = useState<number>(() => {
     const saved = localStorage.getItem('app_font_size');
-    if (!saved) return 16;
+    if (!saved) return 14;
     const parsed = parseInt(saved, 10);
-    if (isNaN(parsed)) return 16;
+    if (isNaN(parsed)) return 14;
     return Math.min(Math.max(parsed, 12), 20);
   });
 
@@ -177,8 +177,8 @@ export const AppearanceLayout: React.FC<AppearanceLayoutProps> = ({
   const handleResetGlass = () => {
     setGlassBlur(16);
     setGlassOpacity(0.65);
-    setFontSize(16);
-    setVisualStyle('glass');
+    setFontSize(14);
+    setVisualStyle('solid');
     if (onShowToast) onShowToast('Pengaturan visual dan tipografi dikembalikan ke default!', 'success');
   };
 
@@ -508,7 +508,7 @@ export const AppearanceLayout: React.FC<AppearanceLayoutProps> = ({
 
               <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-mono">
                 <span>12px (Kecil)</span>
-                <span className="text-blue-600 dark:text-blue-400 font-semibold">Default: 16px</span>
+                <span className="text-blue-600 dark:text-blue-400 font-semibold">Default: 14px</span>
                 <span>20px (Besar)</span>
               </div>
 

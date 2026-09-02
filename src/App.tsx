@@ -85,7 +85,7 @@ export function App() {
 
   // Custom Appearance & Background State
   const [visualStyle, setVisualStyle] = useState<VisualStyle>(() => {
-    return (localStorage.getItem('app_visual_style') as VisualStyle) || 'glass';
+    return (localStorage.getItem('app_visual_style') as VisualStyle) || 'solid';
   });
   const [customBgImage, setCustomBgImage] = useState<string>(() => {
     return localStorage.getItem('app_custom_bg_image') || '';
@@ -100,11 +100,11 @@ export function App() {
 
   // Sync Root CSS Variables & Appearance Event Listener
   useEffect(() => {
-    const fontSize = localStorage.getItem('app_font_size') || '16';
+    const fontSize = localStorage.getItem('app_font_size') || '14';
     const glassBlur = localStorage.getItem('glass_blur') || '16';
     const glassOpacity = localStorage.getItem('glass_opacity') || '0.65';
     const bgOpacity = localStorage.getItem('app_custom_bg_opacity') || '0.85';
-    const currentVisualStyle = (localStorage.getItem('app_visual_style') as VisualStyle) || 'glass';
+    const currentVisualStyle = (localStorage.getItem('app_visual_style') as VisualStyle) || 'solid';
 
     document.documentElement.style.setProperty('--app-font-size', `${fontSize}px`);
     document.documentElement.style.setProperty('--glass-blur', `${glassBlur}px`);

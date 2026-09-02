@@ -90,7 +90,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   onFetchRemoteData,
   isDarkMode,
   darkMode,
-  visualStyle = 'glass',
+  visualStyle = 'solid',
 }) => {
   const [selectedKelasFilter, setSelectedKelasFilter] = useState<string>('Semua');
   const [isMenuExpanded, setIsMenuExpanded] = useState<boolean>(false);
