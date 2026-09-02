@@ -912,24 +912,30 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
                                   key={s.id}
                                   className="p-3 rounded-xl border border-violet-200/80 dark:border-violet-900/60 bg-gradient-to-br from-violet-50/80 to-white dark:from-violet-950/40 dark:to-slate-900/60 hover:shadow-sm transition space-y-1.5 group relative"
                                 >
-                                  <div className="flex items-center justify-between">
-                                    <span className="px-2 py-0.5 rounded-md bg-violet-100 dark:bg-violet-950 text-violet-700 dark:text-violet-300 text-[10px] font-semibold font-mono">
-                                      Jam {s.period}
-                                    </span>
-                                    <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 font-mono">
-                                      {formatTimeString(s.start)} - {formatTimeString(s.end)}
+                                  {/* Baris 1: Waktu di sebelah kiri dengan icon jam & Jumlah JP */}
+                                  <div className="flex items-center justify-between gap-1">
+                                    <div className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-700 dark:text-slate-300 font-mono">
+                                      <Clock className="w-3 h-3 text-violet-600 dark:text-violet-400 shrink-0" />
+                                      <span>{formatTimeString(s.start)} - {formatTimeString(s.end)}</span>
+                                    </div>
+                                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-violet-100 dark:bg-violet-950/80 text-violet-700 dark:text-violet-300 border border-violet-200/60 dark:border-violet-800/60">
+                                      {s.jpm} JP
                                     </span>
                                   </div>
-                                  <div className="font-semibold text-slate-900 dark:text-white text-xs leading-snug">
+
+                                  {/* Baris 2: Mata Pelajaran */}
+                                  <div className="font-bold text-slate-900 dark:text-white text-xs leading-snug">
                                     {s.subject}
                                   </div>
+
+                                  {/* Baris 3: Kelas & Ruangan (Icon Pin Lokasi Warna Ungu) */}
                                   <div className="flex items-center justify-between text-[10px] font-medium text-slate-600 dark:text-slate-400 pt-1 border-t border-violet-100/60 dark:border-slate-800">
-                                    <span className="text-violet-600 dark:text-violet-400 font-semibold">
+                                    <span className="text-violet-600 dark:text-violet-400 font-bold">
                                       {s.class}
                                     </span>
-                                    <span className="text-slate-500 dark:text-slate-400 flex items-center gap-0.5">
-                                      <MapPin className="w-2.5 h-2.5 text-rose-500" />
-                                      {s.room || 'Kelas'}
+                                    <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                                      <MapPin className="w-3 h-3 text-violet-600 dark:text-violet-400 shrink-0" />
+                                      <span>{s.room || 'Kelas'}</span>
                                     </span>
                                   </div>
                                 </div>
