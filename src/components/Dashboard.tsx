@@ -699,19 +699,30 @@ export const Dashboard: React.FC<DashboardProps> = ({
               </div>
 
               {/* School Information */}
-              <div className="relative z-10 pt-2.5 border-t border-white/20 mt-3">
-                <p className="text-xs sm:text-sm font-bold text-white tracking-wide truncate">
-                  {dataSekolah?.namaSekolah || "SMA NEGERI 1 BANGSA YANG BESAR"}
-                </p>
-                <div className="flex items-center gap-1.5 mt-0.5 text-violet-200 text-xs">
-                  <MapPin className="w-3.5 h-3.5 shrink-0 text-violet-300" />
-                  <span className="truncate">
-                    {dataSekolah?.alamatLengkap ||
-                      [dataSekolah?.kelurahan, dataSekolah?.kecamatan, dataSekolah?.kabupatenKota, dataSekolah?.provinsi]
-                        .filter(Boolean)
-                        .join(", ") ||
-                      "Alamat sekolah belum diatur"}
-                  </span>
+              <div className="relative z-10 pt-2.5 border-t border-white/20 mt-3 flex items-center gap-2.5 sm:gap-3">
+                {dataSekolah?.logoSekolahUrl ? (
+                  <img
+                    src={dataSekolah.logoSekolahUrl}
+                    alt="Logo Sekolah"
+                    className="w-10 h-10 sm:w-11 sm:h-11 object-contain shrink-0"
+                  />
+                ) : (
+                  <School className="w-8 h-8 sm:w-9 sm:h-9 text-white/90 shrink-0" />
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs sm:text-sm font-bold text-white tracking-wide truncate">
+                    {dataSekolah?.namaSekolah || "SMA NEGERI 1 BANGSA YANG BESAR"}
+                  </p>
+                  <div className="flex items-center gap-1.5 mt-0.5 text-violet-200 text-xs">
+                    <MapPin className="w-3.5 h-3.5 shrink-0 text-violet-300" />
+                    <span className="truncate">
+                      {dataSekolah?.alamatLengkap ||
+                        [dataSekolah?.kelurahan, dataSekolah?.kecamatan, dataSekolah?.kabupatenKota, dataSekolah?.provinsi]
+                          .filter(Boolean)
+                          .join(", ") ||
+                        "Alamat sekolah belum diatur"}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
