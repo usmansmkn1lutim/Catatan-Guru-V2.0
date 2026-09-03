@@ -11,6 +11,7 @@ import {
   AlertTriangle,
   Eye,
   Pencil,
+  Copy,
   Trash2,
   Download,
   Search,
@@ -161,6 +162,38 @@ export const PresensiSiswaView: React.FC<PresensiSiswaProps> = ({
     setActiveSubTab('riwayat');
   };
 
+  // Duplicate Riwayat Record
+  const handleDuplicateRecord = (record: PresensiRecord) => {
+    // Cari pertemuan tertinggi yang ada untuk kelas & mapel ini agar nomor pertemuan berikutnya runtut
+    const existingPertemuan = presensiList
+      .filter(
+        (p) =>
+          p.kelas === record.kelas &&
+          (p.kodeMapel === record.kodeMapel || p.namaMapel === record.namaMapel)
+      )
+      .map((p) => Number(p.pertemuanKe) || 0);
+
+    const maxPertemuan =
+      existingPertemuan.length > 0 ? Math.max(...existingPertemuan) : Number(record.pertemuanKe) || 1;
+    const nextPertemuan = maxPertemuan + 1;
+
+    const duplicatedRecord: PresensiRecord = {
+      ...record,
+      id: `presensi-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      pertemuanKe: nextPertemuan <= 25 ? nextPertemuan : (Number(record.pertemuanKe) || 1) + 1,
+      tanggal: formatDateString(record.tanggal) || new Date().toISOString().split('T')[0],
+      items: record.items.map((it) => ({ ...it })),
+      summary: { ...record.summary },
+    };
+
+    const updatedList = [duplicatedRecord, ...presensiList];
+    onSavePresensiList(updatedList);
+    showToast(
+      `Presensi berhasil digandakan menjadi Pertemuan ke-${duplicatedRecord.pertemuanKe}! Data rekap telah diperbarui.`,
+      'success'
+    );
+  };
+
   // Delete Riwayat Record
   const handleDeleteRecord = (id: string) => {
     if (confirm('Apakah Anda yakin ingin menghapus data presensi ini?')) {
@@ -186,8 +219,12 @@ export const PresensiSiswaView: React.FC<PresensiSiswaProps> = ({
       else if (it.status === 'Alpha') alpha++;
     });
 
-    const updatedRecord = {
+    const updatedRecord: PresensiRecord = {
       ...editingRecord,
+      tanggal: formatDateString(editingRecord.tanggal) || new Date().toISOString().split('T')[0],
+      pertemuanKe: Number(editingRecord.pertemuanKe) || 1,
+      waktuMulai: formatTimeString(editingRecord.waktuMulai),
+      waktuSelesai: formatTimeString(editingRecord.waktuSelesai),
       summary: { hadir, terlambat, sakit, izin, alpha, totalSiswa: editingRecord.items.length },
     };
 
@@ -668,6 +705,13 @@ export const PresensiSiswaView: React.FC<PresensiSiswaProps> = ({
                       <Pencil className="w-4 h-4" />
                     </button>
                     <button
+                      onClick={() => handleDuplicateRecord(rec)}
+                      className="p-1.5 text-slate-400 hover:text-emerald-600 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+                      title="Gandakan / Salin Presensi"
+                    >
+                      <Copy className="w-4 h-4" />
+                    </button>
+                    <button
                       onClick={() => setDeletingRecord(rec)}
                       className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
                       title="Hapus Presensi"
@@ -860,10 +904,10 @@ export const PresensiSiswaView: React.FC<PresensiSiswaProps> = ({
       {selectedViewRecord &&
         createPortal(
           <div
-            className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 sm:p-6 overflow-y-auto"
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-2.5 sm:p-4 md:p-6 overflow-y-auto"
             style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh' }}
           >
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl p-6 space-y-4 my-auto">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl p-4 sm:p-6 space-y-4 my-auto">
               <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
                 <h3 className="text-base font-bold text-slate-900 dark:text-white">
                   Detail Presensi — {selectedViewRecord.namaMapel}
@@ -877,25 +921,22 @@ export const PresensiSiswaView: React.FC<PresensiSiswaProps> = ({
                 Kelas: <strong className="text-slate-800 dark:text-slate-200">{selectedViewRecord.kelas}</strong> | Tanggal: <strong className="text-slate-800 dark:text-slate-200">{formatDateString(selectedViewRecord.tanggal)}</strong> | <strong className="text-slate-800 dark:text-slate-200">Pertemuan ke-{selectedViewRecord.pertemuanKe}</strong>
               </p>
 
-              <div className="max-h-80 overflow-y-auto custom-scrollbar border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
-                <table className="w-full text-left text-xs">
+              <div className="max-h-80 overflow-y-auto custom-scrollbar border border-slate-200 dark:border-slate-800 rounded-xl overflow-x-auto">
+                <table className="w-full min-w-[500px] text-left text-xs">
                   <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-500 font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800 sticky top-0 bg-slate-50 dark:bg-slate-800 z-10">
                     <tr>
-                      <th className="p-2.5 text-center w-10">No</th>
-                      <th className="p-2.5">NISN</th>
-                      <th className="p-2.5">Nama Siswa</th>
-                      <th className="p-2.5 text-center">Status Kehadiran</th>
-                      <th className="p-2.5">Catatan Khusus</th>
+                      <th className="p-2.5 text-center w-12 shrink-0">No.</th>
+                      <th className="p-2.5 min-w-[150px]">Nama Siswa</th>
+                      <th className="p-2.5 text-center min-w-[140px]">Status Kehadiran</th>
+                      <th className="p-2.5 min-w-[150px]">Catatan Khusus</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                     {selectedViewRecord.items.map((it, idx) => {
-                      const nisnVal = it.nisn || siswaList.find((s) => s.id === it.siswaId || s.namaLengkap === it.namaSiswa)?.nisn || '-';
                       return (
                         <tr key={idx} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/30">
                           <td className="p-2.5 text-center font-mono text-slate-400">{idx + 1}</td>
-                          <td className="p-2.5 font-mono font-semibold text-violet-600 dark:text-violet-400">{nisnVal}</td>
-                          <td className="p-2.5 font-bold text-slate-900 dark:text-white">{it.namaSiswa}</td>
+                          <td className="p-2.5 font-bold text-slate-900 dark:text-white whitespace-nowrap">{it.namaSiswa}</td>
                           <td className="p-2.5 text-center">
                             <span className={`inline-block px-2.5 py-0.5 rounded-full font-bold text-[11px] ${
                               it.status === 'Hadir'
@@ -936,17 +977,17 @@ export const PresensiSiswaView: React.FC<PresensiSiswaProps> = ({
       {editingRecord &&
         createPortal(
           <div
-            className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 sm:p-6 overflow-y-auto"
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-2.5 sm:p-4 md:p-6 overflow-y-auto"
             style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh' }}
           >
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-4xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl my-auto">
-              <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl my-auto">
+              <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
                 <div>
                   <h3 className="text-base font-bold text-slate-900 dark:text-white">
                     Edit Presensi — {editingRecord.namaMapel}
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    Kelas: {editingRecord.kelas} | Tanggal: {formatDateString(editingRecord.tanggal)} | Pertemuan ke-{editingRecord.pertemuanKe}
+                    Kelas: <span className="font-semibold text-violet-600 dark:text-violet-400">{editingRecord.kelas}</span>
                   </p>
                 </div>
                 <button onClick={() => setEditingRecord(null)} className="text-slate-400 hover:text-slate-600">
@@ -954,28 +995,103 @@ export const PresensiSiswaView: React.FC<PresensiSiswaProps> = ({
                 </button>
               </div>
 
-              <div className="p-6 overflow-y-auto flex-1 custom-scrollbar">
-                <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
-                  <table className="w-full text-left text-xs">
+              <div className="p-3.5 sm:p-6 overflow-y-auto flex-1 custom-scrollbar space-y-4">
+                {/* Form Pengaturan Tanggal, Pertemuan Ke, & Waktu */}
+                <div className="bg-slate-50 dark:bg-slate-800/60 p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                  <div>
+                    <label className="block font-semibold text-slate-600 dark:text-slate-400 mb-1 flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5 text-violet-500" />
+                      <span>Tanggal Presensi</span>
+                    </label>
+                    <input
+                      type="date"
+                      value={formatDateString(editingRecord.tanggal)}
+                      onChange={(e) =>
+                        setEditingRecord({
+                          ...editingRecord,
+                          tanggal: e.target.value,
+                        })
+                      }
+                      className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium text-xs focus:outline-none focus:ring-2 focus:ring-violet-500/20"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-semibold text-slate-600 dark:text-slate-400 mb-1 flex items-center gap-1.5">
+                      <ClipboardCheck className="w-3.5 h-3.5 text-violet-500" />
+                      <span>Pertemuan Ke-</span>
+                    </label>
+                    <input
+                      type="number"
+                      min={1}
+                      max={25}
+                      value={editingRecord.pertemuanKe}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value, 10);
+                        setEditingRecord({
+                          ...editingRecord,
+                          pertemuanKe: isNaN(val) ? 1 : val,
+                        });
+                      }}
+                      className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium text-xs focus:outline-none focus:ring-2 focus:ring-violet-500/20"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-semibold text-slate-600 dark:text-slate-400 mb-1 flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-violet-500" />
+                      <span>Waktu Mulai</span>
+                    </label>
+                    <input
+                      type="time"
+                      value={formatTimeString(editingRecord.waktuMulai) || '07:30'}
+                      onChange={(e) =>
+                        setEditingRecord({
+                          ...editingRecord,
+                          waktuMulai: e.target.value,
+                        })
+                      }
+                      className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium text-xs focus:outline-none focus:ring-2 focus:ring-violet-500/20"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-semibold text-slate-600 dark:text-slate-400 mb-1 flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-violet-500" />
+                      <span>Waktu Selesai</span>
+                    </label>
+                    <input
+                      type="time"
+                      value={formatTimeString(editingRecord.waktuSelesai) || '09:00'}
+                      onChange={(e) =>
+                        setEditingRecord({
+                          ...editingRecord,
+                          waktuSelesai: e.target.value,
+                        })
+                      }
+                      className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium text-xs focus:outline-none focus:ring-2 focus:ring-violet-500/20"
+                    />
+                  </div>
+                </div>
+
+                <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-x-auto custom-scrollbar">
+                  <table className="w-full min-w-[560px] text-left text-xs">
                     <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-500 font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800 sticky top-0 bg-slate-50 dark:bg-slate-800 z-10">
                       <tr>
-                        <th className="p-2.5 text-center w-10">No</th>
-                        <th className="p-2.5">NISN</th>
-                        <th className="p-2.5">Nama Siswa</th>
-                        <th className="p-2.5 text-center">Status Kehadiran</th>
-                        <th className="p-2.5">Catatan Khusus</th>
+                        <th className="p-2.5 text-center w-12 shrink-0">No.</th>
+                        <th className="p-2.5 min-w-[150px]">Nama Siswa</th>
+                        <th className="p-2.5 text-center min-w-[270px]">Status Kehadiran</th>
+                        <th className="p-2.5 min-w-[140px]">Catatan</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                       {editingRecord.items.map((it, idx) => {
-                        const nisnVal = it.nisn || siswaList.find((s) => s.id === it.siswaId || s.namaLengkap === it.namaSiswa)?.nisn || '-';
                         return (
                           <tr key={idx} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/30">
                             <td className="p-2.5 text-center font-mono text-slate-400">{idx + 1}</td>
-                            <td className="p-2.5 font-mono font-semibold text-violet-600 dark:text-violet-400">{nisnVal}</td>
-                            <td className="p-2.5 font-bold text-slate-900 dark:text-white">{it.namaSiswa}</td>
+                            <td className="p-2.5 font-bold text-slate-900 dark:text-white whitespace-nowrap">{it.namaSiswa}</td>
                             <td className="p-2.5 text-center">
-                              <div className="flex items-center justify-center space-x-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-full max-w-xs mx-auto">
+                              <div className="flex items-center justify-center space-x-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-full max-w-xs mx-auto shrink-0">
                                 {(['Hadir', 'Terlambat', 'Sakit', 'Izin', 'Alpha'] as StatusPresensi[]).map((st) => {
                                   const isSel = it.status === st;
                                   return (
