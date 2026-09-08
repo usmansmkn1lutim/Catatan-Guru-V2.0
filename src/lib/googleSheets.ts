@@ -20,8 +20,18 @@ import {
   JurnalRecord,
 } from '../types';
 
-// Initialize Firebase
-const firebaseApp = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+// Initialize Firebase with support for both config file and Vercel/Vite environment variables
+const env = (import.meta as any).env || {};
+export const activeFirebaseConfig = {
+  apiKey: env.VITE_FIREBASE_API_KEY || firebaseConfig.apiKey,
+  authDomain: env.VITE_FIREBASE_AUTH_DOMAIN || firebaseConfig.authDomain,
+  projectId: env.VITE_FIREBASE_PROJECT_ID || firebaseConfig.projectId,
+  storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET || firebaseConfig.storageBucket,
+  messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID || firebaseConfig.messagingSenderId,
+  appId: env.VITE_FIREBASE_APP_ID || firebaseConfig.appId,
+};
+
+const firebaseApp = !getApps().length ? initializeApp(activeFirebaseConfig) : getApp();
 export const auth = getAuth(firebaseApp);
 
 const provider = new GoogleAuthProvider();
@@ -30,7 +40,7 @@ provider.addScope('https://www.googleapis.com/auth/drive.file');
 provider.setCustomParameters({ prompt: 'select_account' });
 
 let isSigningIn = false;
-let cachedAccessToken: string | null = localStorage.getItem('catatan_guru_google_token');
+let cachedAccessToken: string | null = null;
 
 export const initAuth = (
   onAuthSuccess?: (user: User, token: string) => void,
@@ -40,12 +50,12 @@ export const initAuth = (
     if (user) {
       if (cachedAccessToken) {
         if (onAuthSuccess) onAuthSuccess(user, cachedAccessToken);
-      } else {
+      } else if (!isSigningIn) {
+        cachedAccessToken = null;
         if (onAuthFailure) onAuthFailure();
       }
     } else {
       cachedAccessToken = null;
-      localStorage.removeItem('catatan_guru_google_token');
       if (onAuthFailure) onAuthFailure();
     }
   });
@@ -62,10 +72,23 @@ export const googleSignIn = async (): Promise<{ user: User; accessToken: string 
     }
 
     cachedAccessToken = credential.accessToken;
-    localStorage.setItem('catatan_guru_google_token', cachedAccessToken);
     return { user: result.user, accessToken: cachedAccessToken };
   } catch (error: any) {
     console.error('Sign in error:', error);
+    if (error?.code === 'auth/unauthorized-domain' || String(error?.message).includes('unauthorized-domain')) {
+      const currentHost = typeof window !== 'undefined' ? window.location.hostname : 'domain Vercel Anda';
+      const customErr: any = new Error(
+        `Domain "${currentHost}" belum diizinkan di Firebase Console. Tambahkan domain ini ke "Authorized Domains" di Firebase Console proyek Anda agar dapat login Google di Vercel.`
+      );
+      customErr.code = 'auth/unauthorized-domain';
+      customErr.domain = currentHost;
+      throw customErr;
+    }
+    if (error?.code === 'auth/operation-not-allowed' || String(error?.message).includes('operation-not-allowed')) {
+      throw new Error(
+        'Metode login Google belum diaktifkan di Firebase Console. Buka Firebase Console > Authentication > Sign-in method, lalu aktifkan "Google".'
+      );
+    }
     if (error?.code === 'auth/popup-closed-by-user' || String(error?.message).includes('popup-closed-by-user')) {
       throw new Error('Jendela Login Google ditutup sebelum selesai. Silakan klik "Masuk dengan Google" dan pilih akun Google Anda.');
     }
@@ -84,12 +107,64 @@ export const googleSignIn = async (): Promise<{ user: User; accessToken: string 
 export const logoutGoogle = async () => {
   await signOut(auth);
   cachedAccessToken = null;
-  localStorage.removeItem('catatan_guru_google_token');
 };
 
 export const getAccessToken = (): string | null => {
   return cachedAccessToken;
 };
+
+export interface SpreadsheetDetails {
+  id: string;
+  title: string;
+  sheets: { id: number; title: string; rowCount?: number; colCount?: number }[];
+  url: string;
+}
+
+// Utility to parse spreadsheet ID from URL or raw ID
+export function extractSpreadsheetId(input: string): string {
+  const trimmed = input.trim();
+  const match = trimmed.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+  if (match && match[1]) {
+    return match[1];
+  }
+  const idMatch = trimmed.match(/^[a-zA-Z0-9-_]{15,}$/);
+  if (idMatch) {
+    return trimmed;
+  }
+  return trimmed;
+}
+
+// Fetch details for a specific spreadsheet
+export async function getSpreadsheetDetails(
+  spreadsheetId: string,
+  accessToken: string
+): Promise<SpreadsheetDetails> {
+  const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (!res.ok) {
+    if (res.status === 404) {
+      throw new Error('Spreadsheet tidak ditemukan. Pastikan ID atau URL spreadsheet benar.');
+    }
+    if (res.status === 403) {
+      throw new Error('Akses ditolak ke Spreadsheet ini. Pastikan akun Google Anda memiliki akses izin melihat/mengedit spreadsheet tersebut.');
+    }
+    const errData = await res.json().catch(() => ({}));
+    throw new Error(errData?.error?.message || `HTTP error ${res.status}`);
+  }
+  const data = await res.json();
+  return {
+    id: data.spreadsheetId,
+    title: data.properties?.title || 'Spreadsheet Tanpa Judul',
+    sheets: (data.sheets || []).map((s: any) => ({
+      id: s.properties?.sheetId,
+      title: s.properties?.title,
+      rowCount: s.properties?.gridProperties?.rowCount,
+      colCount: s.properties?.gridProperties?.columnCount,
+    })),
+    url: data.spreadsheetUrl || `https://docs.google.com/spreadsheets/d/${data.spreadsheetId}/edit`,
+  };
+}
 
 // Interface for Google Drive file
 export interface SpreadsheetFile {

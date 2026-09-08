@@ -810,15 +810,17 @@ export function App() {
         </div>
 
         {/* Page Views Routing */}
-        <div className="flex-1 w-full h-full overflow-y-auto no-scrollbar">
-          <main className="w-full h-full p-4 pb-28 lg:px-8 lg:py-6 lg:pb-28">
-            {/* Main Content Container */}
-            <div className={`w-full p-0 lg:p-6 transition-all min-h-[calc(100vh-13rem)] flex flex-col justify-between overflow-x-hidden overflow-y-visible ${
+        <div className="flex-1 min-h-0 w-full flex flex-col overflow-hidden">
+          <main className="w-full flex-1 min-h-0 p-4 pb-24 lg:px-8 lg:pt-4 lg:pb-4 flex flex-col overflow-hidden">
+            {/* Main Content Container - Aligned with Sidebar bottom */}
+            <div className={`w-full flex-1 min-h-0 flex flex-col justify-between overflow-hidden transition-all ${
               visualStyle === 'solid'
                 ? 'lg:bg-white lg:dark:bg-slate-900 lg:rounded-2xl lg:border lg:border-gray-200 lg:dark:border-slate-800 lg:shadow-sm'
-                : 'lg:bg-white/10 lg:dark:bg-slate-900/10 lg:backdrop-blur-xl lg:rounded-2xl lg:border lg:border-white/20 lg:shadow-lg'
+                : 'lg:bg-white/10 lg:dark:bg-slate-900/10 lg:backdrop-blur-xl lg:rounded-3xl lg:border lg:border-white/20 lg:shadow-lg'
             }`}>
-              <div className="w-full">
+              {/* Inner Scrollable Content */}
+              <div className="w-full flex-1 overflow-y-auto custom-scrollbar p-0 lg:p-6 flex flex-col justify-between">
+                <div className="w-full">
                 {activeTab === 'dashboard' && (
                   <Dashboard
                     dataSekolah={dataSekolah}
@@ -1083,7 +1085,7 @@ export function App() {
               </div>
 
               {/* Footer Text */}
-              <div className="mt-12 pt-6 border-t border-white/20 dark:border-white/10 flex flex-col items-center justify-center text-center space-y-1">
+              <div className="mt-12 pt-6 border-t border-slate-200/50 dark:border-white/10 flex flex-col items-center justify-center text-center space-y-1 shrink-0">
                 <p className="text-xs font-semibold text-black dark:text-white">
                   © 2026 Teacheers. Dari guru untuk guru
                 </p>
@@ -1092,7 +1094,8 @@ export function App() {
                 </p>
               </div>
             </div>
-          </main>
+          </div>
+        </main>
 
         <BottomTabBar activeTab={activeTab} onSelectTab={setActiveTab} />
         </div>
