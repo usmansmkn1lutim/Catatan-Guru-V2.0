@@ -1,11 +1,11 @@
 {
-  "projectId": "ai-studio-applet-webapp-c4778",
-  "appId": "1:73900244330:web:3928dc7dcea9faf9d5f913",
-  "apiKey": "AIzaSyCWf2R4u4_l5Caf2dbJBjGcTkTzjP0ARlE",
-  "authDomain": "ai-studio-applet-webapp-c4778.firebaseapp.com",
-  "storageBucket": "ai-studio-applet-webapp-c4778.firebasestorage.app",
-  "messagingSenderId": "73900244330",
+  "projectId": "teacheers",
+  "appId": "1:185693206909:web:0612ad0978058f229bb414",
+  "apiKey": "AIzaSyCVpAt6TxwzH0R-rGDexm7DAs8hM9WTvvo",
+  "authDomain": "teacheers.firebaseapp.com",
+  "storageBucket": "teacheers.firebasestorage.app",
+  "messagingSenderId": "185693206909",
   "measurementId": "",
-  "oAuthClientId": "73900244330-9qspj9r2b40037rthhoakctcnpb8qnij.apps.googleusercontent.com",
+  "oAuthClientId": "185693206909-vitr06gaei3cc1acoqo59h7hkt4d4t0n.apps.googleusercontent.com",
   "recaptchaSiteKey": ""
 }

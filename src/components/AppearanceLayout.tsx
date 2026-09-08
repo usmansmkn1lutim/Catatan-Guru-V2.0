@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   SlidersHorizontal,
   Image as ImageIcon,
+  Sparkles,
   RotateCcw,
   Trash2,
   Upload,
@@ -213,6 +214,10 @@ export const AppearanceLayout: React.FC<AppearanceLayoutProps> = ({
         
         <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="space-y-2">
+            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-500/10 dark:bg-blue-500/20 border border-blue-500/20 dark:border-blue-400/30 text-blue-600 dark:text-blue-300 text-xs font-semibold">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Personalisasi Tampilan & Antarmuka</span>
+            </div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white">
               Appearance & Layout
             </h1>

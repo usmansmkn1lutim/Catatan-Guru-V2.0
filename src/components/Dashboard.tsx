@@ -916,7 +916,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   };
 
   return (
-    <div className="space-y-6 pb-28 lg:pb-0">
+    <div className="space-y-6 pb-28">
       {/* ========================================================================= */}
       {/* MOBILE & TABLET VIEW (Top Swipeable Card Slider + Menu + Jadwal + Chart) */}
       {/* ========================================================================= */}
