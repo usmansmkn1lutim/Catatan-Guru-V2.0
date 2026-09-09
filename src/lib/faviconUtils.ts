@@ -1,12 +1,9 @@
 /**
- * Utility untuk menyinkronkan dynamic favicon & app icon pada semua media / device
- * ketika ada perubahan logo di Konfigurasi Aplikasi.
+ * Utility untuk memastikan favicon & app icon pada semua browser / media / device
+ * tetap menggunakan aset favicon resmi yang telah disiapkan (bukan logo banner aplikasi).
  */
-export function updateDynamicFavicons(logoUrl: string | undefined): void {
-  if (!logoUrl) return;
-
+export function ensureStandardFavicons(): void {
   try {
-    // Helper untuk mengubah atau menambahkan link tag
     const setLinkTag = (rel: string, type: string | null, sizes: string | null, href: string) => {
       let selector = `link[rel="${rel}"]`;
       if (sizes) {
@@ -22,17 +19,23 @@ export function updateDynamicFavicons(logoUrl: string | undefined): void {
         document.head.appendChild(link);
       }
       
-      // Update href dengan logoUrl yang baru
       link.href = href;
     };
 
-    // Update semua media tag favicon & touch icon untuk semua jenis device
-    setLinkTag('icon', 'image/png', '96x96', logoUrl);
-    setLinkTag('icon', 'image/svg+xml', null, logoUrl);
-    setLinkTag('shortcut icon', null, null, logoUrl);
-    setLinkTag('apple-touch-icon', null, '180x180', logoUrl);
-    setLinkTag('apple-touch-icon-precomposed', null, '180x180', logoUrl);
+    // Pastikan semua tag favicon mengarah ke file favicon resmi dengan cache-busting v=4
+    setLinkTag('icon', 'image/png', '96x96', '/favicon-96x96.png?v=4');
+    setLinkTag('icon', 'image/svg+xml', null, '/favicon.svg?v=4');
+    setLinkTag('shortcut icon', null, null, '/favicon.ico?v=4');
+    setLinkTag('apple-touch-icon', null, '180x180', '/apple-touch-icon.png?v=4');
   } catch (err) {
-    console.error('Gagal memperbarui dynamic favicon:', err);
+    console.error('Gagal menyinkronkan favicon standar:', err);
   }
+}
+
+/**
+ * Pertahankan fungsi updateDynamicFavicons untuk kompatibilitas,
+ * tetapi tetap mengarahkan ke favicon standar agar logo banner tidak merusak favicon Chrome mobile.
+ */
+export function updateDynamicFavicons(_logoUrl?: string): void {
+  ensureStandardFavicons();
 }

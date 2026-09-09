@@ -43,7 +43,7 @@ import {
 import { getAccessToken, exportToGoogleSheets, importFromGoogleSheets } from './lib/googleSheets';
 import { sanitizePresensiList, sanitizeScheduleList, formatDateString } from './lib/dateUtils';
 import { CODE_GS_TEMPLATE, INDEX_HTML_TEMPLATE } from './lib/gasCode';
-import { updateDynamicFavicons } from './lib/faviconUtils';
+import { ensureStandardFavicons } from './lib/faviconUtils';
 
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
@@ -275,12 +275,10 @@ export function App() {
     }
   }, [darkMode]);
 
-  // Dynamic Favicon and App Icon sync across devices
+  // Pastikan favicon browser tetap menggunakan aset favicon resmi (bukan banner logo aplikasi)
   useEffect(() => {
-    if (appConfig?.logoAplikasiUrl) {
-      updateDynamicFavicons(appConfig.logoAplikasiUrl);
-    }
-  }, [appConfig?.logoAplikasiUrl]);
+    ensureStandardFavicons();
+  }, []);
 
   // Persist to local storage on changes
   useEffect(() => {
