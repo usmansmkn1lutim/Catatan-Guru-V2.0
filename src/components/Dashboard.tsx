@@ -94,6 +94,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   darkMode,
   visualStyle = 'solid',
 }) => {
+  const [selectedSemesterFilter, setSelectedSemesterFilter] = useState<string>('Semua');
   const [selectedKelasFilter, setSelectedKelasFilter] = useState<string>('Semua');
   const [selectedBulanFilter, setSelectedBulanFilter] = useState<string>('Semua');
   const [selectedMingguFilter, setSelectedMingguFilter] = useState<string>('Semua');
@@ -314,7 +315,20 @@ export const Dashboard: React.FC<DashboardProps> = ({
     });
 
     // Sort descending (most recent first)
-    const sorted = Array.from(monthSet).sort((a, b) => b.localeCompare(a));
+    let sorted = Array.from(monthSet).sort((a, b) => b.localeCompare(a));
+
+    // Filter based on selected semester if not 'Semua'
+    if (selectedSemesterFilter === '1') {
+      sorted = sorted.filter((ym) => {
+        const m = parseInt(ym.split('-')[1], 10);
+        return m >= 7 && m <= 12;
+      });
+    } else if (selectedSemesterFilter === '2') {
+      sorted = sorted.filter((ym) => {
+        const m = parseInt(ym.split('-')[1], 10);
+        return m >= 1 && m <= 6;
+      });
+    }
 
     return sorted.map((ym) => {
       const [yearStr, monthStr] = ym.split('-');
@@ -322,15 +336,131 @@ export const Dashboard: React.FC<DashboardProps> = ({
       const label = `${monthNames[mIdx] || monthStr} ${yearStr}`;
       return { value: ym, label };
     });
-  }, [presensiList]);
+  }, [presensiList, selectedSemesterFilter]);
 
-  // Chart data preparation with Kelas, Bulan, and Minggu filters
+  // Chart data preparation with Semester, Kelas, Bulan, and Minggu filters
   const chartData = useMemo(() => {
     let filtered = presensiList;
 
     // Filter Kelas
     if (selectedKelasFilter !== 'Semua') {
       filtered = filtered.filter((p) => p.kelas === selectedKelasFilter);
+    }
+
+    // If semester is chosen and Bulan is 'Semua', show timeline grouped by Month (Juli-Desember or Januari-Juni)
+    if (selectedSemesterFilter !== 'Semua' && selectedBulanFilter === 'Semua') {
+      const semester1Months = [
+        { num: 7, label: 'Juli' },
+        { num: 8, label: 'Agustus' },
+        { num: 9, label: 'September' },
+        { num: 10, label: 'Oktober' },
+        { num: 11, label: 'November' },
+        { num: 12, label: 'Desember' },
+      ];
+
+      const semester2Months = [
+        { num: 1, label: 'Januari' },
+        { num: 2, label: 'Februari' },
+        { num: 3, label: 'Maret' },
+        { num: 4, label: 'April' },
+        { num: 5, label: 'Mei' },
+        { num: 6, label: 'Juni' },
+      ];
+
+      const targetMonths = selectedSemesterFilter === '1' ? semester1Months : semester2Months;
+
+      // Filter by Minggu if specified
+      let semesterFiltered = filtered;
+      if (selectedMingguFilter !== 'Semua') {
+        const weekNum = parseInt(selectedMingguFilter, 10);
+        semesterFiltered = semesterFiltered.filter((p) => {
+          const cleanDate = formatDateString(p.tanggal);
+          const parts = cleanDate.split('-');
+          if (parts.length === 3) {
+            const day = parseInt(parts[2], 10);
+            if (weekNum === 1) return day >= 1 && day <= 7;
+            if (weekNum === 2) return day >= 8 && day <= 14;
+            if (weekNum === 3) return day >= 15 && day <= 21;
+            if (weekNum === 4) return day >= 22 && day <= 28;
+            if (weekNum === 5) return day >= 29 && day <= 31;
+          }
+          return true;
+        });
+      }
+
+      // Check if any matching records exist across the entire semester
+      const totalSemesterRecords = semesterFiltered.filter((p) => {
+        const cleanDate = formatDateString(p.tanggal);
+        if (!cleanDate) return false;
+        const parts = cleanDate.split('-');
+        if (parts.length < 2) return false;
+        const mNum = parseInt(parts[1], 10);
+        return targetMonths.some((tm) => tm.num === mNum);
+      });
+
+      if (totalSemesterRecords.length === 0) {
+        return [];
+      }
+
+      // Construct the 6-month timeline for the semester
+      return targetMonths.map((m) => {
+        const monthRecords = semesterFiltered.filter((p) => {
+          const cleanDate = formatDateString(p.tanggal);
+          if (!cleanDate) return false;
+          const parts = cleanDate.split('-');
+          if (parts.length < 2) return false;
+          const mNum = parseInt(parts[1], 10);
+          return mNum === m.num;
+        });
+
+        let hadir = 0;
+        let terlambat = 0;
+        let sakit = 0;
+        let izin = 0;
+        let alpha = 0;
+        let totalSiswa = 0;
+
+        monthRecords.forEach((p) => {
+          const tot = p.summary?.totalSiswa || p.items?.length || 0;
+          hadir += p.summary?.hadir || 0;
+          terlambat += p.summary?.terlambat || 0;
+          sakit += p.summary?.sakit || 0;
+          izin += p.summary?.izin || 0;
+          alpha += p.summary?.alpha || 0;
+          totalSiswa += tot;
+        });
+
+        const tot = totalSiswa || 1;
+        const hasData = totalSiswa > 0;
+
+        return {
+          rawDate: `Bulan ${m.label}`,
+          label: m.label,
+          isMonthly: true,
+          Hadir: hasData ? Math.round((hadir / tot) * 100) : 0,
+          Terlambat: hasData ? Math.round((terlambat / tot) * 100) : 0,
+          Sakit: hasData ? Math.round((sakit / tot) * 100) : 0,
+          Izin: hasData ? Math.round((izin / tot) * 100) : 0,
+          Alpha: hasData ? Math.round((alpha / tot) * 100) : 0,
+        };
+      });
+    }
+
+    // If semester is chosen and specific month is chosen, filter by that semester's months too
+    if (selectedSemesterFilter === '1') {
+      filtered = filtered.filter((p) => {
+        const cleanDate = formatDateString(p.tanggal);
+        if (!cleanDate) return false;
+        const m = parseInt(cleanDate.split('-')[1], 10);
+        return m >= 7 && m <= 12;
+      });
+    } else if (selectedSemesterFilter === '2') {
+      filtered = filtered.filter((p) => {
+        const cleanDate = formatDateString(p.tanggal);
+        if (!cleanDate) return false;
+        const m = parseInt(cleanDate.split('-')[1], 10);
+        return m >= 1 && m <= 6;
+      });
     }
 
     // Filter Bulan (format: YYYY-MM)
@@ -363,6 +493,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
       // If presensiList was completely empty and no filters were changed, provide initial sample
       if (
         presensiList.length === 0 &&
+        selectedSemesterFilter === 'Semua' &&
         selectedKelasFilter === 'Semua' &&
         selectedBulanFilter === 'Semua' &&
         selectedMingguFilter === 'Semua'
@@ -418,7 +549,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         Alpha: Math.round((g.alpha / tot) * 100),
       };
     });
-  }, [presensiList, selectedKelasFilter, selectedBulanFilter, selectedMingguFilter]);
+  }, [presensiList, selectedSemesterFilter, selectedKelasFilter, selectedBulanFilter, selectedMingguFilter]);
 
   // Helper to render Jadwal Hari Ini panel
   const renderJadwalHariIniContent = (isMobileView: boolean = false) => (
@@ -661,8 +792,25 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </p>
         </div>
         
-        {/* Filter Toolbar: Kelas, Bulan, Minggu */}
+        {/* Filter Toolbar: Semester, Kelas, Bulan, Minggu */}
         <div className="flex flex-wrap items-center gap-2">
+          {/* Filter Semester */}
+          <select
+            value={selectedSemesterFilter}
+            onChange={(e) => {
+              const val = e.target.value;
+              setSelectedSemesterFilter(val);
+              setSelectedBulanFilter('Semua');
+              setSelectedMingguFilter('Semua');
+            }}
+            className="bg-white/90 dark:bg-slate-900/80 border border-slate-300 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500 shadow-sm min-w-[135px]"
+            title="Filter Semester"
+          >
+            <option value="Semua" className="text-black bg-white dark:bg-slate-900 dark:text-white">Semua Semester</option>
+            <option value="1" className="text-black bg-white dark:bg-slate-900 dark:text-white">Semester 1 (Ganjil)</option>
+            <option value="2" className="text-black bg-white dark:bg-slate-900 dark:text-white">Semester 2 (Genap)</option>
+          </select>
+
           {/* Filter Kelas */}
           <select
             value={selectedKelasFilter}
@@ -716,7 +864,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
             <ClipboardCheck className="w-8 h-8 text-slate-400 dark:text-slate-500" />
             <p className="text-xs font-bold text-slate-800 dark:text-slate-200">Tidak ada data kehadiran</p>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 max-w-sm">
-              Tidak ditemukan data presensi untuk kombinasi filter kelas, bulan, atau minggu yang dipilih.
+              Tidak ditemukan data presensi untuk kombinasi filter semester, kelas, bulan, atau minggu yang dipilih.
             </p>
           </div>
         ) : (
@@ -741,6 +889,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   if (!active || !payload || !payload.length) return null;
                   const rawDate = payload[0]?.payload?.rawDate;
                   const displayLabel = payload[0]?.payload?.label || label;
+                  const isMonthly = payload[0]?.payload?.isMonthly;
+                  const displayTitle = isMonthly
+                    ? `Bulan: ${displayLabel}`
+                    : `Tanggal: ${displayLabel} ${rawDate ? `(${rawDate})` : ''}`;
+
                   const orderMap: Record<string, number> = {
                     Hadir: 1,
                     Terlambat: 2,
@@ -757,7 +910,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   return (
                     <div className="bg-slate-900 text-white p-3 rounded-xl border border-slate-800 shadow-xl text-xs space-y-2">
                       <p className="font-semibold text-white border-b border-slate-800 pb-1">
-                        Tanggal: {displayLabel} {rawDate ? `(${rawDate})` : ''}
+                        {displayTitle}
                       </p>
                       <div className="space-y-1">
                         {sortedPayload.map((entry: any, index: number) => (
