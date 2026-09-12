@@ -782,7 +782,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         ? 'bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 shadow-sm'
         : 'bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl border border-white/20 shadow-lg'
     }`}>
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3 mb-4">
+      <div className="flex flex-col gap-3 mb-4">
         <div>
           <h4 className="text-sm font-bold text-black dark:text-white">
             Statistik Kehadiran Siswa
@@ -793,7 +793,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
         
         {/* Filter Toolbar: Semester, Kelas, Bulan, Minggu */}
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 pt-0.5">
           {/* Filter Semester */}
           <select
             value={selectedSemesterFilter}
