@@ -1,0 +1,40 @@
+--- src/lib/googleSheets.ts
++++ src/lib/googleSheets.ts
+@@ -137,6 +137,8 @@
+         { properties: { title: 'Data_Presensi' } },
+         { properties: { title: 'Data_Nilai' } },
+         { properties: { title: 'Data_Jurnal' } },
++        { properties: { title: 'Jadwal_Settings' } },
++        { properties: { title: 'Jadwal_Mengajar' } },
+       ],
+     };
+ 
+@@ -179,6 +181,8 @@
+     presensiList: PresensiRecord[];
++    scheduleList?: any[];
++    scheduleConfig?: any;
+     nilaiList: NilaiRecord[];
+     jurnalList: JurnalRecord[];
+   }
+ ) {
+   try {
++    // 0. Ensure all required sheets exist
++    const requiredSheets = ['Data_Sekolah', 'Profil_Guru', 'Data_Mapel', 'Data_Kelas', 'Data_Siswa', 'Data_Presensi', 'Data_Nilai', 'Data_Jurnal', 'Jadwal_Settings', 'Jadwal_Mengajar'];
++    const metaRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}`, {
++      headers: { Authorization: `Bearer ${accessToken}` }
++    });
++    if (metaRes.ok) {
++      const metaData = await metaRes.json();
++      const existingTitles = metaData.sheets.map((s: any) => s.properties.title);
++      const missingSheets = requiredSheets.filter(title => !existingTitles.includes(title));
++      if (missingSheets.length > 0) {
++        const addSheetRequests = missingSheets.map(title => ({ addSheet: { properties: { title } } }));
++        await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}:batchUpdate`, {
++          method: 'POST',
++          headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
++          body: JSON.stringify({ requests: addSheetRequests })
++        });
++      }
++    }
++
+     // 1. Prepare sheet data rows
