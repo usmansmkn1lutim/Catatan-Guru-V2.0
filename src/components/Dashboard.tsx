@@ -95,6 +95,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
   visualStyle = 'solid',
 }) => {
   const [selectedKelasFilter, setSelectedKelasFilter] = useState<string>('Semua');
+  const [selectedBulanFilter, setSelectedBulanFilter] = useState<string>('Semua');
+  const [selectedMingguFilter, setSelectedMingguFilter] = useState<string>('Semua');
   const [isMenuExpanded, setIsMenuExpanded] = useState<boolean>(false);
   const [activeSlide, setActiveSlide] = useState<number>(0);
   const sliderRef = useRef<HTMLDivElement>(null);
@@ -270,21 +272,110 @@ export const Dashboard: React.FC<DashboardProps> = ({
     return Math.round((totalHadirPct / presensiList.length) * 10) / 10;
   }, [presensiList]);
 
-  // Chart data preparation
+  // Available months extracted from presensiList and standard calendar for filtering
+  const availableMonths = useMemo(() => {
+    const monthNames = [
+      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ];
+    const monthSet = new Set<string>();
+
+    // Add all months present in presensiList
+    presensiList.forEach((p) => {
+      const clean = formatDateString(p.tanggal);
+      if (clean && clean.length >= 7) {
+        const ym = clean.substring(0, 7);
+        if (/^\d{4}-\d{2}$/.test(ym)) {
+          monthSet.add(ym);
+        }
+      }
+    });
+
+    // Detect unique years from data or fallback to current year
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const detectedYears = new Set<number>([currentYear]);
+
+    presensiList.forEach((p) => {
+      const clean = formatDateString(p.tanggal);
+      if (clean && clean.length >= 4) {
+        const y = parseInt(clean.substring(0, 4), 10);
+        if (!isNaN(y) && y > 2000 && y < 2100) {
+          detectedYears.add(y);
+        }
+      }
+    });
+
+    // Populate all 12 months for the detected years
+    detectedYears.forEach((yr) => {
+      for (let m = 1; m <= 12; m++) {
+        monthSet.add(`${yr}-${String(m).padStart(2, '0')}`);
+      }
+    });
+
+    // Sort descending (most recent first)
+    const sorted = Array.from(monthSet).sort((a, b) => b.localeCompare(a));
+
+    return sorted.map((ym) => {
+      const [yearStr, monthStr] = ym.split('-');
+      const mIdx = parseInt(monthStr, 10) - 1;
+      const label = `${monthNames[mIdx] || monthStr} ${yearStr}`;
+      return { value: ym, label };
+    });
+  }, [presensiList]);
+
+  // Chart data preparation with Kelas, Bulan, and Minggu filters
   const chartData = useMemo(() => {
-    const filtered =
-      selectedKelasFilter === 'Semua'
-        ? presensiList
-        : presensiList.filter((p) => p.kelas === selectedKelasFilter);
+    let filtered = presensiList;
+
+    // Filter Kelas
+    if (selectedKelasFilter !== 'Semua') {
+      filtered = filtered.filter((p) => p.kelas === selectedKelasFilter);
+    }
+
+    // Filter Bulan (format: YYYY-MM)
+    if (selectedBulanFilter !== 'Semua') {
+      filtered = filtered.filter((p) => {
+        const cleanDate = formatDateString(p.tanggal);
+        return cleanDate.startsWith(selectedBulanFilter);
+      });
+    }
+
+    // Filter Minggu (1 to 5)
+    if (selectedMingguFilter !== 'Semua') {
+      const weekNum = parseInt(selectedMingguFilter, 10);
+      filtered = filtered.filter((p) => {
+        const cleanDate = formatDateString(p.tanggal);
+        const parts = cleanDate.split('-');
+        if (parts.length === 3) {
+          const day = parseInt(parts[2], 10);
+          if (weekNum === 1) return day >= 1 && day <= 7;
+          if (weekNum === 2) return day >= 8 && day <= 14;
+          if (weekNum === 3) return day >= 15 && day <= 21;
+          if (weekNum === 4) return day >= 22 && day <= 28;
+          if (weekNum === 5) return day >= 29 && day <= 31;
+        }
+        return true;
+      });
+    }
 
     if (filtered.length === 0) {
-      return [
-        { rawDate: '2026-08-01', label: '01 Ags', Hadir: 85, Terlambat: 8, Sakit: 4, Izin: 2, Alpha: 1 },
-        { rawDate: '2026-08-02', label: '02 Ags', Hadir: 88, Terlambat: 6, Sakit: 3, Izin: 2, Alpha: 1 },
-        { rawDate: '2026-08-03', label: '03 Ags', Hadir: 90, Terlambat: 5, Sakit: 3, Izin: 1, Alpha: 1 },
-        { rawDate: '2026-08-04', label: '04 Ags', Hadir: 92, Terlambat: 4, Sakit: 2, Izin: 1, Alpha: 1 },
-        { rawDate: '2026-08-05', label: '05 Ags', Hadir: 95, Terlambat: 2, Sakit: 1, Izin: 1, Alpha: 0 },
-      ];
+      // If presensiList was completely empty and no filters were changed, provide initial sample
+      if (
+        presensiList.length === 0 &&
+        selectedKelasFilter === 'Semua' &&
+        selectedBulanFilter === 'Semua' &&
+        selectedMingguFilter === 'Semua'
+      ) {
+        return [
+          { rawDate: '2026-08-01', label: '01 Ags', Hadir: 85, Terlambat: 8, Sakit: 4, Izin: 2, Alpha: 1 },
+          { rawDate: '2026-08-02', label: '02 Ags', Hadir: 88, Terlambat: 6, Sakit: 3, Izin: 2, Alpha: 1 },
+          { rawDate: '2026-08-03', label: '03 Ags', Hadir: 90, Terlambat: 5, Sakit: 3, Izin: 1, Alpha: 1 },
+          { rawDate: '2026-08-04', label: '04 Ags', Hadir: 92, Terlambat: 4, Sakit: 2, Izin: 1, Alpha: 1 },
+          { rawDate: '2026-08-05', label: '05 Ags', Hadir: 95, Terlambat: 2, Sakit: 1, Izin: 1, Alpha: 0 },
+        ];
+      }
+      return [];
     }
 
     // Grouping by sanitized YYYY-MM-DD date string
@@ -327,7 +418,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         Alpha: Math.round((g.alpha / tot) * 100),
       };
     });
-  }, [presensiList, selectedKelasFilter]);
+  }, [presensiList, selectedKelasFilter, selectedBulanFilter, selectedMingguFilter]);
 
   // Helper to render Jadwal Hari Ini panel
   const renderJadwalHariIniContent = (isMobileView: boolean = false) => (
@@ -560,119 +651,165 @@ export const Dashboard: React.FC<DashboardProps> = ({
         ? 'bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 shadow-sm'
         : 'bg-white/10 dark:bg-slate-900/10 backdrop-blur-xl border border-white/20 shadow-lg'
     }`}>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mb-4">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3 mb-4">
         <div>
           <h4 className="text-sm font-bold text-black dark:text-white">
-            Statistik Kehadiran Harian
+            Statistik Kehadiran Siswa
           </h4>
           <p className="text-xs text-black dark:text-white/70">
-            Grafik kehadiran siswa dalam pertemuan pembelajaran
+            Grafik persentase kehadiran siswa dalam pertemuan pembelajaran
           </p>
         </div>
-        <select
-          value={selectedKelasFilter}
-          onChange={(e) => setSelectedKelasFilter(e.target.value)}
-          className="bg-white/80 dark:bg-slate-900/60 border border-slate-300 dark:border-white/30 rounded-lg px-3 py-1.5 text-xs font-semibold text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500 shadow-sm self-start sm:self-auto"
-        >
-          <option value="Semua" className="text-black bg-white">Semua Kelas</option>
-          {kelasList.map((k) => (
-            <option key={k.id} value={k.namaKelas} className="text-black bg-white">
-              {k.namaKelas}
-            </option>
-          ))}
-        </select>
+        
+        {/* Filter Toolbar: Kelas, Bulan, Minggu */}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Filter Kelas */}
+          <select
+            value={selectedKelasFilter}
+            onChange={(e) => setSelectedKelasFilter(e.target.value)}
+            className="bg-white/90 dark:bg-slate-900/80 border border-slate-300 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500 shadow-sm min-w-[110px]"
+            title="Filter Kelas"
+          >
+            <option value="Semua" className="text-black bg-white dark:bg-slate-900 dark:text-white">Semua Kelas</option>
+            {kelasList.map((k) => (
+              <option key={k.id} value={k.namaKelas} className="text-black bg-white dark:bg-slate-900 dark:text-white">
+                {k.namaKelas}
+              </option>
+            ))}
+          </select>
+
+          {/* Filter Bulan */}
+          <select
+            value={selectedBulanFilter}
+            onChange={(e) => setSelectedBulanFilter(e.target.value)}
+            className="bg-white/90 dark:bg-slate-900/80 border border-slate-300 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500 shadow-sm min-w-[125px]"
+            title="Filter Bulan"
+          >
+            <option value="Semua" className="text-black bg-white dark:bg-slate-900 dark:text-white">Semua Bulan</option>
+            {availableMonths.map((m) => (
+              <option key={m.value} value={m.value} className="text-black bg-white dark:bg-slate-900 dark:text-white">
+                {m.label}
+              </option>
+            ))}
+          </select>
+
+          {/* Filter Minggu */}
+          <select
+            value={selectedMingguFilter}
+            onChange={(e) => setSelectedMingguFilter(e.target.value)}
+            className="bg-white/90 dark:bg-slate-900/80 border border-slate-300 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500 shadow-sm min-w-[115px]"
+            title="Filter Minggu"
+          >
+            <option value="Semua" className="text-black bg-white dark:bg-slate-900 dark:text-white">Semua Minggu</option>
+            <option value="1" className="text-black bg-white dark:bg-slate-900 dark:text-white">Minggu 1 (Tgl 1-7)</option>
+            <option value="2" className="text-black bg-white dark:bg-slate-900 dark:text-white">Minggu 2 (Tgl 8-14)</option>
+            <option value="3" className="text-black bg-white dark:bg-slate-900 dark:text-white">Minggu 3 (Tgl 15-21)</option>
+            <option value="4" className="text-black bg-white dark:bg-slate-900 dark:text-white">Minggu 4 (Tgl 22-28)</option>
+            <option value="5" className="text-black bg-white dark:bg-slate-900 dark:text-white">Minggu 5 (Tgl 29-31)</option>
+          </select>
+        </div>
       </div>
 
       <div className="h-64 sm:h-72 w-full pt-1">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? "rgba(255, 255, 255, 0.15)" : "rgba(0, 0, 0, 0.15)"} />
-            <XAxis 
-              dataKey="label" 
-              tick={{ fontSize: 11, fill: isDark ? '#ffffff' : '#000000', fontWeight: 600 }} 
-              stroke={isDark ? "#ffffff" : "#000000"}
-              tickLine={{ stroke: isDark ? "#ffffff" : "#000000" }}
-            />
-            <YAxis 
-              domain={[0, 100]} 
-              tick={{ fontSize: 11, fill: isDark ? '#ffffff' : '#000000', fontWeight: 600 }} 
-              unit="%" 
-              stroke={isDark ? "#ffffff" : "#000000"}
-              tickLine={{ stroke: isDark ? "#ffffff" : "#000000" }}
-            />
-            <Tooltip
-              content={({ active, payload, label }: any) => {
-                if (!active || !payload || !payload.length) return null;
-                const rawDate = payload[0]?.payload?.rawDate;
-                const displayLabel = payload[0]?.payload?.label || label;
-                const orderMap: Record<string, number> = {
-                  Hadir: 1,
-                  Terlambat: 2,
-                  Sakit: 3,
-                  Izin: 4,
-                  Alpha: 5,
-                };
-                const sortedPayload = [...payload].sort((a, b) => {
-                  const nameA = a.name || a.dataKey;
-                  const nameB = b.name || b.dataKey;
-                  return (orderMap[nameA] || 99) - (orderMap[nameB] || 99);
-                });
+        {chartData.length === 0 ? (
+          <div className="h-full w-full flex flex-col items-center justify-center text-center p-6 rounded-xl bg-slate-50/60 dark:bg-slate-800/30 border border-dashed border-slate-200 dark:border-slate-800 space-y-2">
+            <ClipboardCheck className="w-8 h-8 text-slate-400 dark:text-slate-500" />
+            <p className="text-xs font-bold text-slate-800 dark:text-slate-200">Tidak ada data kehadiran</p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 max-w-sm">
+              Tidak ditemukan data presensi untuk kombinasi filter kelas, bulan, atau minggu yang dipilih.
+            </p>
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? "rgba(255, 255, 255, 0.15)" : "rgba(0, 0, 0, 0.15)"} />
+              <XAxis 
+                dataKey="label" 
+                tick={{ fontSize: 11, fill: isDark ? '#ffffff' : '#000000', fontWeight: 600 }} 
+                stroke={isDark ? "#ffffff" : "#000000"}
+                tickLine={{ stroke: isDark ? "#ffffff" : "#000000" }}
+              />
+              <YAxis 
+                domain={[0, 100]} 
+                tick={{ fontSize: 11, fill: isDark ? '#ffffff' : '#000000', fontWeight: 600 }} 
+                unit="%" 
+                stroke={isDark ? "#ffffff" : "#000000"}
+                tickLine={{ stroke: isDark ? "#ffffff" : "#000000" }}
+              />
+              <Tooltip
+                content={({ active, payload, label }: any) => {
+                  if (!active || !payload || !payload.length) return null;
+                  const rawDate = payload[0]?.payload?.rawDate;
+                  const displayLabel = payload[0]?.payload?.label || label;
+                  const orderMap: Record<string, number> = {
+                    Hadir: 1,
+                    Terlambat: 2,
+                    Sakit: 3,
+                    Izin: 4,
+                    Alpha: 5,
+                  };
+                  const sortedPayload = [...payload].sort((a, b) => {
+                    const nameA = a.name || a.dataKey;
+                    const nameB = b.name || b.dataKey;
+                    return (orderMap[nameA] || 99) - (orderMap[nameB] || 99);
+                  });
 
-                return (
-                  <div className="bg-slate-900 text-white p-3 rounded-xl border border-slate-800 shadow-xl text-xs space-y-2">
-                    <p className="font-semibold text-white border-b border-slate-800 pb-1">
-                      Tanggal: {displayLabel} {rawDate ? `(${rawDate})` : ''}
-                    </p>
-                    <div className="space-y-1">
-                      {sortedPayload.map((entry: any, index: number) => (
-                        <div key={`item-${index}`} className="flex items-center justify-between space-x-4">
-                          <span className="flex items-center space-x-1.5">
-                            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
-                            <span className="text-slate-300">{entry.name}:</span>
-                          </span>
-                          <span className="font-bold" style={{ color: entry.color }}>
-                            {entry.value}%
-                          </span>
-                        </div>
-                      ))}
+                  return (
+                    <div className="bg-slate-900 text-white p-3 rounded-xl border border-slate-800 shadow-xl text-xs space-y-2">
+                      <p className="font-semibold text-white border-b border-slate-800 pb-1">
+                        Tanggal: {displayLabel} {rawDate ? `(${rawDate})` : ''}
+                      </p>
+                      <div className="space-y-1">
+                        {sortedPayload.map((entry: any, index: number) => (
+                          <div key={`item-${index}`} className="flex items-center justify-between space-x-4">
+                            <span className="flex items-center space-x-1.5">
+                              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
+                              <span className="text-slate-300">{entry.name}:</span>
+                            </span>
+                            <span className="font-bold" style={{ color: entry.color }}>
+                              {entry.value}%
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                }}
+              />
+              <Legend
+                content={() => (
+                  <div className="flex flex-wrap items-center justify-center gap-4 pt-3 text-xs">
+                    <div className="flex items-center space-x-1.5">
+                      <span className="w-3 h-0.5 rounded-full bg-[#10b981] inline-block"></span>
+                      <span className="text-black dark:text-white/80 font-bold">Hadir</span>
+                    </div>
+                    <div className="flex items-center space-x-1.5">
+                      <span className="w-3 h-0.5 rounded-full bg-[#f59e0b] inline-block"></span>
+                      <span className="text-black dark:text-white/80 font-bold">Terlambat</span>
+                    </div>
+                    <div className="flex items-center space-x-1.5">
+                      <span className="w-3 h-0.5 rounded-full bg-[#3b82f6] inline-block"></span>
+                      <span className="text-black dark:text-white/80 font-bold">Sakit</span>
+                    </div>
+                    <div className="flex items-center space-x-1.5">
+                      <span className="w-3 h-0.5 rounded-full bg-[#a855f7] inline-block"></span>
+                      <span className="text-black dark:text-white/80 font-bold">Izin</span>
+                    </div>
+                    <div className="flex items-center space-x-1.5">
+                      <span className="w-3 h-0.5 rounded-full bg-[#f43f5e] inline-block"></span>
+                      <span className="text-black dark:text-white/80 font-bold">Alpha</span>
                     </div>
                   </div>
-                );
-              }}
-            />
-            <Legend
-              content={() => (
-                <div className="flex flex-wrap items-center justify-center gap-4 pt-3 text-xs">
-                  <div className="flex items-center space-x-1.5">
-                    <span className="w-3 h-0.5 rounded-full bg-[#10b981] inline-block"></span>
-                    <span className="text-black dark:text-white/80 font-bold">Hadir</span>
-                  </div>
-                  <div className="flex items-center space-x-1.5">
-                    <span className="w-3 h-0.5 rounded-full bg-[#f59e0b] inline-block"></span>
-                    <span className="text-black dark:text-white/80 font-bold">Terlambat</span>
-                  </div>
-                  <div className="flex items-center space-x-1.5">
-                    <span className="w-3 h-0.5 rounded-full bg-[#3b82f6] inline-block"></span>
-                    <span className="text-black dark:text-white/80 font-bold">Sakit</span>
-                  </div>
-                  <div className="flex items-center space-x-1.5">
-                    <span className="w-3 h-0.5 rounded-full bg-[#a855f7] inline-block"></span>
-                    <span className="text-black dark:text-white/80 font-bold">Izin</span>
-                  </div>
-                  <div className="flex items-center space-x-1.5">
-                    <span className="w-3 h-0.5 rounded-full bg-[#f43f5e] inline-block"></span>
-                    <span className="text-black dark:text-white/80 font-bold">Alpha</span>
-                  </div>
-                </div>
-              )}
-            />
-            <Line type="monotone" dataKey="Hadir" stroke="#10b981" strokeWidth={2.5} dot={{ r: 4 }} activeDot={{ r: 6 }} />
-            <Line type="monotone" dataKey="Terlambat" stroke="#f59e0b" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
-            <Line type="monotone" dataKey="Sakit" stroke="#3b82f6" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
-            <Line type="monotone" dataKey="Izin" stroke="#a855f7" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
-            <Line type="monotone" dataKey="Alpha" stroke="#f43f5e" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
-          </LineChart>
-        </ResponsiveContainer>
+                )}
+              />
+              <Line type="monotone" dataKey="Hadir" stroke="#10b981" strokeWidth={2.5} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+              <Line type="monotone" dataKey="Terlambat" stroke="#f59e0b" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
+              <Line type="monotone" dataKey="Sakit" stroke="#3b82f6" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
+              <Line type="monotone" dataKey="Izin" stroke="#a855f7" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
+              <Line type="monotone" dataKey="Alpha" stroke="#f43f5e" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
+            </LineChart>
+          </ResponsiveContainer>
+        )}
       </div>
     </div>
   );
