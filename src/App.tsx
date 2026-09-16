@@ -227,9 +227,22 @@ export function App() {
   const [presensiList, setPresensiList] = useState<PresensiRecord[]>(() =>
     sanitizePresensiList(loadFromStorage('presensiList', initialPresensiList))
   );
-  const [scheduleList, setScheduleList] = useState<JadwalRecord[]>(() =>
-    sanitizeScheduleList(loadFromStorage('scheduleList', initialScheduleList))
-  );
+  const [scheduleList, setScheduleList] = useState<JadwalRecord[]>(() => {
+    const stored = loadFromStorage('scheduleList', []);
+    if (Array.isArray(stored) && stored.length > 0) {
+      return sanitizeScheduleList(stored);
+    }
+    try {
+      const backupStr = localStorage.getItem('catatan_guru_schedule_backup');
+      if (backupStr) {
+        const backupData = JSON.parse(backupStr);
+        if (Array.isArray(backupData) && backupData.length > 0) {
+          return sanitizeScheduleList(backupData);
+        }
+      }
+    } catch (e) {}
+    return sanitizeScheduleList(initialScheduleList);
+  });
   const [scheduleConfig, setScheduleConfig] = useState<ScheduleConfig>(() =>
     sanitizeScheduleConfig(loadFromStorage('scheduleConfig', initialScheduleConfig))
   );
@@ -388,23 +401,38 @@ export function App() {
             fotoProfilUrl: remoteData.profilGuru.fotoProfilUrl || prev.fotoProfilUrl || '',
           }));
         }
-        if (remoteData.mapelList && Array.isArray(remoteData.mapelList)) setMapelList(remoteData.mapelList);
-        if (remoteData.kelasList && Array.isArray(remoteData.kelasList)) setKelasList(remoteData.kelasList);
-        if (remoteData.siswaList && Array.isArray(remoteData.siswaList)) setSiswaList(remoteData.siswaList);
+        if (remoteData.mapelList && Array.isArray(remoteData.mapelList)) {
+          if (remoteData.mapelList.length > 0 || !silent) setMapelList(remoteData.mapelList);
+        }
+        if (remoteData.kelasList && Array.isArray(remoteData.kelasList)) {
+          if (remoteData.kelasList.length > 0 || !silent) setKelasList(remoteData.kelasList);
+        }
+        if (remoteData.siswaList && Array.isArray(remoteData.siswaList)) {
+          if (remoteData.siswaList.length > 0 || !silent) setSiswaList(remoteData.siswaList);
+        }
         if (remoteData.presensiList && Array.isArray(remoteData.presensiList)) {
-          setPresensiList(sanitizePresensiList(remoteData.presensiList));
+          if (remoteData.presensiList.length > 0 || !silent) setPresensiList(sanitizePresensiList(remoteData.presensiList));
         }
         if (remoteData.scheduleList && Array.isArray(remoteData.scheduleList)) {
-          setScheduleList(sanitizeScheduleList(remoteData.scheduleList));
+          if (remoteData.scheduleList.length > 0) {
+            const sanitized = sanitizeScheduleList(remoteData.scheduleList);
+            setScheduleList(sanitized);
+            saveToStorage('scheduleList', sanitized);
+            localStorage.setItem('catatan_guru_schedule_backup', JSON.stringify(sanitized));
+          } else if (!silent) {
+            // Only clear if explicitly requested by non-silent sync
+            setScheduleList([]);
+            saveToStorage('scheduleList', []);
+          }
         }
         if (remoteData.scheduleConfig) {
           setScheduleConfig(sanitizeScheduleConfig(remoteData.scheduleConfig));
         }
         if (remoteData.nilaiList && Array.isArray(remoteData.nilaiList)) {
-          setNilaiList(remoteData.nilaiList.map((n: NilaiRecord) => ({ ...n, tanggal: formatDateString(n.tanggal) })));
+          if (remoteData.nilaiList.length > 0 || !silent) setNilaiList(remoteData.nilaiList.map((n: NilaiRecord) => ({ ...n, tanggal: formatDateString(n.tanggal) })));
         }
         if (remoteData.jurnalList && Array.isArray(remoteData.jurnalList)) {
-          setJurnalList(remoteData.jurnalList.map((j: JurnalRecord) => ({ ...j, tanggal: formatDateString(j.tanggal) })));
+          if (remoteData.jurnalList.length > 0 || !silent) setJurnalList(remoteData.jurnalList.map((j: JurnalRecord) => ({ ...j, tanggal: formatDateString(j.tanggal) })));
         }
         if (remoteData.appConfig) {
           setAppConfig((prev) => ({
@@ -458,10 +486,24 @@ export function App() {
     try {
       const fetchedData = await getJadwalMengajarFromGasUrl(gasUrl);
       if (fetchedData && Array.isArray(fetchedData)) {
-        setScheduleList(fetchedData);
-        saveToStorage('scheduleList', fetchedData);
-        if (!silent) {
-          showToast('Data Jadwal Mengajar berhasil diambil dari Google Sheets!', 'success');
+        if (fetchedData.length > 0) {
+          const sanitized = sanitizeScheduleList(fetchedData);
+          setScheduleList(sanitized);
+          saveToStorage('scheduleList', sanitized);
+          localStorage.setItem('catatan_guru_schedule_backup', JSON.stringify(sanitized));
+          if (!silent) {
+            showToast(`Data Jadwal Mengajar (${sanitized.length} sesi) berhasil diambil dari Google Sheets!`, 'success');
+          }
+        } else {
+          // If remote is empty, NEVER overwrite local schedules in silent mode!
+          const currentLocal = loadFromStorage('scheduleList', []);
+          if (currentLocal && currentLocal.length > 0) {
+            console.warn('Remote Jadwal is empty, keeping local schedule count:', currentLocal.length);
+            // Push local schedules to remote to repair empty spreadsheet
+            saveJadwalMengajarToGasUrl(gasUrl, currentLocal).catch((e) => console.warn('Repair remote sync failed:', e));
+          } else if (!silent) {
+            showToast('Belum ada data jadwal tersimpan di Google Sheets.', 'info');
+          }
         }
       }
     } catch (err) {
@@ -476,14 +518,17 @@ export function App() {
     // 1. Optimistic UI update
     setScheduleList(newList);
 
-    // 2. Save state to localStorage
+    // 2. Save state to localStorage & persistent safety backup
     saveToStorage('scheduleList', newList);
+    if (newList.length > 0) {
+      localStorage.setItem('catatan_guru_schedule_backup', JSON.stringify(newList));
+    }
 
     // 3. Send POST request to GAS Web App URL
     const gasUrl = getStoredGasUrl();
     if (gasUrl) {
       try {
-        const res = await saveJadwalMengajarToGasUrl(gasUrl, newList);
+        const res = await saveJadwalMengajarToGasUrl(gasUrl, newList, true);
         if (res && res.status === 'success') {
           const timeStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
           setAutoSyncStatus('synced');
@@ -500,14 +545,12 @@ export function App() {
   // Initial Boot & Window Focus Remote Sync
   useEffect(() => {
     handleFetchRemoteData(true);
-    fetchJadwalMengajarFromGas(true);
 
     const onFocus = () => {
       const gasUrl = getStoredGasUrl();
       const activeSheetId = localStorage.getItem('catatan_guru_active_sheet_id');
       if (gasUrl || activeSheetId) {
         handleFetchRemoteData(true);
-        fetchJadwalMengajarFromGas(true);
       }
     };
 
@@ -516,13 +559,6 @@ export function App() {
       window.removeEventListener('focus', onFocus);
     };
   }, []);
-
-  // Fetch Jadwal Mengajar when switching to 'jadwal' menu tab
-  useEffect(() => {
-    if (activeTab === 'jadwal') {
-      fetchJadwalMengajarFromGas(true);
-    }
-  }, [activeTab]);
 
   // Debounced Auto-Sync on state changes
   useEffect(() => {

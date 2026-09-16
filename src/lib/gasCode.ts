@@ -67,7 +67,8 @@ function doPost(e) {
 
     if (action === "saveJadwalMengajar") {
       var scheduleList = contents.payload || contents.data || [];
-      var saveRes = saveJadwalMengajar(scheduleList, contents.guruName);
+      var allowEmpty = contents.allowEmpty === true;
+      var saveRes = saveJadwalMengajar(scheduleList, contents.guruName, allowEmpty);
       return responseJson(saveRes);
     }
 
@@ -233,8 +234,18 @@ function saveAppDataFull(data) {
     );
 
     // 10. Jadwal Mengajar
-    var scheduleListToSave = (data.scheduleList && Array.isArray(data.scheduleList)) ? data.scheduleList : [];
-    saveJadwalMengajar(scheduleListToSave, guruName);
+    if (data.scheduleList && Array.isArray(data.scheduleList)) {
+      if (data.scheduleList.length > 0 || data.explicitClearSchedule === true) {
+        saveJadwalMengajar(data.scheduleList, guruName, true);
+      } else {
+        var existingSchedSheet = ss.getSheetByName("Jadwal_Mengajar");
+        if (!existingSchedSheet || existingSchedSheet.getLastRow() < 2) {
+          saveJadwalMengajar([], guruName, true);
+        } else {
+          console.log("Preserved existing Jadwal_Mengajar because incoming list was empty and explicitClearSchedule was false");
+        }
+      }
+    }
 
     // Safe Backup to Config Sheet without cell length crashes
     try {
@@ -434,7 +445,12 @@ function getJadwalMengajar() {
     var ss = getSpreadsheet();
     var sheet = ss.getSheetByName("Jadwal_Mengajar");
     if (!sheet || sheet.getLastRow() < 2) {
-      return [];
+      var backupSheet = ss.getSheetByName("Jadwal_Backup");
+      if (backupSheet && backupSheet.getLastRow() >= 2) {
+        sheet = backupSheet;
+      } else {
+        return [];
+      }
     }
     var rows = sheet.getDataRange().getValues();
     var scheduleList = [];
@@ -492,11 +508,21 @@ function getJadwalMengajar() {
   }
 }
 
-function saveJadwalMengajar(scheduleList, guruName) {
+function saveJadwalMengajar(scheduleList, guruName, allowEmpty) {
   var lock = LockService.getScriptLock();
   try { lock.tryLock(10000); } catch (lErr) {}
   try {
     var ss = getSpreadsheet();
+    var list = scheduleList || [];
+    var sheet = ss.getSheetByName("Jadwal_Mengajar");
+
+    // Guard: If incoming list is empty and allowEmpty is false, do not clear existing sheet with data
+    if (list.length === 0 && !allowEmpty) {
+      if (sheet && sheet.getLastRow() >= 2) {
+        return { status: "success", message: "Jadwal kosong; data jadwal di Google Sheets tetap aman dipertahankan." };
+      }
+    }
+
     var gName = guruName || "";
     if (!gName) {
       var sheetGuru = ss.getSheetByName("Profil_Guru") || ss.getSheetByName("Profil Guru");
@@ -505,7 +531,7 @@ function saveJadwalMengajar(scheduleList, guruName) {
       }
     }
     var headers = ["ID", "Nama Guru", "Sistem", "Siklus", "Hari", "Jam Ke", "Jam Mulai", "Jam Selesai", "Kelas", "Kode Mapel", "Nama Mapel", "Ruang", "JPM", "Catatan"];
-    var scheduleRows = (scheduleList || []).map(function(s) {
+    var scheduleRows = list.map(function(s) {
       return [
         s.id || '',
         gName,
@@ -524,6 +550,14 @@ function saveJadwalMengajar(scheduleList, guruName) {
       ];
     });
     writeSheet(ss, "Jadwal_Mengajar", headers, scheduleRows);
+
+    // Save automatic backup copy to Jadwal_Backup if list has items
+    if (list.length > 0) {
+      try {
+        writeSheet(ss, "Jadwal_Backup", headers, scheduleRows);
+      } catch (bErr) {}
+    }
+
     return { status: "success", message: "Jadwal Mengajar berhasil disimpan di Google Sheets!" };
   } catch (err) {
     return { status: "error", message: err.toString() };

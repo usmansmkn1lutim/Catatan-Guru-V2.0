@@ -546,17 +546,22 @@ export async function exportToGoogleSheets(
     ];
 
     const jadwalMengajarRows = [
-      ['Nama Guru', 'Sistem', 'Siklus', 'Hari', 'JamMulai', 'JamSelesai', 'Kelas', 'Mapel', 'Ruang'],
+      ['ID', 'Nama Guru', 'Sistem', 'Siklus', 'Hari', 'Jam Ke', 'Jam Mulai', 'Jam Selesai', 'Kelas', 'Kode Mapel', 'Nama Mapel', 'Ruang', 'JPM', 'Catatan'],
       ...(data.scheduleList || []).map((s) => [
-        data.profilGuru.namaGuru,
+        s.id || '',
+        data.profilGuru?.namaGuru || '',
         data.scheduleConfig?.systemType || 'REGULER',
         s.cycle || 'Reguler',
         s.day || '',
+        s.period || '',
         s.start || '',
         s.end || '',
         s.class || '',
+        s.kodeMapel || '',
         s.subject || '',
         s.room || '',
+        s.jpm !== undefined && s.jpm !== null ? s.jpm : 2,
+        s.catatan || '',
       ]),
     ];
 
@@ -610,7 +615,7 @@ export async function importFromGoogleSheets(spreadsheetId: string, accessToken:
       'Data_Kelas!A2:D100',
       'Data_Siswa!A2:K500',
       'Jadwal_Settings!A2:F2',
-      'Jadwal_Mengajar!A2:I1000',
+      'Jadwal_Mengajar!A1:N1000',
     ];
 
     const rangesQuery = ranges.map((r) => `ranges=${encodeURIComponent(r)}`).join('&');
@@ -695,16 +700,48 @@ export async function importFromGoogleSheets(spreadsheetId: string, accessToken:
 
     // Parse Jadwal Mengajar
     const scheduleListValues = valueRanges[6]?.values || [];
-    const scheduleList: any[] = scheduleListValues.map((r: string[], idx: number) => ({
-      id: `gas_${idx}`,
-      cycle: r[2] || 'Reguler',
-      day: r[3] || '',
-      start: r[4] || '',
-      end: r[5] || '',
-      class: r[6] || '',
-      subject: r[7] || '',
-      room: r[8] || '',
-    })).filter(s => s.subject && s.class);
+    let scheduleList: any[] = [];
+    if (scheduleListValues.length > 0) {
+      const firstRow = scheduleListValues[0] || [];
+      const hasHeader = String(firstRow[0] || '').toUpperCase() === 'ID' || String(firstRow[0] || '').toUpperCase().includes('GURU');
+      const dataRows = hasHeader ? scheduleListValues.slice(1) : scheduleListValues;
+      const is14Col = String(firstRow[0] || '').toUpperCase() === 'ID' || (dataRows[0] && dataRows[0].length >= 10);
+
+      scheduleList = dataRows.map((r: string[], idx: number) => {
+        if (is14Col) {
+          return {
+            id: r[0] || `sched_${idx}`,
+            cycle: r[3] || 'Reguler',
+            day: r[4] || '',
+            period: r[5] || '',
+            start: r[6] || '',
+            end: r[7] || '',
+            class: r[8] || '',
+            kodeMapel: r[9] || '',
+            subject: r[10] || '',
+            room: r[11] || '',
+            jpm: Number(r[12]) || 2,
+            catatan: r[13] || '',
+          };
+        } else {
+          // Legacy 9 columns format
+          return {
+            id: `sched_${idx}`,
+            cycle: r[2] || 'Reguler',
+            day: r[3] || '',
+            period: '1 - 2',
+            start: r[4] || '',
+            end: r[5] || '',
+            class: r[6] || '',
+            kodeMapel: '',
+            subject: r[7] || '',
+            room: r[8] || '',
+            jpm: 2,
+            catatan: '',
+          };
+        }
+      }).filter((s: any) => s.subject && s.class);
+    }
 
     return {
       dataSekolah: Object.keys(dsObj).length > 0 ? {

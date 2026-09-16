@@ -39,9 +39,11 @@ import {
   Layers,
   ArrowRight,
   Check,
+  ShieldCheck,
+  RotateCcw,
 } from 'lucide-react';
 import { formatDateString, formatDateDMY, formatTimeString } from '../lib/dateUtils';
-import { sanitizeScheduleConfig } from '../data/initialData';
+import { sanitizeScheduleConfig, initialScheduleList } from '../data/initialData';
 
 interface JadwalMengajarProps {
   scheduleList: JadwalRecord[];
@@ -494,6 +496,39 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
     showToast('Presensi & Jurnal KBM berhasil disimpan!', 'success');
   };
 
+  const handleRestoreFromBackup = () => {
+    try {
+      const backupStr = localStorage.getItem('catatan_guru_schedule_backup');
+      if (backupStr) {
+        const parsed = JSON.parse(backupStr);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          onSaveScheduleList(parsed);
+          showToast(`Berhasil memulihkan ${parsed.length} sesi jadwal dari cadangan lokal!`, 'success');
+          return;
+        }
+      }
+      showToast('Tidak ada data cadangan jadwal lokal yang tersimpan.', 'error');
+    } catch (e) {
+      showToast('Gagal memulihkan cadangan jadwal.', 'error');
+    }
+  };
+
+  const handleLoadDefaultSchedules = () => {
+    onSaveScheduleList(initialScheduleList);
+    showToast('Berhasil memuat contoh jadwal default.', 'success');
+  };
+
+  const hasLocalBackup = useMemo(() => {
+    try {
+      const backupStr = localStorage.getItem('catatan_guru_schedule_backup');
+      if (backupStr) {
+        const parsed = JSON.parse(backupStr);
+        return Array.isArray(parsed) && parsed.length > 0;
+      }
+    } catch (e) {}
+    return false;
+  }, [scheduleList]);
+
   return (
     <div className="space-y-6 pb-16 no-print">
       {/* Title Bar & Main Header */}
@@ -520,6 +555,16 @@ export const JadwalMengajarView: React.FC<JadwalMengajarProps> = ({
             <Sliders className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />
             <span>Setup Sistem</span>
           </button>
+          {hasLocalBackup && (
+            <button
+              onClick={handleRestoreFromBackup}
+              className="px-3.5 py-2 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-700 dark:text-amber-300 rounded-xl text-xs font-semibold transition border border-amber-200 dark:border-amber-800 flex items-center space-x-1.5"
+              title="Pulihkan Jadwal dari Cadangan Lokal"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>Pulihkan Cadangan</span>
+            </button>
+          )}
           <button
             onClick={() => setIsCopyModalOpen(true)}
             className="px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-semibold transition border border-slate-200 dark:border-slate-700 flex items-center space-x-1.5"

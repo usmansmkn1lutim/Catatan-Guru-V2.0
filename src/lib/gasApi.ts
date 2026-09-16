@@ -216,11 +216,12 @@ export async function getJadwalMengajarFromGasUrl(url: string): Promise<any[] | 
 /**
  * Menyimpan data Jadwal Mengajar ke Google Spreadsheet via GAS Web App
  */
-export async function saveJadwalMengajarToGasUrl(url: string, payload: any[]): Promise<any> {
+export async function saveJadwalMengajarToGasUrl(url: string, payload: any[], allowEmpty: boolean = true): Promise<any> {
   try {
     return await callGasEndpoint(url, {
       action: 'saveJadwalMengajar',
       payload: payload,
+      allowEmpty: allowEmpty,
     });
   } catch (err: any) {
     const msg = String(err?.message || err);
