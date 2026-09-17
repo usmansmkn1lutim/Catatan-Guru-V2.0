@@ -760,7 +760,7 @@ export function App() {
   };
 
   return (
-    <div className={`h-screen w-screen text-slate-900 dark:text-slate-100 flex font-sans antialiased overflow-hidden relative z-0 ${
+    <div className={`h-screen w-screen text-slate-900 dark:text-slate-100 flex flex-col font-sans antialiased overflow-hidden relative z-0 ${
       visualStyle === 'solid' ? 'bg-[#F9FAFC] dark:bg-slate-950' : 'bg-slate-50 dark:bg-slate-950'
     }`}>
       {/* Custom Background Image Layer */}
@@ -805,7 +805,7 @@ export function App() {
       )}
 
       {/* Centered App Wrapper */}
-      <div className="w-full max-w-[1400px] mx-auto flex gap-0 lg:gap-6 h-full relative">
+      <div className="w-full max-w-[1440px] mx-auto flex gap-0 lg:gap-6 lg:p-6 h-full relative">
         {/* Navigation Sidebar */}
         <Sidebar
         appConfig={appConfig}
@@ -820,7 +820,7 @@ export function App() {
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden relative">
+      <div className="flex-1 flex flex-col min-w-0 h-full lg:overflow-visible overflow-hidden relative">
         {/* Header Bar */}
         <div className="shrink-0 z-40" style={{ scrollbarGutter: 'stable' }}>
         <Header
@@ -844,10 +844,10 @@ export function App() {
         </div>
 
         {/* Page Views Routing */}
-        <div className="flex-1 w-full h-full overflow-y-auto no-scrollbar lg:overflow-hidden lg:flex lg:flex-col lg:min-h-0 lg:h-auto">
-          <main className="w-full h-full p-4 pb-28 lg:px-8 lg:pt-4 lg:pb-4 lg:flex-1 lg:min-h-0 lg:flex lg:flex-col lg:h-auto">
+        <div className="flex-1 w-full h-full overflow-y-auto no-scrollbar lg:overflow-visible lg:flex lg:flex-col lg:min-h-0 lg:h-auto">
+          <main className="w-full h-full p-4 pb-32 lg:p-0 lg:mt-6 lg:flex-1 lg:min-h-0 lg:flex lg:flex-col lg:h-full lg:overflow-visible">
             {/* Main Content Container */}
-            <div className={`w-full p-0 lg:p-6 transition-all min-h-[calc(100vh-13rem)] lg:min-h-0 lg:h-full lg:flex-1 flex flex-col overflow-x-hidden overflow-y-visible lg:overflow-hidden ${
+            <div className={`w-full p-0 lg:p-8 transition-all lg:min-h-0 lg:h-full lg:flex-1 flex flex-col overflow-x-hidden overflow-y-visible lg:overflow-hidden relative z-10 ${
               visualStyle === 'solid'
                 ? 'lg:bg-white lg:dark:bg-slate-900 lg:rounded-2xl lg:border lg:border-gray-200 lg:dark:border-slate-800 lg:shadow-sm'
                 : 'lg:bg-white/10 lg:dark:bg-slate-900/10 lg:backdrop-blur-xl lg:rounded-2xl lg:border lg:border-white/20 lg:shadow-lg'

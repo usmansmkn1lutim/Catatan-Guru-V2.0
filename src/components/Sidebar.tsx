@@ -104,8 +104,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const sidebarContent = (
     <div className={`flex flex-col justify-between transition-colors w-64 select-none h-full overflow-hidden ${
       isSolid
-        ? 'bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 lg:h-[calc(100vh-2rem)] lg:bg-white lg:dark:bg-slate-900 lg:rounded-2xl lg:border lg:border-gray-200 lg:dark:border-slate-800 lg:my-4 lg:ml-4 lg:shadow-sm'
-        : 'bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border-r border-white/60 dark:border-slate-700/50 dark:border-slate-800 lg:h-[calc(100vh-2rem)] lg:bg-white/10 lg:dark:bg-slate-900/10 lg:backdrop-blur-lg lg:rounded-3xl lg:border lg:border-white/30 lg:dark:border-slate-700/40 lg:my-4 lg:ml-4 lg:shadow-[0_12px_40px_rgba(0,0,0,0.12)] lg:dark:shadow-[0_12px_40px_rgba(0,0,0,0.25)]'
+        ? 'bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 lg:bg-white lg:dark:bg-slate-900 lg:rounded-2xl lg:border lg:border-gray-200 lg:dark:border-slate-800 lg:my-0 lg:ml-0 lg:shadow-sm'
+        : 'bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border-r border-white/60 dark:border-slate-700/50 dark:border-slate-800 lg:bg-white/10 lg:dark:bg-slate-900/10 lg:backdrop-blur-lg lg:rounded-2xl lg:border lg:border-white/30 lg:dark:border-slate-700/40 lg:my-0 lg:ml-0 lg:shadow-[0_12px_40px_rgba(0,0,0,0.12)] lg:dark:shadow-[0_12px_40px_rgba(0,0,0,0.25)]'
     }`}>
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Sidebar Header */}
@@ -221,7 +221,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:block shrink-0 h-screen sticky top-0 z-20">
+      <aside className="hidden lg:block shrink-0 h-full sticky top-0 z-20">
         {sidebarContent}
       </aside>
     </>
