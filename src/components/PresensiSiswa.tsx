@@ -533,7 +533,7 @@ export const PresensiSiswaView: React.FC<PresensiSiswaProps> = ({
                 <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-500 font-bold uppercase tracking-wider">
                   <tr>
                     <th className="p-3">No</th>
-                    <th className="p-3">NISN</th>
+                    <th className="hidden lg:table-cell p-3">NISN</th>
                     <th className="p-3">Nama Siswa</th>
                     <th className="p-3 text-center">Status Kehadiran</th>
                     <th className="p-3">Catatan Khusus</th>
@@ -543,7 +543,7 @@ export const PresensiSiswaView: React.FC<PresensiSiswaProps> = ({
                   {studentPresensiItems.map((item, idx) => (
                     <tr key={item.siswaId} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/30">
                       <td className="p-3 font-mono text-slate-400">{idx + 1}</td>
-                      <td className="p-3 font-mono font-semibold text-violet-600 dark:text-violet-400">{item.nisn}</td>
+                      <td className="hidden lg:table-cell p-3 font-mono font-semibold text-violet-600 dark:text-violet-400">{item.nisn}</td>
                       <td className="p-3 font-bold text-slate-900 dark:text-white">{item.namaSiswa}</td>
                       <td className="p-3">
                         {/* Horizontal Segmented Control / Radio */}
@@ -841,9 +841,9 @@ export const PresensiSiswaView: React.FC<PresensiSiswaProps> = ({
               <table className="w-full text-left text-[11px] whitespace-nowrap">
                 <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-500 font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
                   <tr>
-                    <th className="p-2.5 sticky left-0 bg-slate-50 dark:bg-slate-800 z-10">No</th>
-                    <th className="p-2.5 sticky left-8 bg-slate-50 dark:bg-slate-800 z-10">NISN</th>
-                    <th className="p-2.5 sticky left-32 bg-slate-50 dark:bg-slate-800 z-10">Nama Siswa</th>
+                    <th className="w-8 min-w-[32px] px-1.5 py-2.5 text-center sticky left-0 bg-slate-50 dark:bg-slate-800 z-10">No</th>
+                    <th className="hidden lg:table-cell p-2.5 sticky lg:left-8 bg-slate-50 dark:bg-slate-800 z-10">NISN</th>
+                    <th className="p-2.5 sticky left-8 lg:left-32 bg-slate-50 dark:bg-slate-800 z-10">Nama Siswa</th>
                     <th className="p-2.5">Kelas</th>
                     {Array.from({ length: 25 }, (_, i) => (
                       <th key={i} className="p-2 text-center w-8">
@@ -861,9 +861,9 @@ export const PresensiSiswaView: React.FC<PresensiSiswaProps> = ({
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {rekapMatrixData.map((row) => (
                     <tr key={row.siswa.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30">
-                      <td className="p-2.5 font-mono sticky left-0 bg-white dark:bg-slate-900 z-10">{row.no}</td>
-                      <td className="p-2.5 font-mono text-violet-600 font-semibold sticky left-8 bg-white dark:bg-slate-900 z-10">{row.siswa.nisn}</td>
-                      <td className="p-2.5 font-bold text-slate-900 dark:text-white sticky left-32 bg-white dark:bg-slate-900 z-10">{row.siswa.namaLengkap}</td>
+                      <td className="w-8 min-w-[32px] px-1.5 py-2.5 text-center font-mono sticky left-0 bg-white dark:bg-slate-900 z-10">{row.no}</td>
+                      <td className="hidden lg:table-cell p-2.5 font-mono text-violet-600 font-semibold sticky lg:left-8 bg-white dark:bg-slate-900 z-10">{row.siswa.nisn}</td>
+                      <td className="p-2.5 font-bold text-slate-900 dark:text-white sticky left-8 lg:left-32 bg-white dark:bg-slate-900 z-10">{row.siswa.namaLengkap}</td>
                       <td className="p-2.5">{row.siswa.namaKelas}</td>
                       {Array.from({ length: 25 }, (_, i) => {
                         const st = row.meetings[i + 1];

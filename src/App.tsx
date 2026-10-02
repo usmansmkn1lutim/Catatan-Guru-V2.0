@@ -271,7 +271,7 @@ export function App() {
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
 
   // Copy code feedback state
   const [copiedGs, setCopiedGs] = useState(false);
@@ -345,7 +345,7 @@ export function App() {
   }, [jurnalList]);
 
   // Toast helper
-  const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
     setToast({ message, type });
     setTimeout(() => {
       setToast(null);
@@ -785,13 +785,15 @@ export function App() {
           <div className="w-10 h-10 bg-violet-100 dark:bg-violet-900/50 rounded-full flex items-center justify-center text-violet-600 dark:text-violet-400 shrink-0">
             {toast.type === 'success' ? (
               <CheckCircle2 className="w-5 h-5 text-violet-600 dark:text-violet-400" />
+            ) : toast.type === 'info' ? (
+              <AlertCircle className="w-5 h-5 text-blue-500" />
             ) : (
               <AlertCircle className="w-5 h-5 text-rose-500" />
             )}
           </div>
           <div>
             <p className="text-sm font-bold text-slate-800 dark:text-slate-100">
-              {toast.type === 'success' ? 'Sukses' : 'Perhatian'}
+              {toast.type === 'success' ? 'Sukses' : toast.type === 'info' ? 'Informasi' : 'Perhatian'}
             </p>
             <p className="text-xs text-slate-500 dark:text-slate-400">{toast.message}</p>
           </div>

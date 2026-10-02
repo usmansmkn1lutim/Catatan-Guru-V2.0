@@ -579,10 +579,10 @@ export const NilaiSiswaView: React.FC<NilaiSiswaProps> = ({
                     <th className="p-3 sticky left-0 z-20 bg-slate-100 dark:bg-slate-800 min-w-[48px] border-b border-slate-200 dark:border-slate-700">
                       No
                     </th>
-                    <th className="p-3 sticky left-[48px] z-20 bg-slate-100 dark:bg-slate-800 min-w-[110px] border-b border-slate-200 dark:border-slate-700">
+                    <th className="hidden lg:table-cell p-3 sticky lg:left-[48px] z-20 bg-slate-100 dark:bg-slate-800 min-w-[110px] border-b border-slate-200 dark:border-slate-700">
                       NISN
                     </th>
-                    <th className="p-3 sticky left-[158px] z-20 bg-slate-100 dark:bg-slate-800 min-w-[180px] border-b border-r-2 border-slate-300 dark:border-slate-600 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.08)]">
+                    <th className="p-3 sticky left-[48px] lg:left-[158px] z-20 bg-slate-100 dark:bg-slate-800 min-w-[180px] border-b border-r-2 border-slate-300 dark:border-slate-600 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.08)]">
                       Nama Siswa
                     </th>
 
@@ -622,10 +622,10 @@ export const NilaiSiswaView: React.FC<NilaiSiswaProps> = ({
                       <td className="p-3 sticky left-0 z-10 bg-white dark:bg-slate-900 font-mono text-slate-400">
                         {idx + 1}
                       </td>
-                      <td className="p-3 sticky left-[48px] z-10 bg-white dark:bg-slate-900 font-mono text-violet-600 font-semibold">
+                      <td className="hidden lg:table-cell p-3 sticky lg:left-[48px] z-10 bg-white dark:bg-slate-900 font-mono text-violet-600 font-semibold">
                         {item.nisn}
                       </td>
-                      <td className="p-3 sticky left-[158px] z-10 bg-white dark:bg-slate-900 font-bold text-slate-900 dark:text-white border-r-2 border-slate-200 dark:border-slate-700 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.05)]">
+                      <td className="p-3 sticky left-[48px] lg:left-[158px] z-10 bg-white dark:bg-slate-900 font-bold text-slate-900 dark:text-white border-r-2 border-slate-200 dark:border-slate-700 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.05)]">
                         {item.namaSiswa}
                       </td>
 
@@ -741,8 +741,8 @@ export const NilaiSiswaView: React.FC<NilaiSiswaProps> = ({
                 <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-500 font-bold uppercase tracking-wider">
                   <tr>
                     <th className="p-3 sticky left-0 z-20 bg-slate-100 dark:bg-slate-800 min-w-[48px] border-b border-slate-200 dark:border-slate-700">No</th>
-                    <th className="p-3 sticky left-[48px] z-20 bg-slate-100 dark:bg-slate-800 min-w-[110px] border-b border-slate-200 dark:border-slate-700">NISN</th>
-                    <th className="p-3 sticky left-[158px] z-20 bg-slate-100 dark:bg-slate-800 min-w-[180px] border-b border-r-2 border-slate-300 dark:border-slate-600 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.08)]">Nama Siswa</th>
+                    <th className="hidden lg:table-cell p-3 sticky lg:left-[48px] z-20 bg-slate-100 dark:bg-slate-800 min-w-[110px] border-b border-slate-200 dark:border-slate-700">NISN</th>
+                    <th className="p-3 sticky left-[48px] lg:left-[158px] z-20 bg-slate-100 dark:bg-slate-800 min-w-[180px] border-b border-r-2 border-slate-300 dark:border-slate-600 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.08)]">Nama Siswa</th>
                     <th className="p-3">Kelas</th>
                     <th className="p-3">Mata Pelajaran</th>
                     {rekapColumns.map((colName) => (
@@ -758,8 +758,8 @@ export const NilaiSiswaView: React.FC<NilaiSiswaProps> = ({
                   {rekapFlatData.map((row, idx) => (
                     <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/30">
                       <td className="p-3 sticky left-0 z-10 bg-white dark:bg-slate-900 font-mono text-slate-400">{idx + 1}</td>
-                      <td className="p-3 sticky left-[48px] z-10 bg-white dark:bg-slate-900 font-mono font-semibold text-violet-600">{row.siswa.nisn}</td>
-                      <td className="p-3 sticky left-[158px] z-10 bg-white dark:bg-slate-900 font-bold text-slate-900 dark:text-white border-r-2 border-slate-200 dark:border-slate-700 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.05)]">{row.siswa.namaLengkap}</td>
+                      <td className="hidden lg:table-cell p-3 sticky lg:left-[48px] z-10 bg-white dark:bg-slate-900 font-mono font-semibold text-violet-600">{row.siswa.nisn}</td>
+                      <td className="p-3 sticky left-[48px] lg:left-[158px] z-10 bg-white dark:bg-slate-900 font-bold text-slate-900 dark:text-white border-r-2 border-slate-200 dark:border-slate-700 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.05)]">{row.siswa.namaLengkap}</td>
                       <td className="p-3">{row.siswa.namaKelas}</td>
                       <td className="p-3 text-slate-600 dark:text-slate-300">{row.mapel}</td>
                       {rekapColumns.map((colName) => (
