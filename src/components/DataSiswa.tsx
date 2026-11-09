@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { Siswa, Kelas, PresensiRecord, NilaiRecord } from '../types';
 import { formatWhatsAppUrl } from '../lib/storage';
 import {
@@ -450,9 +451,14 @@ export const DataSiswaView: React.FC<DataSiswaProps> = ({
       </div>
 
       {/* Add / Edit Student Modal */}
-      {isSiswaModalOpen && editingSiswa && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+      {isSiswaModalOpen &&
+        editingSiswa &&
+        createPortal(
+          <div
+            className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm lg:bg-white lg:dark:bg-slate-900 z-[9999] flex items-center justify-center p-0 lg:p-6 overflow-y-auto"
+            style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh' }}
+          >
+            <div className="bg-white dark:bg-slate-900 border-0 lg:border border-slate-200 dark:border-slate-800 rounded-none lg:rounded-2xl w-full h-full lg:max-w-2xl lg:max-h-[90vh] flex flex-col overflow-hidden shadow-2xl my-auto">
             <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
               <h3 className="text-base font-bold text-slate-900 dark:text-white">
                 {siswaList.some((s) => s.id === editingSiswa.id) ? 'Edit Data Siswa' : 'Tambah Siswa Baru'}
@@ -614,13 +620,18 @@ export const DataSiswaView: React.FC<DataSiswaProps> = ({
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Student Detail Modal (Biodata, Pie Chart, Attendance History, Grades Rekap, WA button) */}
-      {selectedDetailSiswa && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+      {selectedDetailSiswa &&
+        createPortal(
+          <div
+            className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm lg:bg-white lg:dark:bg-slate-900 z-[9999] flex items-center justify-center p-0 lg:p-6 overflow-y-auto"
+            style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh' }}
+          >
+            <div className="bg-white dark:bg-slate-900 border-0 lg:border border-slate-200 dark:border-slate-800 rounded-none lg:rounded-2xl w-full h-full lg:max-w-4xl lg:max-h-[90vh] flex flex-col overflow-hidden shadow-2xl my-auto">
             {/* Modal Header */}
             <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0 bg-violet-600 text-white">
               <div className="flex items-center space-x-3">
@@ -839,13 +850,18 @@ export const DataSiswaView: React.FC<DataSiswaProps> = ({
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Mass Import Modal */}
-      {isImportModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl p-6 space-y-4">
+      {isImportModalOpen &&
+        createPortal(
+          <div
+            className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm lg:bg-white lg:dark:bg-slate-900 z-[9999] flex items-center justify-center p-0 lg:p-6 overflow-y-auto"
+            style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh' }}
+          >
+            <div className="bg-white dark:bg-slate-900 border-0 lg:border border-slate-200 dark:border-slate-800 rounded-none lg:rounded-2xl w-full h-full lg:max-w-2xl lg:max-h-[90vh] flex flex-col overflow-hidden shadow-2xl my-auto p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <h3 className="text-base font-bold text-slate-900 dark:text-white">Import Data Siswa Massal</h3>
               <button onClick={() => setIsImportModalOpen(false)} className="text-slate-400 hover:text-slate-600">
@@ -933,13 +949,18 @@ export const DataSiswaView: React.FC<DataSiswaProps> = ({
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Modal Hapus Siswa Confirmation */}
-      {deletingSiswa && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl p-6 space-y-4">
+      {deletingSiswa &&
+        createPortal(
+          <div
+            className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm lg:bg-white lg:dark:bg-slate-900 z-[9999] flex items-center justify-center p-0 lg:p-6 overflow-y-auto"
+            style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh' }}
+          >
+            <div className="bg-white dark:bg-slate-900 border-0 lg:border border-slate-200 dark:border-slate-800 rounded-none lg:rounded-2xl w-full h-full lg:max-w-md lg:max-h-[90vh] flex flex-col overflow-hidden shadow-2xl my-auto p-6 space-y-4">
             <div className="flex items-center space-x-3 text-rose-600 dark:text-rose-400">
               <div className="p-3 bg-rose-100 dark:bg-rose-950/60 rounded-xl">
                 <Trash2 className="w-6 h-6" />
@@ -978,7 +999,8 @@ export const DataSiswaView: React.FC<DataSiswaProps> = ({
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
