@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ActiveTab, DataSekolah, AppConfig, VisualStyle } from '../types';
 import { DEFAULT_APP_LOGO } from '../data/initialData';
 import {
@@ -19,12 +20,13 @@ import {
   School,
   Sliders,
   Palette,
+  Settings,
 } from 'lucide-react';
 
 interface SidebarProps {
   sekolah?: DataSekolah;
   appConfig?: AppConfig;
-  activeTab: ActiveTab;
+  activeTab?: ActiveTab;
   setActiveTab?: (tab: ActiveTab) => void;
   onSelectTab?: (tab: ActiveTab) => void;
   isOpenMobile?: boolean;
@@ -36,6 +38,7 @@ interface SidebarProps {
 
 interface MenuItem {
   id: ActiveTab;
+  path: string;
   label: string;
   icon: React.ElementType;
 }
@@ -58,42 +61,44 @@ export const Sidebar: React.FC<SidebarProps> = ({
   visualStyle = 'solid',
 }) => {
   const isSolid = visualStyle === 'solid';
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const menuGroups: MenuGroup[] = [
     {
       title: 'UTAMA',
-      items: [{ id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard }],
+      items: [{ id: 'dashboard', path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard }],
     },
     {
       title: 'ADMINISTRASI',
       items: [
-        { id: 'sekolah', label: 'Data Sekolah', icon: Building2 },
-        { id: 'mapel', label: 'Data Mapel', icon: BookOpen },
-        { id: 'kelas', label: 'Data Kelas', icon: GraduationCap },
-        { id: 'siswa', label: 'Data Siswa', icon: Users },
+        { id: 'sekolah', path: '/data-sekolah', label: 'Data Sekolah', icon: Building2 },
+        { id: 'mapel', path: '/data-mapel', label: 'Data Mapel', icon: BookOpen },
+        { id: 'kelas', path: '/data-kelas', label: 'Data Kelas', icon: GraduationCap },
+        { id: 'siswa', path: '/data-siswa', label: 'Data Siswa', icon: Users },
       ],
     },
     {
       title: 'AKADEMIK',
       items: [
-        { id: 'jadwal', label: 'Jadwal', icon: CalendarDays },
-        { id: 'presensi', label: 'Presensi', icon: ClipboardCheck },
-        { id: 'nilai', label: 'Nilai', icon: Award },
-        { id: 'jurnal', label: 'Jurnal', icon: BookMarked },
+        { id: 'jadwal', path: '/jadwal', label: 'Jadwal', icon: CalendarDays },
+        { id: 'presensi', path: '/presensi', label: 'Presensi', icon: ClipboardCheck },
+        { id: 'nilai', path: '/nilai', label: 'Nilai', icon: Award },
+        { id: 'jurnal', path: '/jurnal', label: 'Jurnal', icon: BookMarked },
       ],
     },
     {
       title: 'SETTING',
       items: [
-        { id: 'tampilan', label: 'Appearance & Layout', icon: Palette },
-        { id: 'google_sheets', label: 'Google Sheets API', icon: FileSpreadsheet },
+        { id: 'setting_menu', path: '/setting', label: 'Setting', icon: Settings },
       ],
     },
   ];
 
-  const handleSelect = (id: ActiveTab) => {
-    if (setActiveTab) setActiveTab(id);
-    if (onSelectTab) onSelectTab(id);
+  const handleSelect = (item: MenuItem) => {
+    navigate(item.path);
+    if (setActiveTab) setActiveTab(item.id);
+    if (onSelectTab) onSelectTab(item.id);
     if (setIsOpenMobile) setIsOpenMobile(false);
   };
 
@@ -147,11 +152,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <div className="space-y-1">
               {group.items.map((item) => {
                 const Icon = item.icon;
-                const isActive = activeTab === item.id;
+                const isSettingActive =
+                  item.path === '/setting' && location.pathname.startsWith('/setting');
+                const isActive =
+                  location.pathname === item.path ||
+                  (item.path === '/dashboard' && location.pathname === '/') ||
+                  isSettingActive;
                 return (
                   <button
                     key={item.id}
-                    onClick={() => handleSelect(item.id)}
+                    onClick={() => handleSelect(item)}
                     className={`w-full flex items-center space-x-3 px-4 py-2.5 transition-all text-sm font-medium ${
                       isActive
                         ? isSolid

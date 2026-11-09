@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import {
   AppConfig,
   DataSekolah,
@@ -75,13 +76,214 @@ import {
   CloudUpload,
 } from 'lucide-react';
 
+interface GasDeployViewProps {
+  copiedGs: boolean;
+  copiedHtml: boolean;
+  copyToClipboard: (text: string, type: 'gs' | 'html') => void;
+}
+
+const GasDeployView: React.FC<GasDeployViewProps> = ({
+  copiedGs,
+  copiedHtml,
+  copyToClipboard,
+}) => (
+  <div className="space-y-6 pb-12">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm flex items-center space-x-3">
+      <div className="w-10 h-10 rounded-xl bg-violet-600 text-white flex items-center justify-center">
+        <CloudUpload className="w-5 h-5" />
+      </div>
+      <div>
+        <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+          Panduan Deployment ke Google Apps Script (GAS)
+        </h2>
+        <p className="text-xs text-slate-500 dark:text-slate-400">
+          Instruksi lengkap menyambungkan aplikasi ini secara gratis dengan Google Spreadsheet
+        </p>
+      </div>
+    </div>
+
+    {/* Step-by-Step Guide */}
+    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm space-y-4 text-xs">
+      <h3 className="text-sm font-bold text-violet-600 dark:text-violet-400 uppercase tracking-wider">
+        Langkah-Langkah Pemasangan (Deployment)
+      </h3>
+
+      <ol className="list-decimal list-inside space-y-3 text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
+        <li>
+          Buka <strong>Google Drive</strong>, buat satu file <strong>Google Spreadsheet Baru</strong>, dan beri nama misalnya:{' '}
+          <code className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-violet-600">
+            Database Catatan Guru
+          </code>
+          .
+        </li>
+        <li>
+          Di dalam Google Spreadsheet tersebut, klik menu <strong>Ekstensi (Extensions)</strong> &gt;{' '}
+          <strong>Apps Script</strong>.
+        </li>
+        <li>
+          Di dalam editor Google Apps Script, ganti seluruh isi file{' '}
+          <code className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-violet-600">
+            Code.gs
+          </code>{' '}
+          dengan kode backend di bawah ini.
+        </li>
+        <li>
+          Klik tombol <strong>+ (Tambah File)</strong> &gt; pilih <strong>HTML</strong>, beri nama file{' '}
+          <code className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-violet-600">
+            Index
+          </code>{' '}
+          (sehingga menjadi{' '}
+          <code className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-violet-600">
+            Index.html
+          </code>
+          ), lalu tempelkan kode wrapper HTML di bawah ini.
+        </li>
+        <li>
+          Klik tombol <strong>Deploy (Terapkan)</strong> di sudut kanan atas &gt; pilih{' '}
+          <strong>Deployment Baru (New Deployment)</strong>.
+        </li>
+        <li>
+          Pilih jenis <strong>Aplikasi Web (Web App)</strong>. Atur:
+          <ul className="list-disc list-inside ml-6 mt-1 text-slate-600 dark:text-slate-400">
+            <li>
+              <strong>Jalankan sebagai:</strong> Saya (Alamat email Anda)
+            </li>
+            <li>
+              <strong>Siapa yang memiliki akses:</strong> Siapa saja (Anyone)
+            </li>
+          </ul>
+        </li>
+        <li>
+          Klik <strong>Terapkan (Deploy)</strong>, berikan izin akses ke Spreadsheet Anda, dan salin{' '}
+          <strong>URL Aplikasi Web</strong> yang dihasilkan. Aplikasi siap digunakan permanen!
+        </li>
+      </ol>
+    </div>
+
+    {/* Code.gs Viewer & Copy */}
+    <div className="bg-slate-900 text-slate-100 rounded-2xl overflow-hidden shadow-xl border border-slate-800">
+      <div className="px-6 py-3 bg-slate-800 flex items-center justify-between border-b border-slate-700">
+        <span className="font-mono text-xs font-bold text-violet-400 flex items-center space-x-2">
+          <Code className="w-4 h-4" />
+          <span>Code.gs</span>
+        </span>
+        <button
+          onClick={() => copyToClipboard(CODE_GS_TEMPLATE, 'gs')}
+          className="flex items-center space-x-1.5 px-3 py-1 bg-violet-600 text-white rounded-lg text-xs font-semibold hover:bg-violet-700 transition-colors"
+        >
+          {copiedGs ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+          <span>{copiedGs ? 'Tersalin!' : 'Salin Code.gs'}</span>
+        </button>
+      </div>
+      <pre className="p-6 text-[11px] font-mono overflow-x-auto max-h-80 custom-scrollbar text-slate-300">
+        {CODE_GS_TEMPLATE}
+      </pre>
+    </div>
+
+    {/* Index.html Viewer & Copy */}
+    <div className="bg-slate-900 text-slate-100 rounded-2xl overflow-hidden shadow-xl border border-slate-800">
+      <div className="px-6 py-3 bg-slate-800 flex items-center justify-between border-b border-slate-700">
+        <span className="font-mono text-xs font-bold text-violet-400 flex items-center space-x-2">
+          <Code className="w-4 h-4" />
+          <span>Index.html</span>
+        </span>
+        <button
+          onClick={() => copyToClipboard(INDEX_HTML_TEMPLATE, 'html')}
+          className="flex items-center space-x-1.5 px-3 py-1 bg-violet-600 text-white rounded-lg text-xs font-semibold hover:bg-violet-700 transition-colors"
+        >
+          {copiedHtml ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+          <span>{copiedHtml ? 'Tersalin!' : 'Salin Index.html'}</span>
+        </button>
+      </div>
+      <pre className="p-6 text-[11px] font-mono overflow-x-auto max-h-80 custom-scrollbar text-slate-300">
+        {INDEX_HTML_TEMPLATE}
+      </pre>
+    </div>
+  </div>
+);
+
+function NotFoundView() {
+  const navigate = useNavigate();
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[420px] py-12 px-4 text-center">
+      <div className="w-16 h-16 rounded-2xl bg-violet-100 dark:bg-violet-900/40 text-violet-600 dark:text-violet-400 flex items-center justify-center mb-4 shadow-sm">
+        <AlertCircle className="w-8 h-8" />
+      </div>
+      <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+        Halaman Tidak Ditemukan (404)
+      </h2>
+      <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mb-6 leading-relaxed">
+        Halaman atau rute yang Anda tuju tidak ditemukan atau telah dipindahkan.
+      </p>
+      <button
+        onClick={() => navigate('/dashboard')}
+        className="px-5 py-2.5 bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold rounded-xl shadow-md transition-colors"
+      >
+        Kembali ke Dashboard
+      </button>
+    </div>
+  );
+}
+
 export function App() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
   const [isOpenMobile, setIsOpenMobile] = useState<boolean>(false);
   const [darkMode, setDarkMode] = useState<boolean>(() => {
     return localStorage.getItem('theme_mode') === 'dark';
   });
+
+  // Sync activeTab with URL location
+  useEffect(() => {
+    const pathToTab: Record<string, string> = {
+      '/dashboard': 'dashboard',
+      '/data-sekolah': 'sekolah',
+      '/profil-guru': 'profil',
+      '/data-mapel': 'mapel',
+      '/data-kelas': 'kelas',
+      '/data-siswa': 'siswa',
+      '/jadwal': 'jadwal',
+      '/presensi': 'presensi',
+      '/nilai': 'nilai',
+      '/jurnal': 'jurnal',
+      '/setting': 'setting_menu',
+      '/setting/tampilan': 'tampilan',
+      '/setting/google-sheets': 'google_sheets',
+      '/setting/deployment': 'gas_deploy',
+      '/administrasi': 'administrasi_menu',
+      '/akademik': 'akademik_menu',
+    };
+    if (pathToTab[location.pathname]) {
+      setActiveTab(pathToTab[location.pathname]);
+    }
+  }, [location.pathname]);
+
+  const handleNavigateTab = (tab: string) => {
+    setActiveTab(tab);
+    const tabToPath: Record<string, string> = {
+      dashboard: '/dashboard',
+      sekolah: '/data-sekolah',
+      profil: '/profil-guru',
+      mapel: '/data-mapel',
+      kelas: '/data-kelas',
+      siswa: '/data-siswa',
+      jadwal: '/jadwal',
+      presensi: '/presensi',
+      nilai: '/nilai',
+      jurnal: '/jurnal',
+      setting_menu: '/setting',
+      tampilan: '/setting/tampilan',
+      google_sheets: '/setting/google-sheets',
+      gas_deploy: '/setting/deployment',
+      administrasi_menu: '/administrasi',
+      akademik_menu: '/akademik',
+    };
+    if (tabToPath[tab]) {
+      navigate(tabToPath[tab]);
+    }
+  };
 
   // Custom Appearance & Background State
   const [visualStyle, setVisualStyle] = useState<VisualStyle>(() => {
@@ -810,16 +1012,17 @@ export function App() {
       <div className="w-full max-w-[1440px] mx-auto flex gap-0 lg:gap-6 lg:p-6 h-full relative">
         {/* Navigation Sidebar */}
         <Sidebar
-        appConfig={appConfig}
-        sekolah={dataSekolah}
-        activeTab={activeTab}
-        onSelectTab={setActiveTab}
-        collapsed={sidebarCollapsed}
-        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-        isOpenMobile={isOpenMobile}
-        setIsOpenMobile={setIsOpenMobile}
-        visualStyle={visualStyle}
-      />
+          appConfig={appConfig}
+          sekolah={dataSekolah}
+          activeTab={activeTab}
+          setActiveTab={handleNavigateTab}
+          onSelectTab={handleNavigateTab}
+          collapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+          isOpenMobile={isOpenMobile}
+          setIsOpenMobile={setIsOpenMobile}
+          visualStyle={visualStyle}
+        />
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 h-full lg:overflow-visible overflow-hidden relative">
@@ -831,7 +1034,7 @@ export function App() {
           profilGuru={profilGuru}
           darkMode={darkMode}
           onToggleDarkMode={() => setDarkMode(!darkMode)}
-          setActiveTab={setActiveTab}
+          setActiveTab={handleNavigateTab}
           onSyncData={handleSyncData}
           isSyncing={isSyncing}
           autoSyncStatus={autoSyncStatus}
@@ -856,268 +1059,258 @@ export function App() {
             }`}>
               <div className="w-full min-h-0 flex-1 flex flex-col justify-between lg:overflow-y-auto no-scrollbar lg:pr-1">
                 <div className="w-full">
-                {activeTab === 'dashboard' && (
-                  <Dashboard
-                    dataSekolah={dataSekolah}
-                    profilGuru={profilGuru}
-                    siswaList={siswaList}
-                    kelasList={kelasList}
-                    mapelList={mapelList}
-                    presensiList={presensiList}
-                    scheduleList={scheduleList}
-                    scheduleConfig={scheduleConfig}
-                    nilaiList={nilaiList}
-                    jurnalList={jurnalList}
-                    onNavigate={(tab) => setActiveTab(tab)}
-                    autoSyncStatus={autoSyncStatus}
-                    lastSyncedTime={lastSyncedTime}
-                    autoSyncEnabled={autoSyncEnabled}
-                    onFetchRemoteData={() => handleFetchRemoteData(false)}
-                    darkMode={darkMode}
-                    isDarkMode={darkMode}
-                    visualStyle={visualStyle}
-                  />
-                )}
+                  <Routes>
+                    {/* Root Redirect */}
+                    <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-                {activeTab === 'sekolah' && (
-                  <DataSekolahView
-                    dataSekolah={dataSekolah}
-                    onSaveDataSekolah={setDataSekolah}
-                    showToast={showToast}
-                  />
-                )}
+                    {/* 1. Dashboard */}
+                    <Route
+                      path="/dashboard"
+                      element={
+                        <Dashboard
+                          dataSekolah={dataSekolah}
+                          profilGuru={profilGuru}
+                          siswaList={siswaList}
+                          kelasList={kelasList}
+                          mapelList={mapelList}
+                          presensiList={presensiList}
+                          scheduleList={scheduleList}
+                          scheduleConfig={scheduleConfig}
+                          nilaiList={nilaiList}
+                          jurnalList={jurnalList}
+                          onNavigate={handleNavigateTab}
+                          autoSyncStatus={autoSyncStatus}
+                          lastSyncedTime={lastSyncedTime}
+                          autoSyncEnabled={autoSyncEnabled}
+                          onFetchRemoteData={() => handleFetchRemoteData(false)}
+                          darkMode={darkMode}
+                          isDarkMode={darkMode}
+                          visualStyle={visualStyle}
+                        />
+                      }
+                    />
 
-                {activeTab === 'profil' && (
-                  <ProfilGuruView
-                    profilGuru={profilGuru}
-                    onSaveProfilGuru={setProfilGuru}
-                    showToast={showToast}
-                  />
-                )}
+                    {/* 2. Data Sekolah */}
+                    <Route
+                      path="/data-sekolah"
+                      element={
+                        <DataSekolahView
+                          dataSekolah={dataSekolah}
+                          onSaveDataSekolah={setDataSekolah}
+                          showToast={showToast}
+                        />
+                      }
+                    />
 
-                {activeTab === 'mapel' && (
-                  <DataMapelView
-                    mapelList={mapelList}
-                    onSaveMapelList={setMapelList}
-                    showToast={showToast}
-                  />
-                )}
+                    {/* 3. Profil Guru */}
+                    <Route
+                      path="/profil-guru"
+                      element={
+                        <ProfilGuruView
+                          profilGuru={profilGuru}
+                          onSaveProfilGuru={setProfilGuru}
+                          showToast={showToast}
+                        />
+                      }
+                    />
 
-                {activeTab === 'kelas' && (
-                  <DataKelasView
-                    kelasList={kelasList}
-                    siswaList={siswaList}
-                    onSaveKelasList={setKelasList}
-                    onSaveSiswaList={setSiswaList}
-                    showToast={showToast}
-                  />
-                )}
+                    {/* 4. Data Mapel */}
+                    <Route
+                      path="/data-mapel"
+                      element={
+                        <DataMapelView
+                          mapelList={mapelList}
+                          onSaveMapelList={setMapelList}
+                          showToast={showToast}
+                        />
+                      }
+                    />
 
-                {activeTab === 'siswa' && (
-                  <DataSiswaView
-                    siswaList={siswaList}
-                    kelasList={kelasList}
-                    presensiList={presensiList}
-                    nilaiList={nilaiList}
-                    onSaveSiswaList={setSiswaList}
-                    showToast={showToast}
-                  />
-                )}
+                    {/* 5. Data Kelas */}
+                    <Route
+                      path="/data-kelas"
+                      element={
+                        <DataKelasView
+                          kelasList={kelasList}
+                          siswaList={siswaList}
+                          onSaveKelasList={setKelasList}
+                          onSaveSiswaList={setSiswaList}
+                          showToast={showToast}
+                        />
+                      }
+                    />
 
-                {activeTab === 'jadwal' && (
-                  <JadwalMengajarView
-                    scheduleList={scheduleList}
-                    scheduleConfig={scheduleConfig}
-                    siswaList={siswaList}
-                    kelasList={kelasList}
-                    mapelList={mapelList}
-                    presensiList={presensiList}
-                    jurnalList={jurnalList}
-                    onSaveScheduleList={handleSaveScheduleList}
-                    onSaveScheduleConfig={setScheduleConfig}
-                    onSavePresensiList={setPresensiList}
-                    onSaveJurnalList={setJurnalList}
-                    showToast={showToast}
-                    visualStyle={visualStyle}
-                    namaGuru={profilGuru.namaGuru}
-                    nipGuru={profilGuru.nip}
-                    namaSekolah={dataSekolah.namaSekolah}
-                  />
-                )}
+                    {/* 6. Data Siswa */}
+                    <Route
+                      path="/data-siswa"
+                      element={
+                        <DataSiswaView
+                          siswaList={siswaList}
+                          kelasList={kelasList}
+                          presensiList={presensiList}
+                          nilaiList={nilaiList}
+                          onSaveSiswaList={setSiswaList}
+                          showToast={showToast}
+                        />
+                      }
+                    />
 
-                {activeTab === 'presensi' && (
-                  <PresensiSiswaView
-                    presensiList={presensiList}
-                    siswaList={siswaList}
-                    kelasList={kelasList}
-                    mapelList={mapelList}
-                    onSavePresensiList={setPresensiList}
-                    showToast={showToast}
-                  />
-                )}
+                    {/* 7. Jadwal */}
+                    <Route
+                      path="/jadwal"
+                      element={
+                        <JadwalMengajarView
+                          scheduleList={scheduleList}
+                          scheduleConfig={scheduleConfig}
+                          siswaList={siswaList}
+                          kelasList={kelasList}
+                          mapelList={mapelList}
+                          presensiList={presensiList}
+                          jurnalList={jurnalList}
+                          onSaveScheduleList={handleSaveScheduleList}
+                          onSaveScheduleConfig={setScheduleConfig}
+                          onSavePresensiList={setPresensiList}
+                          onSaveJurnalList={setJurnalList}
+                          showToast={showToast}
+                          visualStyle={visualStyle}
+                          namaGuru={profilGuru.namaGuru}
+                          nipGuru={profilGuru.nip}
+                          namaSekolah={dataSekolah.namaSekolah}
+                        />
+                      }
+                    />
 
-                {activeTab === 'nilai' && (
-                  <NilaiSiswaView
-                    nilaiList={nilaiList}
-                    siswaList={siswaList}
-                    kelasList={kelasList}
-                    mapelList={mapelList}
-                    onSaveNilaiList={setNilaiList}
-                    showToast={showToast}
-                  />
-                )}
+                    {/* 8. Presensi */}
+                    <Route
+                      path="/presensi"
+                      element={
+                        <PresensiSiswaView
+                          presensiList={presensiList}
+                          siswaList={siswaList}
+                          kelasList={kelasList}
+                          mapelList={mapelList}
+                          onSavePresensiList={setPresensiList}
+                          showToast={showToast}
+                        />
+                      }
+                    />
 
-                {activeTab === 'jurnal' && (
-                  <JurnalGuruView
-                    jurnalList={jurnalList}
-                    mapelList={mapelList}
-                    kelasList={kelasList}
-                    onSaveJurnalList={setJurnalList}
-                    showToast={showToast}
-                  />
-                )}
+                    {/* 9. Nilai */}
+                    <Route
+                      path="/nilai"
+                      element={
+                        <NilaiSiswaView
+                          nilaiList={nilaiList}
+                          siswaList={siswaList}
+                          kelasList={kelasList}
+                          mapelList={mapelList}
+                          onSaveNilaiList={setNilaiList}
+                          showToast={showToast}
+                        />
+                      }
+                    />
 
-                {activeTab === 'google_sheets' && (
-                  <GoogleSheetsView
-                    dataSekolah={dataSekolah}
-                    profilGuru={profilGuru}
-                    mapelList={mapelList}
-                    kelasList={kelasList}
-                    siswaList={siswaList}
-                    presensiList={presensiList}
-                    nilaiList={nilaiList}
-                    jurnalList={jurnalList}
-                    onImportData={(data) => {
-                      if (data.dataSekolah) setDataSekolah(data.dataSekolah);
-                      if (data.profilGuru) setProfilGuru(data.profilGuru);
-                      if (data.mapelList && data.mapelList.length > 0) setMapelList(data.mapelList);
-                      if (data.kelasList && data.kelasList.length > 0) setKelasList(data.kelasList);
-                      if (data.siswaList && data.siswaList.length > 0) setSiswaList(data.siswaList);
-                      if (data.scheduleList && data.scheduleList.length > 0) setScheduleList(sanitizeScheduleList(data.scheduleList));
-                      if (data.scheduleConfig) setScheduleConfig(sanitizeScheduleConfig(data.scheduleConfig));
-                    }}
-                    showToast={showToast}
-                    autoSyncEnabled={autoSyncEnabled}
-                    onToggleAutoSync={handleToggleAutoSync}
-                    autoSyncStatus={autoSyncStatus}
-                    lastSyncedTime={lastSyncedTime}
-                  />
-                )}
+                    {/* 10. Jurnal */}
+                    <Route
+                      path="/jurnal"
+                      element={
+                        <JurnalGuruView
+                          jurnalList={jurnalList}
+                          mapelList={mapelList}
+                          kelasList={kelasList}
+                          onSaveJurnalList={setJurnalList}
+                          showToast={showToast}
+                        />
+                      }
+                    />
 
-                {/* Deployment to Google Apps Script View */}
-                {activeTab === 'gas_deploy' && (
-                  <div className="space-y-6 pb-12">
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm flex items-center space-x-3">
-                      <div className="w-10 h-10 rounded-xl bg-violet-600 text-white flex items-center justify-center">
-                        <CloudUpload className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-                          Panduan Deployment ke Google Apps Script (GAS)
-                        </h2>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
-                          Instruksi lengkap menyambungkan aplikasi ini secara gratis dengan Google Spreadsheet
-                        </p>
-                      </div>
-                    </div>
+                    {/* 11. Setting Hub */}
+                    <Route
+                      path="/setting"
+                      element={<SettingMenu onNavigate={handleNavigateTab} />}
+                    />
 
-                    {/* Step-by-Step Guide */}
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm space-y-4 text-xs">
-                      <h3 className="text-sm font-bold text-violet-600 dark:text-violet-400 uppercase tracking-wider">
-                        Langkah-Langkah Pemasangan (Deployment)
-                      </h3>
+                    {/* 12. Appearance & Layout */}
+                    <Route
+                      path="/setting/tampilan"
+                      element={
+                        <AppearanceLayout
+                          darkMode={darkMode}
+                          setDarkMode={setDarkMode}
+                          onToggleDarkMode={() => setDarkMode(!darkMode)}
+                          onShowToast={showToast}
+                        />
+                      }
+                    />
 
-                      <ol className="list-decimal list-inside space-y-3 text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
-                        <li>
-                          Buka <strong>Google Drive</strong>, buat satu file <strong>Google Spreadsheet Baru</strong>, dan beri nama misalnya: <code className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-violet-600">Database Catatan Guru</code>.
-                        </li>
-                        <li>
-                          Di dalam Google Spreadsheet tersebut, klik menu <strong>Ekstensi (Extensions)</strong> &gt; <strong>Apps Script</strong>.
-                        </li>
-                        <li>
-                          Di dalam editor Google Apps Script, ganti seluruh isi file <code className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-violet-600">Code.gs</code> dengan kode backend di bawah ini.
-                        </li>
-                        <li>
-                          Klik tombol <strong>+ (Tambah File)</strong> &gt; pilih <strong>HTML</strong>, beri nama file <code className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-violet-600">Index</code> (sehingga menjadi <code className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-violet-600">Index.html</code>), lalu tempelkan kode wrapper HTML di bawah ini.
-                        </li>
-                        <li>
-                          Klik tombol <strong>Deploy (Terapkan)</strong> di sudut kanan atas &gt; pilih <strong>Deployment Baru (New Deployment)</strong>.
-                        </li>
-                        <li>
-                          Pilih jenis <strong>Aplikasi Web (Web App)</strong>. Atur:
-                          <ul className="list-disc list-inside ml-6 mt-1 text-slate-600 dark:text-slate-400">
-                            <li><strong>Jalankan sebagai:</strong> Saya (Alamat email Anda)</li>
-                            <li><strong>Siapa yang memiliki akses:</strong> Siapa saja (Anyone)</li>
-                          </ul>
-                        </li>
-                        <li>
-                          Klik <strong>Terapkan (Deploy)</strong>, berikan izin akses ke Spreadsheet Anda, dan salin <strong>URL Aplikasi Web</strong> yang dihasilkan. Aplikasi siap digunakan permanen!
-                        </li>
-                      </ol>
-                    </div>
+                    {/* 13. Google Sheets API */}
+                    <Route
+                      path="/setting/google-sheets"
+                      element={
+                        <GoogleSheetsView
+                          dataSekolah={dataSekolah}
+                          profilGuru={profilGuru}
+                          mapelList={mapelList}
+                          kelasList={kelasList}
+                          siswaList={siswaList}
+                          presensiList={presensiList}
+                          nilaiList={nilaiList}
+                          jurnalList={jurnalList}
+                          onImportData={(data) => {
+                            if (data.dataSekolah) setDataSekolah(data.dataSekolah);
+                            if (data.profilGuru) setProfilGuru(data.profilGuru);
+                            if (data.mapelList && data.mapelList.length > 0) setMapelList(data.mapelList);
+                            if (data.kelasList && data.kelasList.length > 0) setKelasList(data.kelasList);
+                            if (data.siswaList && data.siswaList.length > 0) setSiswaList(data.siswaList);
+                            if (data.scheduleList && data.scheduleList.length > 0)
+                              setScheduleList(sanitizeScheduleList(data.scheduleList));
+                            if (data.scheduleConfig)
+                              setScheduleConfig(sanitizeScheduleConfig(data.scheduleConfig));
+                          }}
+                          showToast={showToast}
+                          autoSyncEnabled={autoSyncEnabled}
+                          onToggleAutoSync={handleToggleAutoSync}
+                          autoSyncStatus={autoSyncStatus}
+                          lastSyncedTime={lastSyncedTime}
+                        />
+                      }
+                    />
 
-                    {/* Code.gs Viewer & Copy */}
-                    <div className="bg-slate-900 text-slate-100 rounded-2xl overflow-hidden shadow-xl border border-slate-800">
-                      <div className="px-6 py-3 bg-slate-800 flex items-center justify-between border-b border-slate-700">
-                        <span className="font-mono text-xs font-bold text-violet-400 flex items-center space-x-2">
-                          <Code className="w-4 h-4" />
-                          <span>Code.gs</span>
-                        </span>
-                        <button
-                          onClick={() => copyToClipboard(CODE_GS_TEMPLATE, 'gs')}
-                          className="flex items-center space-x-1.5 px-3 py-1 bg-violet-600 text-white rounded-lg text-xs font-semibold hover:bg-violet-700 transition-colors"
-                        >
-                          {copiedGs ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                          <span>{copiedGs ? 'Tersalin!' : 'Salin Code.gs'}</span>
-                        </button>
-                      </div>
-                      <pre className="p-6 text-[11px] font-mono overflow-x-auto max-h-80 custom-scrollbar text-slate-300">
-                        {CODE_GS_TEMPLATE}
-                      </pre>
-                    </div>
+                    {/* 14. Panduan Deployment */}
+                    <Route
+                      path="/setting/deployment"
+                      element={
+                        <GasDeployView
+                          copiedGs={copiedGs}
+                          copiedHtml={copiedHtml}
+                          copyToClipboard={copyToClipboard}
+                        />
+                      }
+                    />
 
-                    {/* Index.html Viewer & Copy */}
-                    <div className="bg-slate-900 text-slate-100 rounded-2xl overflow-hidden shadow-xl border border-slate-800">
-                      <div className="px-6 py-3 bg-slate-800 flex items-center justify-between border-b border-slate-700">
-                        <span className="font-mono text-xs font-bold text-violet-400 flex items-center space-x-2">
-                          <Code className="w-4 h-4" />
-                          <span>Index.html</span>
-                        </span>
-                        <button
-                          onClick={() => copyToClipboard(INDEX_HTML_TEMPLATE, 'html')}
-                          className="flex items-center space-x-1.5 px-3 py-1 bg-violet-600 text-white rounded-lg text-xs font-semibold hover:bg-violet-700 transition-colors"
-                        >
-                          {copiedHtml ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                          <span>{copiedHtml ? 'Tersalin!' : 'Salin Index.html'}</span>
-                        </button>
-                      </div>
-                      <pre className="p-6 text-[11px] font-mono overflow-x-auto max-h-80 custom-scrollbar text-slate-300">
-                        {INDEX_HTML_TEMPLATE}
-                      </pre>
-                    </div>
-                  </div>
-                )}
-                {activeTab === 'administrasi_menu' && (
-                  <AdministrasiMenu onNavigate={(tab) => setActiveTab(tab)} />
-                )}
+                    {/* 15. Menu Administrasi */}
+                    <Route
+                      path="/administrasi"
+                      element={<AdministrasiMenu onNavigate={handleNavigateTab} />}
+                    />
 
-                {activeTab === 'akademik_menu' && (
-                  <AkademikMenu onNavigate={(tab) => setActiveTab(tab)} />
-                )}
+                    {/* 16. Menu Akademik */}
+                    <Route
+                      path="/akademik"
+                      element={<AkademikMenu onNavigate={handleNavigateTab} />}
+                    />
 
-                {activeTab === 'setting_menu' && (
-                  <SettingMenu onNavigate={(tab) => setActiveTab(tab)} />
-                )}
+                    {/* Aliases for backwards compatibility */}
+                    <Route path="/profil" element={<Navigate to="/profil-guru" replace />} />
+                    <Route path="/data-guru" element={<Navigate to="/profil-guru" replace />} />
+                    <Route path="/tampilan" element={<Navigate to="/setting/tampilan" replace />} />
+                    <Route path="/google-sheets" element={<Navigate to="/setting/google-sheets" replace />} />
+                    <Route path="/panduan-gas" element={<Navigate to="/setting/deployment" replace />} />
 
-                {activeTab === 'tampilan' && (
-                  <AppearanceLayout
-                    darkMode={darkMode}
-                    setDarkMode={setDarkMode}
-                    onToggleDarkMode={() => setDarkMode(!darkMode)}
-                    onShowToast={showToast}
-                  />
-                )}
-              </div>
+                    {/* 404 Catch-All Route */}
+                    <Route path="*" element={<NotFoundView />} />
+                  </Routes>
+                </div>
 
               {/* Footer Text */}
               <div className="mt-12 pt-6 border-t border-white/20 dark:border-white/10 flex flex-col items-center justify-center text-center space-y-1 shrink-0">
@@ -1132,7 +1325,7 @@ export function App() {
             </div>
           </main>
 
-        <BottomTabBar activeTab={activeTab} onSelectTab={setActiveTab} />
+        <BottomTabBar activeTab={activeTab} onSelectTab={handleNavigateTab} />
         </div>
       </div>
       </div>

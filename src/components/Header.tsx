@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { DataSekolah, ProfilGuru, ActiveTab, AppConfig, VisualStyle } from "../types";
 import {
   Moon,
@@ -60,10 +61,21 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleMobileMenu,
   visualStyle = "solid",
 }) => {
+  const navigate = useNavigate();
   const currentSekolah = sekolah || dataSekolah;
   const currentGuru = guru || profilGuru;
   const activeDark = isDarkMode ?? darkMode ?? false;
   const isSolid = visualStyle === "solid";
+
+  const handleProfileClick = () => {
+    navigate("/profil-guru");
+    if (setActiveTab) setActiveTab("profil");
+  };
+
+  const handleGoogleSheetsClick = () => {
+    navigate("/setting/google-sheets");
+    if (setActiveTab) setActiveTab("google_sheets");
+  };
 
   const handleToggleDark = () => {
     if (onToggleDarkMode) onToggleDarkMode();
@@ -100,7 +112,7 @@ export const Header: React.FC<HeaderProps> = ({
               )}
             </button>
             <div 
-              onClick={() => setActiveTab && setActiveTab("profil")}
+              onClick={handleProfileClick}
               className="w-9 h-9 sm:w-10 sm:h-10 bg-violet-100 rounded-full border-2 border-white dark:border-slate-800 shadow-sm overflow-hidden shrink-0 flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-violet-400 transition-all"
             >
               {currentGuru?.fotoProfilUrl ? (
@@ -178,7 +190,7 @@ export const Header: React.FC<HeaderProps> = ({
 
             {autoSyncStatus === "synced" && (
               <span
-                onClick={() => setActiveTab && setActiveTab("google_sheets")}
+                onClick={handleGoogleSheetsClick}
                 className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-bold cursor-pointer hover:underline"
                 title="Data otomatis disinkronkan ke Google Sheets setiap kali ada perubahan"
               >
@@ -197,7 +209,7 @@ export const Header: React.FC<HeaderProps> = ({
 
             {autoSyncStatus === "error" && (
               <span
-                onClick={() => setActiveTab && setActiveTab("google_sheets")}
+                onClick={handleGoogleSheetsClick}
                 className="flex items-center gap-1.5 text-rose-600 dark:text-rose-400 font-bold cursor-pointer hover:underline"
                 title="Terjadi kendala saat auto-sync ke Google Sheets. Klik untuk periksa konfigurasi URL GAS."
               >
@@ -208,7 +220,7 @@ export const Header: React.FC<HeaderProps> = ({
 
             {autoSyncStatus === "unconfigured" && (
               <button
-                onClick={() => setActiveTab && setActiveTab("google_sheets")}
+                onClick={handleGoogleSheetsClick}
                 className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-bold hover:underline"
                 title="Klik untuk menghubungkan URL Web App Google Apps Script"
               >
@@ -262,7 +274,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="h-8 w-[1px] bg-slate-200 dark:bg-slate-800 hidden sm:block"></div>
 
           <button
-            onClick={() => setActiveTab && setActiveTab("profil")}
+            onClick={handleProfileClick}
             className="flex items-center gap-3 text-right hover:opacity-90 transition-opacity"
           >
             <div className="hidden sm:block">

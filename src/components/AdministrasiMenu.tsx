@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ActiveTab } from '../types';
 import { School, BookOpen, GraduationCap, Users, Sparkles, ArrowRight } from 'lucide-react';
 
@@ -7,9 +8,11 @@ interface AdministrasiMenuProps {
 }
 
 export const AdministrasiMenu: React.FC<AdministrasiMenuProps> = ({ onNavigate }) => {
+  const navigate = useNavigate();
   const menus = [
     {
       id: 'sekolah' as ActiveTab,
+      path: '/data-sekolah',
       label: 'Identitas Sekolah',
       desc: 'Data pokok sekolah, NPSN, alamat, kepala sekolah & logo instansi',
       icon: <School className="w-7 h-7 text-violet-600 dark:text-violet-400" />,
@@ -18,6 +21,7 @@ export const AdministrasiMenu: React.FC<AdministrasiMenuProps> = ({ onNavigate }
     },
     {
       id: 'mapel' as ActiveTab,
+      path: '/data-mapel',
       label: 'Mata Pelajaran',
       desc: 'Daftar mata pelajaran yang diampu beserta kode dan jam per minggu',
       icon: <BookOpen className="w-7 h-7 text-sky-600 dark:text-sky-400" />,
@@ -26,6 +30,7 @@ export const AdministrasiMenu: React.FC<AdministrasiMenuProps> = ({ onNavigate }
     },
     {
       id: 'kelas' as ActiveTab,
+      path: '/data-kelas',
       label: 'Kelas / Rombel',
       desc: 'Manajemen rombongan belajar, wali kelas & tingkatan tahun ajaran',
       icon: <GraduationCap className="w-7 h-7 text-fuchsia-600 dark:text-fuchsia-400" />,
@@ -34,6 +39,7 @@ export const AdministrasiMenu: React.FC<AdministrasiMenuProps> = ({ onNavigate }
     },
     {
       id: 'siswa' as ActiveTab,
+      path: '/data-siswa',
       label: 'Data Siswa',
       desc: 'Daftar siswa terdaftar per rombel lengkap dengan NIS/NISN',
       icon: <Users className="w-7 h-7 text-indigo-600 dark:text-indigo-400" />,
@@ -65,7 +71,10 @@ export const AdministrasiMenu: React.FC<AdministrasiMenuProps> = ({ onNavigate }
         {menus.map((menu) => (
           <button
             key={menu.id}
-            onClick={() => onNavigate(menu.id)}
+            onClick={() => {
+              navigate(menu.path);
+              onNavigate(menu.id);
+            }}
             className="group relative bg-white/40 hover:bg-white/70 dark:bg-slate-900/40 dark:hover:bg-slate-900/60 backdrop-blur-xl border border-white/20 hover:border-violet-400/50 rounded-2xl p-6 shadow-lg transition-all duration-300 flex flex-col justify-between items-stretch text-left overflow-hidden h-full active:scale-[0.98]"
           >
             <div>

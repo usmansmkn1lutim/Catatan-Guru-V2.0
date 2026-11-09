@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Siswa, Kelas, Mapel, PresensiRecord, JadwalRecord, ScheduleConfig, ScheduleDay, ScheduleCycle, ActiveTab, VisualStyle } from '../types';
 import { formatDateString, formatTimeString } from '../lib/dateUtils';
 import {
@@ -106,8 +107,30 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
   const isDark = isDarkMode ?? darkMode ?? (typeof document !== 'undefined' && document.documentElement.classList.contains('dark'));
   const isSolid = visualStyle === 'solid';
+  const navigate = useNavigate();
+
+  const TAB_TO_PATH: Record<string, string> = {
+    dashboard: '/dashboard',
+    sekolah: '/data-sekolah',
+    profil: '/profil-guru',
+    mapel: '/data-mapel',
+    kelas: '/data-kelas',
+    siswa: '/data-siswa',
+    jadwal: '/jadwal',
+    presensi: '/presensi',
+    nilai: '/nilai',
+    jurnal: '/jurnal',
+    setting_menu: '/setting',
+    tampilan: '/setting/tampilan',
+    google_sheets: '/setting/google-sheets',
+    gas_deploy: '/setting/deployment',
+    administrasi_menu: '/administrasi',
+    akademik_menu: '/akademik',
+  };
 
   const goToTab = (tab: ActiveTab) => {
+    const path = TAB_TO_PATH[tab] || (tab.startsWith('/') ? tab : `/${tab}`);
+    navigate(path);
     if (setActiveTab) setActiveTab(tab);
     if (onNavigate) onNavigate(tab);
   };

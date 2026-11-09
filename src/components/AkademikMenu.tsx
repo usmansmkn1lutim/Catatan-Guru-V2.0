@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ActiveTab } from '../types';
 import { CalendarDays, ClipboardCheck, Award, BookMarked, Sparkles, ArrowRight } from 'lucide-react';
 
@@ -7,9 +8,11 @@ interface AkademikMenuProps {
 }
 
 export const AkademikMenu: React.FC<AkademikMenuProps> = ({ onNavigate }) => {
+  const navigate = useNavigate();
   const menus = [
     {
       id: 'jadwal' as ActiveTab,
+      path: '/jadwal',
       label: 'Jadwal',
       desc: 'Pengaturan jadwal presisi dengan dual-sistem Reguler & Blok 2-Mingguan (Minggu A & B)',
       icon: <CalendarDays className="w-7 h-7 text-violet-600 dark:text-violet-400" />,
@@ -18,6 +21,7 @@ export const AkademikMenu: React.FC<AkademikMenuProps> = ({ onNavigate }) => {
     },
     {
       id: 'presensi' as ActiveTab,
+      path: '/presensi',
       label: 'Presensi Siswa',
       desc: 'Pencatatan absensi harian (Hadir, Sakit, Izin, Alpa) dan statistik kehadiran',
       icon: <ClipboardCheck className="w-7 h-7 text-rose-600 dark:text-rose-400" />,
@@ -26,6 +30,7 @@ export const AkademikMenu: React.FC<AkademikMenuProps> = ({ onNavigate }) => {
     },
     {
       id: 'nilai' as ActiveTab,
+      path: '/nilai',
       label: 'Penilaian Siswa',
       desc: 'Input nilai tugas harian, Tujuan Pembelajaran (TP), ulangan & rekap nilai akhir',
       icon: <Award className="w-7 h-7 text-amber-600 dark:text-amber-400" />,
@@ -34,6 +39,7 @@ export const AkademikMenu: React.FC<AkademikMenuProps> = ({ onNavigate }) => {
     },
     {
       id: 'jurnal' as ActiveTab,
+      path: '/jurnal',
       label: 'Jurnal Mengajar Guru',
       desc: 'Catatan agenda kelas, materi ajar, kendala pembelajaran & catatan evaluasi guru',
       icon: <BookMarked className="w-7 h-7 text-teal-600 dark:text-teal-400" />,
@@ -65,7 +71,10 @@ export const AkademikMenu: React.FC<AkademikMenuProps> = ({ onNavigate }) => {
         {menus.map((menu) => (
           <button
             key={menu.id}
-            onClick={() => onNavigate(menu.id)}
+            onClick={() => {
+              navigate(menu.path);
+              onNavigate(menu.id);
+            }}
             className="group relative bg-white/40 hover:bg-white/70 dark:bg-slate-900/40 dark:hover:bg-slate-900/60 backdrop-blur-xl border border-white/20 hover:border-emerald-400/50 rounded-2xl p-6 shadow-lg transition-all duration-300 flex flex-col justify-between items-stretch text-left overflow-hidden h-full active:scale-[0.98]"
           >
             <div>

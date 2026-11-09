@@ -1,15 +1,18 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ActiveTab } from '../types';
-import { Sliders, FileSpreadsheet, Palette, Sparkles, ArrowRight, ShieldCheck } from 'lucide-react';
+import { FileSpreadsheet, Palette, Sparkles, ArrowRight, CloudUpload } from 'lucide-react';
 
 interface SettingMenuProps {
   onNavigate: (tab: ActiveTab) => void;
 }
 
 export const SettingMenu: React.FC<SettingMenuProps> = ({ onNavigate }) => {
+  const navigate = useNavigate();
   const menus = [
     {
       id: 'tampilan' as ActiveTab,
+      path: '/setting/tampilan',
       label: 'Appearance & Layout',
       desc: 'Atur tema Light / Dark Glassmorphism, ukuran tipografi & foto background kustom',
       icon: <Palette className="w-7 h-7 text-blue-600 dark:text-blue-400" />,
@@ -18,11 +21,21 @@ export const SettingMenu: React.FC<SettingMenuProps> = ({ onNavigate }) => {
     },
     {
       id: 'google_sheets' as ActiveTab,
+      path: '/setting/google-sheets',
       label: 'Google Sheets API',
       desc: 'Integrasi cloud database dua arah dan live auto-sync dengan Google Spreadsheet',
       icon: <FileSpreadsheet className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />,
       accentBg: 'bg-emerald-500/10 dark:bg-emerald-500/20 border-emerald-500/20 dark:border-emerald-400/30',
       badge: 'Cloud Sync',
+    },
+    {
+      id: 'gas_deploy' as ActiveTab,
+      path: '/setting/deployment',
+      label: 'Panduan Deployment',
+      desc: 'Instruksi lengkap dan template kode Google Apps Script (GAS) untuk integrasi cloud gratis',
+      icon: <CloudUpload className="w-7 h-7 text-violet-600 dark:text-violet-400" />,
+      accentBg: 'bg-violet-500/10 dark:bg-violet-500/20 border-violet-500/20 dark:border-violet-400/30',
+      badge: 'Deployment',
     },
   ];
 
@@ -36,20 +49,23 @@ export const SettingMenu: React.FC<SettingMenuProps> = ({ onNavigate }) => {
             <span>Pengaturan & Personalisasi</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-black text-black dark:text-white tracking-tight">
-            Menu Pengaturan (Setting)
+            Menu Setting
           </h2>
           <p className="text-xs sm:text-sm text-black dark:text-slate-400 font-medium">
-            Kelola tampilan tema visual, konfigurasi logo aplikasi, dan konektivitas cloud data.
+            Kelola tampilan tema visual, konfigurasi logo aplikasi, konektivitas cloud data, dan panduan deployment.
           </p>
         </div>
       </div>
 
       {/* Light & Dark Glassmorphism Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
         {menus.map((menu) => (
           <button
             key={menu.id}
-            onClick={() => onNavigate(menu.id)}
+            onClick={() => {
+              navigate(menu.path);
+              onNavigate(menu.id);
+            }}
             className="group relative bg-white/40 hover:bg-white/70 dark:bg-slate-900/40 dark:hover:bg-slate-900/60 backdrop-blur-xl border border-white/20 hover:border-blue-400/50 rounded-2xl p-6 shadow-lg transition-all duration-300 flex flex-col justify-between items-stretch text-left overflow-hidden h-full active:scale-[0.98]"
           >
             <div>
