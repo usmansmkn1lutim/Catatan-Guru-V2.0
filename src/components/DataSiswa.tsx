@@ -1,5 +1,4 @@
-import React, { useState, useMemo } from 'react';
-import { createPortal } from 'react-dom';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Siswa, Kelas, PresensiRecord, NilaiRecord } from '../types';
 import { formatWhatsAppUrl } from '../lib/storage';
 import {
@@ -53,6 +52,52 @@ export const DataSiswaView: React.FC<DataSiswaProps> = ({
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [importedPreviewSiswa, setImportedPreviewSiswa] = useState<Siswa[]>([]);
   const [isDraggingSiswa, setIsDraggingSiswa] = useState(false);
+
+  // Dialog refs and synchronization effects
+  const addEditDialogRef = useRef<HTMLDialogElement>(null);
+  const detailDialogRef = useRef<HTMLDialogElement>(null);
+  const importDialogRef = useRef<HTMLDialogElement>(null);
+  const deleteDialogRef = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    const dialog = addEditDialogRef.current;
+    if (!dialog) return;
+    if (isSiswaModalOpen && editingSiswa) {
+      if (!dialog.open) dialog.showModal();
+    } else {
+      if (dialog.open) dialog.close();
+    }
+  }, [isSiswaModalOpen, editingSiswa]);
+
+  useEffect(() => {
+    const dialog = detailDialogRef.current;
+    if (!dialog) return;
+    if (selectedDetailSiswa) {
+      if (!dialog.open) dialog.showModal();
+    } else {
+      if (dialog.open) dialog.close();
+    }
+  }, [selectedDetailSiswa]);
+
+  useEffect(() => {
+    const dialog = importDialogRef.current;
+    if (!dialog) return;
+    if (isImportModalOpen) {
+      if (!dialog.open) dialog.showModal();
+    } else {
+      if (dialog.open) dialog.close();
+    }
+  }, [isImportModalOpen]);
+
+  useEffect(() => {
+    const dialog = deleteDialogRef.current;
+    if (!dialog) return;
+    if (deletingSiswa) {
+      if (!dialog.open) dialog.showModal();
+    } else {
+      if (dialog.open) dialog.close();
+    }
+  }, [deletingSiswa]);
 
   // Filtered student list
   const filteredSiswaList = useMemo(() => {
@@ -451,14 +496,22 @@ export const DataSiswaView: React.FC<DataSiswaProps> = ({
       </div>
 
       {/* Add / Edit Student Modal */}
-      {isSiswaModalOpen &&
-        editingSiswa &&
-        createPortal(
-          <div
-            className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm lg:bg-white lg:dark:bg-slate-900 z-[9999] flex items-center justify-center p-0 lg:p-6 overflow-y-auto"
-            style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh' }}
-          >
-            <div className="bg-white dark:bg-slate-900 border-0 lg:border border-slate-200 dark:border-slate-800 rounded-none lg:rounded-2xl w-full h-full lg:max-w-2xl lg:max-h-[90vh] flex flex-col overflow-hidden shadow-2xl my-auto">
+      <dialog
+        ref={addEditDialogRef}
+        onClose={() => setIsSiswaModalOpen(false)}
+        onCancel={(e) => {
+          e.preventDefault();
+          setIsSiswaModalOpen(false);
+        }}
+        onClick={(e) => {
+          if (e.target === addEditDialogRef.current) {
+            setIsSiswaModalOpen(false);
+          }
+        }}
+        className="backdrop:bg-[rgba(15,23,42,0.25)] backdrop:backdrop-blur-[3px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl p-0 m-auto"
+      >
+        {editingSiswa && (
+          <div className="flex flex-col h-full max-h-[90vh]">
             <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
               <h3 className="text-base font-bold text-slate-900 dark:text-white">
                 {siswaList.some((s) => s.id === editingSiswa.id) ? 'Edit Data Siswa' : 'Tambah Siswa Baru'}
@@ -620,18 +673,26 @@ export const DataSiswaView: React.FC<DataSiswaProps> = ({
               </div>
             </form>
           </div>
-        </div>,
-        document.body
-      )}
+        )}
+      </dialog>
 
-      {/* Student Detail Modal (Biodata, Pie Chart, Attendance History, Grades Rekap, WA button) */}
-      {selectedDetailSiswa &&
-        createPortal(
-          <div
-            className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm lg:bg-white lg:dark:bg-slate-900 z-[9999] flex items-center justify-center p-0 lg:p-6 overflow-y-auto"
-            style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh' }}
-          >
-            <div className="bg-white dark:bg-slate-900 border-0 lg:border border-slate-200 dark:border-slate-800 rounded-none lg:rounded-2xl w-full h-full lg:max-w-4xl lg:max-h-[90vh] flex flex-col overflow-hidden shadow-2xl my-auto">
+      {/* Student Detail Modal */}
+      <dialog
+        ref={detailDialogRef}
+        onClose={() => setSelectedDetailSiswa(null)}
+        onCancel={(e) => {
+          e.preventDefault();
+          setSelectedDetailSiswa(null);
+        }}
+        onClick={(e) => {
+          if (e.target === detailDialogRef.current) {
+            setSelectedDetailSiswa(null);
+          }
+        }}
+        className="backdrop:bg-[rgba(15,23,42,0.25)] backdrop:backdrop-blur-[3px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl p-0 m-auto"
+      >
+        {selectedDetailSiswa && (
+          <div className="flex flex-col h-full max-h-[90vh]">
             {/* Modal Header */}
             <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0 bg-violet-600 text-white">
               <div className="flex items-center space-x-3">
@@ -850,117 +911,131 @@ export const DataSiswaView: React.FC<DataSiswaProps> = ({
               </button>
             </div>
           </div>
-        </div>,
-        document.body
-      )}
+        )}
+      </dialog>
 
       {/* Mass Import Modal */}
-      {isImportModalOpen &&
-        createPortal(
-          <div
-            className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm lg:bg-white lg:dark:bg-slate-900 z-[9999] flex items-center justify-center p-0 lg:p-6 overflow-y-auto"
-            style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh' }}
-          >
-            <div className="bg-white dark:bg-slate-900 border-0 lg:border border-slate-200 dark:border-slate-800 rounded-none lg:rounded-2xl w-full h-full lg:max-w-2xl lg:max-h-[90vh] flex flex-col overflow-hidden shadow-2xl my-auto p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">Import Data Siswa Massal</h3>
-              <button onClick={() => setIsImportModalOpen(false)} className="text-slate-400 hover:text-slate-600">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="flex items-center justify-between bg-violet-50 dark:bg-violet-950/40 p-4 rounded-xl border border-violet-200 dark:border-violet-800">
-              <div>
-                <p className="text-xs font-bold text-violet-900 dark:text-violet-200">Langkah 1: Unduh Format Template</p>
-                <p className="text-[11px] text-violet-700 dark:text-violet-300">Gunakan file Excel yang telah disesuaikan strukturnya</p>
-              </div>
-              <button
-                onClick={handleDownloadTemplate}
-                className="px-3.5 py-1.5 bg-violet-600 text-white text-xs font-semibold rounded-full flex items-center space-x-1 hover:bg-violet-700"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Unduh Template</span>
-              </button>
-            </div>
-
-            <div
-              onDragOver={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setIsDraggingSiswa(true);
-              }}
-              onDragLeave={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setIsDraggingSiswa(false);
-              }}
-              onDrop={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setIsDraggingSiswa(false);
-                const file = e.dataTransfer.files?.[0];
-                if (file) processSiswaFile(file);
-              }}
-              className={`p-6 border-2 border-dashed rounded-xl text-center transition-all ${
-                isDraggingSiswa
-                  ? 'border-violet-600 bg-violet-50 dark:bg-violet-950/40 scale-[1.01]'
-                  : 'border-slate-300 dark:border-slate-700 hover:border-violet-400 bg-slate-50/50 dark:bg-slate-800/30'
-              }`}
-            >
-              <Upload className={`w-8 h-8 mx-auto mb-2 transition-transform ${isDraggingSiswa ? 'text-violet-700 scale-125 animate-bounce' : 'text-violet-600'}`} />
-              <p className="text-xs font-bold text-slate-700 dark:text-slate-200">
-                Langkah 2: {isDraggingSiswa ? 'Lepaskan File Excel / CSV di sini' : 'Tarik & Lepas File Excel / CSV di sini'}
-              </p>
-              <p className="text-[11px] text-slate-400 my-1">Atau klik tombol di bawah jika ingin memilih manual</p>
-              <label className="inline-block mt-1 px-4 py-2 bg-violet-600 text-white text-xs font-semibold rounded-full cursor-pointer hover:bg-violet-700 shadow-sm">
-                <span>Pilih File</span>
-                <input type="file" accept=".xlsx, .xls, .csv" onChange={handleImportFileChange} className="hidden" />
-              </label>
-            </div>
-
-            {importedPreviewSiswa.length > 0 && (
-              <div className="space-y-2">
-                <p className="text-xs font-bold text-emerald-600">
-                  Preview: Ready to import {importedPreviewSiswa.length} siswa
-                </p>
-                <div className="max-h-40 overflow-y-auto border border-slate-200 dark:border-slate-800 rounded-lg p-2 text-xs space-y-1">
-                  {importedPreviewSiswa.map((s, i) => (
-                    <div key={i} className="truncate">
-                      <strong>{s.nisn}</strong> - {s.namaLengkap} ({s.namaKelas})
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="flex justify-end space-x-3 pt-3 border-t border-slate-100 dark:border-slate-800">
-              <button
-                onClick={() => setIsImportModalOpen(false)}
-                className="px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-400"
-              >
-                Batal
-              </button>
-              <button
-                onClick={handleConfirmMassImport}
-                disabled={importedPreviewSiswa.length === 0}
-                className="px-5 py-2 bg-violet-600 text-white text-xs font-semibold rounded-full disabled:opacity-50"
-              >
-                Konfirmasi & Simpan
-              </button>
-            </div>
+      <dialog
+        ref={importDialogRef}
+        onClose={() => setIsImportModalOpen(false)}
+        onCancel={(e) => {
+          e.preventDefault();
+          setIsImportModalOpen(false);
+        }}
+        onClick={(e) => {
+          if (e.target === importDialogRef.current) {
+            setIsImportModalOpen(false);
+          }
+        }}
+        className="backdrop:bg-[rgba(15,23,42,0.25)] backdrop:backdrop-blur-[3px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl p-0 m-auto"
+      >
+        <div className="flex flex-col h-full max-h-[90vh] p-6 space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+            <h3 className="text-base font-bold text-slate-900 dark:text-white">Import Data Siswa Massal</h3>
+            <button onClick={() => setIsImportModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+              <X className="w-5 h-5" />
+            </button>
           </div>
-        </div>,
-        document.body
-      )}
+
+          <div className="flex items-center justify-between bg-violet-50 dark:bg-violet-950/40 p-4 rounded-xl border border-violet-200 dark:border-violet-800">
+            <div>
+              <p className="text-xs font-bold text-violet-900 dark:text-violet-200">Langkah 1: Unduh Format Template</p>
+              <p className="text-[11px] text-violet-700 dark:text-violet-300">Gunakan file Excel yang telah disesuaikan strukturnya</p>
+            </div>
+            <button
+              onClick={handleDownloadTemplate}
+              className="px-3.5 py-1.5 bg-violet-600 text-white text-xs font-semibold rounded-full flex items-center space-x-1 hover:bg-violet-700"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Unduh Template</span>
+            </button>
+          </div>
+
+          <div
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsDraggingSiswa(true);
+            }}
+            onDragLeave={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsDraggingSiswa(false);
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsDraggingSiswa(false);
+              const file = e.dataTransfer.files?.[0];
+              if (file) processSiswaFile(file);
+            }}
+            className={`p-6 border-2 border-dashed rounded-xl text-center transition-all ${
+              isDraggingSiswa
+                ? 'border-violet-600 bg-violet-50 dark:bg-violet-950/40 scale-[1.01]'
+                : 'border-slate-300 dark:border-slate-700 hover:border-violet-400 bg-slate-50/50 dark:bg-slate-800/30'
+            }`}
+          >
+            <Upload className={`w-8 h-8 mx-auto mb-2 transition-transform ${isDraggingSiswa ? 'text-violet-700 scale-125 animate-bounce' : 'text-violet-600'}`} />
+            <p className="text-xs font-bold text-slate-700 dark:text-slate-200">
+              Langkah 2: {isDraggingSiswa ? 'Lepaskan File Excel / CSV di sini' : 'Tarik & Lepas File Excel / CSV di sini'}
+            </p>
+            <p className="text-[11px] text-slate-400 my-1">Atau klik tombol di bawah jika ingin memilih manual</p>
+            <label className="inline-block mt-1 px-4 py-2 bg-violet-600 text-white text-xs font-semibold rounded-full cursor-pointer hover:bg-violet-700 shadow-sm">
+              <span>Pilih File</span>
+              <input type="file" accept=".xlsx, .xls, .csv" onChange={handleImportFileChange} className="hidden" />
+            </label>
+          </div>
+
+          {importedPreviewSiswa.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-xs font-bold text-emerald-600">
+                Preview: Ready to import {importedPreviewSiswa.length} siswa
+              </p>
+              <div className="max-h-40 overflow-y-auto border border-slate-200 dark:border-slate-800 rounded-lg p-2 text-xs space-y-1">
+                {importedPreviewSiswa.map((s, i) => (
+                  <div key={i} className="truncate">
+                    <strong>{s.nisn}</strong> - {s.namaLengkap} ({s.namaKelas})
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="flex justify-end space-x-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+            <button
+              onClick={() => setIsImportModalOpen(false)}
+              className="px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-400"
+            >
+              Batal
+            </button>
+            <button
+              onClick={handleConfirmMassImport}
+              disabled={importedPreviewSiswa.length === 0}
+              className="px-5 py-2 bg-violet-600 text-white text-xs font-semibold rounded-full disabled:opacity-50"
+            >
+              Konfirmasi & Simpan
+            </button>
+          </div>
+        </div>
+      </dialog>
 
       {/* Modal Hapus Siswa Confirmation */}
-      {deletingSiswa &&
-        createPortal(
-          <div
-            className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm lg:bg-white lg:dark:bg-slate-900 z-[9999] flex items-center justify-center p-0 lg:p-6 overflow-y-auto"
-            style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh' }}
-          >
-            <div className="bg-white dark:bg-slate-900 border-0 lg:border border-slate-200 dark:border-slate-800 rounded-none lg:rounded-2xl w-full h-full lg:max-w-md lg:max-h-[90vh] flex flex-col overflow-hidden shadow-2xl my-auto p-6 space-y-4">
+      <dialog
+        ref={deleteDialogRef}
+        onClose={() => setDeletingSiswa(null)}
+        onCancel={(e) => {
+          e.preventDefault();
+          setDeletingSiswa(null);
+        }}
+        onClick={(e) => {
+          if (e.target === deleteDialogRef.current) {
+            setDeletingSiswa(null);
+          }
+        }}
+        className="backdrop:bg-[rgba(15,23,42,0.25)] backdrop:backdrop-blur-[3px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-md max-h-[90vh] flex flex-col overflow-hidden shadow-2xl p-0 m-auto"
+      >
+        {deletingSiswa && (
+          <div className="p-6 space-y-4">
             <div className="flex items-center space-x-3 text-rose-600 dark:text-rose-400">
               <div className="p-3 bg-rose-100 dark:bg-rose-950/60 rounded-xl">
                 <Trash2 className="w-6 h-6" />
@@ -999,9 +1074,8 @@ export const DataSiswaView: React.FC<DataSiswaProps> = ({
               </button>
             </div>
           </div>
-        </div>,
-        document.body
-      )}
+        )}
+      </dialog>
     </div>
   );
 };

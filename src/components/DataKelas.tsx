@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Kelas, Siswa } from '../types';
 import {
   GraduationCap,
@@ -37,6 +37,41 @@ export const DataKelasView: React.FC<DataKelasProps> = ({
   const [addSiswaSelectId, setAddSiswaSelectId] = useState('');
 
   const [deletingKelas, setDeletingKelas] = useState<Kelas | null>(null);
+
+  // Dialog refs and synchronization effects
+  const kelasDialogRef = useRef<HTMLDialogElement>(null);
+  const rosterDialogRef = useRef<HTMLDialogElement>(null);
+  const deleteKelasDialogRef = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    const dialog = kelasDialogRef.current;
+    if (!dialog) return;
+    if (isKelasModalOpen && editingKelas) {
+      if (!dialog.open) dialog.showModal();
+    } else {
+      if (dialog.open) dialog.close();
+    }
+  }, [isKelasModalOpen, editingKelas]);
+
+  useEffect(() => {
+    const dialog = rosterDialogRef.current;
+    if (!dialog) return;
+    if (isRosterModalOpen && selectedRosterKelas) {
+      if (!dialog.open) dialog.showModal();
+    } else {
+      if (dialog.open) dialog.close();
+    }
+  }, [isRosterModalOpen, selectedRosterKelas]);
+
+  useEffect(() => {
+    const dialog = deleteKelasDialogRef.current;
+    if (!dialog) return;
+    if (deletingKelas) {
+      if (!dialog.open) dialog.showModal();
+    } else {
+      if (dialog.open) dialog.close();
+    }
+  }, [deletingKelas]);
 
   // Sorted and searched classes alphabetically
   const filteredAndSortedKelas = useMemo(() => {
@@ -234,10 +269,23 @@ export const DataKelasView: React.FC<DataKelasProps> = ({
       </div>
 
       {/* Add / Edit Class Modal */}
-      {isKelasModalOpen && editingKelas && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-md overflow-hidden shadow-xl">
-            <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+      <dialog
+        ref={kelasDialogRef}
+        onClose={() => setIsKelasModalOpen(false)}
+        onCancel={(e) => {
+          e.preventDefault();
+          setIsKelasModalOpen(false);
+        }}
+        onClick={(e) => {
+          if (e.target === kelasDialogRef.current) {
+            setIsKelasModalOpen(false);
+          }
+        }}
+        className="backdrop:bg-[rgba(15,23,42,0.25)] backdrop:backdrop-blur-[3px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-md max-h-[90vh] flex flex-col overflow-hidden shadow-xl p-0 m-auto"
+      >
+        {editingKelas && (
+          <div className="flex flex-col h-full max-h-[90vh]">
+            <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
               <h3 className="text-base font-bold text-slate-900 dark:text-white">
                 {kelasList.some((k) => k.id === editingKelas.id) ? 'Edit Data Kelas' : 'Tambah Kelas Baru'}
               </h3>
@@ -246,7 +294,7 @@ export const DataKelasView: React.FC<DataKelasProps> = ({
               </button>
             </div>
 
-            <form onSubmit={handleSaveKelas} className="p-6 space-y-4">
+            <form onSubmit={handleSaveKelas} className="p-6 space-y-4 overflow-y-auto flex-1 custom-scrollbar">
               <div>
                 <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
                   Nama Kelas
@@ -288,7 +336,7 @@ export const DataKelasView: React.FC<DataKelasProps> = ({
                 />
               </div>
 
-              <div className="pt-4 flex justify-end space-x-3">
+              <div className="pt-4 flex justify-end space-x-3 shrink-0">
                 <button
                   type="button"
                   onClick={() => setIsKelasModalOpen(false)}
@@ -305,13 +353,26 @@ export const DataKelasView: React.FC<DataKelasProps> = ({
               </div>
             </form>
           </div>
-        </div>
-      )}
+        )}
+      </dialog>
 
       {/* Class Student Roster Modal */}
-      {isRosterModalOpen && selectedRosterKelas && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]">
+      <dialog
+        ref={rosterDialogRef}
+        onClose={() => setIsRosterModalOpen(false)}
+        onCancel={(e) => {
+          e.preventDefault();
+          setIsRosterModalOpen(false);
+        }}
+        onClick={(e) => {
+          if (e.target === rosterDialogRef.current) {
+            setIsRosterModalOpen(false);
+          }
+        }}
+        className="backdrop:bg-[rgba(15,23,42,0.25)] backdrop:backdrop-blur-[3px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl p-0 m-auto"
+      >
+        {selectedRosterKelas && (
+          <div className="flex flex-col h-full max-h-[85vh]">
             <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
               <div>
                 <h3 className="text-base font-bold text-slate-900 dark:text-white">
@@ -328,7 +389,7 @@ export const DataKelasView: React.FC<DataKelasProps> = ({
             </div>
 
             {/* Add student dropdown input */}
-            <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center gap-2">
+            <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center gap-2 shrink-0">
               <select
                 value={addSiswaSelectId}
                 onChange={(e) => setAddSiswaSelectId(e.target.value)}
@@ -345,7 +406,6 @@ export const DataKelasView: React.FC<DataKelasProps> = ({
               <button
                 onClick={handleAddStudentToClass}
                 disabled={!addSiswaSelectId}
-
                 className="w-full sm:w-auto px-4 py-1.5 bg-violet-600 text-white text-xs font-semibold rounded-lg hover:bg-violet-700 disabled:opacity-50 flex items-center justify-center space-x-1"
               >
                 <UserPlus className="w-3.5 h-3.5" />
@@ -403,13 +463,26 @@ export const DataKelasView: React.FC<DataKelasProps> = ({
               </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </dialog>
 
       {/* Modal Hapus Kelas Confirmation */}
-      {deletingKelas && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl p-6 space-y-4">
+      <dialog
+        ref={deleteKelasDialogRef}
+        onClose={() => setDeletingKelas(null)}
+        onCancel={(e) => {
+          e.preventDefault();
+          setDeletingKelas(null);
+        }}
+        onClick={(e) => {
+          if (e.target === deleteKelasDialogRef.current) {
+            setDeletingKelas(null);
+          }
+        }}
+        className="backdrop:bg-[rgba(15,23,42,0.25)] backdrop:backdrop-blur-[3px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-md max-h-[90vh] flex flex-col overflow-hidden shadow-2xl p-0 m-auto"
+      >
+        {deletingKelas && (
+          <div className="p-6 space-y-4">
             <div className="flex items-center space-x-3 text-rose-600 dark:text-rose-400">
               <div className="p-3 bg-rose-100 dark:bg-rose-950/60 rounded-xl">
                 <Trash2 className="w-6 h-6" />
@@ -448,8 +521,8 @@ export const DataKelasView: React.FC<DataKelasProps> = ({
               </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </dialog>
     </div>
   );
 };
