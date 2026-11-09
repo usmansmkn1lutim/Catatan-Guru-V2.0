@@ -18,6 +18,7 @@ import {
   Check,
   X,
   FileSpreadsheet,
+  Save,
 } from 'lucide-react';
 
 interface PresensiSiswaProps {
@@ -50,6 +51,15 @@ export const PresensiSiswaView: React.FC<PresensiSiswaProps> = ({
 
   // Attendance Items for input
   const [studentPresensiItems, setStudentPresensiItems] = useState<ItemPresensiSiswa[]>([]);
+  // Mobile Catatan inline visibility per student
+  const [mobileCatatanOpenMap, setMobileCatatanOpenMap] = useState<Record<string, boolean>>({});
+
+  const toggleMobileCatatan = (siswaId: string) => {
+    setMobileCatatanOpenMap((prev) => ({
+      ...prev,
+      [siswaId]: !prev[siswaId],
+    }));
+  };
 
   // Live Attendance summary for current input tab items
   const inputLiveSummary = useMemo(() => {
@@ -532,37 +542,35 @@ export const PresensiSiswaView: React.FC<PresensiSiswaProps> = ({
                 >
                   ✓ Set Hadir Semua
                 </button>
-                <button
-                  type="button"
-                  onClick={handleSimpanPresensi}
-                  className="px-5 py-2 bg-violet-600 text-white text-xs font-semibold rounded-full hover:bg-violet-700 transition-colors shadow-md shadow-violet-500/20"
-                >
-                  Simpan Presensi Kelas
-                </button>
               </div>
             </div>
 
-            {/* Live Attendance Summary Badges above the Table */}
-            <div className="flex flex-wrap items-center gap-2.5 p-3.5 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200/80 dark:border-slate-800 text-xs">
-              <span className="font-semibold text-slate-600 dark:text-slate-400 mr-1">Informasi Presensi:</span>
-              <span className="px-3 py-1 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold rounded-full border border-emerald-200 dark:border-emerald-800">
-                Hadir: {inputLiveSummary.hadir}
-              </span>
-              <span className="px-3 py-1 bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 font-bold rounded-full border border-amber-200 dark:border-amber-800">
-                Terlambat: {inputLiveSummary.terlambat}
-              </span>
-              <span className="px-3 py-1 bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-bold rounded-full border border-blue-200 dark:border-blue-800">
-                Sakit: {inputLiveSummary.sakit}
-              </span>
-              <span className="px-3 py-1 bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 font-bold rounded-full border border-purple-200 dark:border-purple-800">
-                Izin: {inputLiveSummary.izin}
-              </span>
-              <span className="px-3 py-1 bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 font-bold rounded-full border border-rose-200 dark:border-rose-800">
-                Alpha: {inputLiveSummary.alpha}
-              </span>
+            {/* Live Attendance Summary (Two Rows) */}
+            <div className="p-3.5 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200/80 dark:border-slate-800 text-xs space-y-1.5">
+              <div className="font-bold text-slate-700 dark:text-slate-300">
+                Informasi Presensi:
+              </div>
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-1 font-semibold text-xs">
+                <span className="text-emerald-600 dark:text-emerald-400 font-bold">
+                  Hadir: {inputLiveSummary.hadir}
+                </span>
+                <span className="text-amber-600 dark:text-amber-400 font-bold">
+                  Terlambat: {inputLiveSummary.terlambat}
+                </span>
+                <span className="text-blue-600 dark:text-blue-400 font-bold">
+                  Sakit: {inputLiveSummary.sakit}
+                </span>
+                <span className="text-purple-600 dark:text-purple-400 font-bold">
+                  Izin: {inputLiveSummary.izin}
+                </span>
+                <span className="text-rose-600 dark:text-rose-400 font-bold">
+                  Alpha: {inputLiveSummary.alpha}
+                </span>
+              </div>
             </div>
 
-            <div className="overflow-x-auto">
+            {/* Desktop Table View (>= 768px) */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-500 font-bold uppercase tracking-wider">
                   <tr>
@@ -600,7 +608,7 @@ export const PresensiSiswaView: React.FC<PresensiSiswaProps> = ({
                                       : st === 'Izin'
                                       ? 'bg-purple-600 text-white shadow-sm'
                                       : 'bg-rose-600 text-white shadow-sm'
-                                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                                 }`}
                               >
                                 {st}
@@ -622,12 +630,118 @@ export const PresensiSiswaView: React.FC<PresensiSiswaProps> = ({
                   ))}
                 </tbody>
               </table>
+            </div>
 
-              {studentPresensiItems.length === 0 && (
-                <div className="p-8 text-center text-slate-400">
-                  Tidak ada siswa terdaftar di kelas {inputKelas}. Silakan tambah siswa di menu Data Siswa terlebih dahulu.
-                </div>
-              )}
+            {/* Mobile List View (< 768px): Two-level list without cards */}
+            <div className="block md:hidden divide-y divide-slate-100 dark:divide-slate-800">
+              {studentPresensiItems.map((item, idx) => {
+                const isCatatanOpen = Boolean(mobileCatatanOpenMap[item.siswaId]);
+                const hasCatatan = Boolean(item.catatan && item.catatan.trim().length > 0);
+
+                return (
+                  <div key={item.siswaId} className="py-3.5 space-y-2">
+                    {/* Baris 1: Nomor + Nama Siswa + Tombol Catatan */}
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <span className="font-mono text-xs text-slate-400 shrink-0 w-5">
+                          {idx + 1}.
+                        </span>
+                        <span className="font-bold text-sm text-slate-900 dark:text-white truncate">
+                          {item.namaSiswa}
+                        </span>
+                        {item.nisn && (
+                          <span className="hidden xs:inline-block text-[11px] font-mono text-slate-400 dark:text-slate-500">
+                            ({item.nisn})
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Tombol Toggle Catatan */}
+                      <button
+                        type="button"
+                        onClick={() => toggleMobileCatatan(item.siswaId)}
+                        className={`shrink-0 text-[11px] font-semibold px-2 py-0.5 rounded-md transition-colors flex items-center gap-1.5 ${
+                          hasCatatan
+                            ? 'text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/50 hover:bg-violet-100 dark:hover:bg-violet-900/60'
+                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                        }`}
+                        title={hasCatatan ? (isCatatanOpen ? 'Tutup Catatan' : 'Lihat Catatan') : (isCatatanOpen ? 'Tutup Catatan' : 'Tambah Catatan')}
+                      >
+                        {hasCatatan ? (
+                          <>
+                            <span className="w-1.5 h-1.5 rounded-full bg-violet-600 dark:bg-violet-400" />
+                            <span>{isCatatanOpen ? 'Tutup Catatan' : 'Catatan tersedia · Lihat'}</span>
+                          </>
+                        ) : (
+                          <span>{isCatatanOpen ? '✕ Tutup' : '+ Catatan'}</span>
+                        )}
+                      </button>
+                    </div>
+
+                    {/* Baris 2: Segmented Control 5 Status (Equal Width, Full Width) */}
+                    <div className="w-full bg-slate-100 dark:bg-slate-800 p-1 rounded-full grid grid-cols-5 gap-1">
+                      {(['Hadir', 'Terlambat', 'Sakit', 'Izin', 'Alpha'] as StatusPresensi[]).map((st) => {
+                        const isSel = item.status === st;
+                        return (
+                          <button
+                            key={st}
+                            type="button"
+                            onClick={() => handleStatusChange(item.siswaId, st)}
+                            className={`w-full py-1.5 px-0.5 text-center text-[10px] xs:text-[11px] font-bold rounded-full transition-all truncate ${
+                              isSel
+                                ? st === 'Hadir'
+                                  ? 'bg-emerald-600 text-white shadow-sm'
+                                  : st === 'Terlambat'
+                                  ? 'bg-amber-500 text-white shadow-sm'
+                                  : st === 'Sakit'
+                                  ? 'bg-blue-600 text-white shadow-sm'
+                                  : st === 'Izin'
+                                  ? 'bg-purple-600 text-white shadow-sm'
+                                  : 'bg-rose-600 text-white shadow-sm'
+                                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                            }`}
+                            title={st}
+                          >
+                            {st}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Baris 3: Input Catatan Khusus (Hanya tampil jika di-expand) */}
+                    {isCatatanOpen && (
+                      <div className="pt-1 animate-in fade-in duration-150">
+                        <input
+                          type="text"
+                          placeholder={`Catatan untuk ${item.namaSiswa}...`}
+                          value={item.catatan || ''}
+                          onChange={(e) => handleCatatanChange(item.siswaId, e.target.value)}
+                          className="w-full px-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all shadow-inner"
+                          autoFocus
+                        />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {studentPresensiItems.length === 0 && (
+              <div className="p-8 text-center text-slate-400">
+                Tidak ada siswa terdaftar di kelas {inputKelas}. Silakan tambah siswa di menu Data Siswa terlebih dahulu.
+              </div>
+            )}
+
+            {/* Bottom Right Save Button */}
+            <div className="flex justify-end pt-4 mt-4 border-t border-slate-100 dark:border-slate-800">
+              <button
+                type="button"
+                onClick={handleSimpanPresensi}
+                className="inline-flex items-center gap-2 px-5 py-2 bg-violet-600 text-white text-xs font-semibold rounded-full hover:bg-violet-700 transition-colors shadow-md shadow-violet-500/20"
+              >
+                <Save className="w-4 h-4" />
+                <span>Simpan Presensi Kelas</span>
+              </button>
             </div>
           </div>
         </div>
